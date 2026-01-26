@@ -1,0 +1,68 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project Hezzni.xcodeproj -scheme "Hezzni Pessenger" -destination "platform=iOS Simulator,name=iPhone 17" build
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  Inject: https://github.com/krzysztofzablocki/Inject.git @ 1.5.2
+  FlagsKit: https://github.com/pichukov/FlagsKit @ 1.0.0
+  GoogleMaps: https://github.com/googlemaps/ios-maps-sdk @ 10.6.0
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (9 targets)
+    Target 'Hezzni Pessenger' in project 'Hezzni'
+        ➜ Explicit dependency on target 'GoogleMaps' in project 'GoogleMaps'
+        ➜ Explicit dependency on target 'FlagsKit' in project 'FlagsKit'
+        ➜ Explicit dependency on target 'Inject' in project 'Inject'
+    Target 'Inject' in project 'Inject'
+        ➜ Explicit dependency on target 'Inject' in project 'Inject'
+    Target 'Inject' in project 'Inject' (no dependencies)
+    Target 'FlagsKit' in project 'FlagsKit'
+        ➜ Explicit dependency on target 'FlagsKit' in project 'FlagsKit'
+        ➜ Explicit dependency on target 'FlagsKit_FlagsKit' in project 'FlagsKit'
+    Target 'FlagsKit' in project 'FlagsKit'
+        ➜ Explicit dependency on target 'FlagsKit_FlagsKit' in project 'FlagsKit'
+    Target 'FlagsKit_FlagsKit' in project 'FlagsKit' (no dependencies)
+    Target 'GoogleMaps' in project 'GoogleMaps'
+        ➜ Explicit dependency on target 'GoogleMapsTarget' in project 'GoogleMaps'
+        ➜ Explicit dependency on target 'GoogleMaps_GoogleMapsTarget' in project 'GoogleMaps'
+    Target 'GoogleMapsTarget' in project 'GoogleMaps'
+        ➜ Explicit dependency on target 'GoogleMaps_GoogleMapsTarget' in project 'GoogleMaps'
+    Target 'GoogleMaps_GoogleMapsTarget' in project 'GoogleMaps' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -x objective-c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/ibtool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/MacBookPro/Developer/Swift/Hezzni Pessenger/Hezzni Pessenger/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: ee4d2186e9f2d08d5a4ed062a3871498
+Build description path: /Users/MacBookPro/Developer/Swift/Hezzni Pessenger/DerivedData/Hezzni/Build/Intermediates.noindex/XCBuildData/ee4d2186e9f2d08d5a4ed062a3871498.xcbuilddata
+error: unable to attach DB: error: accessing build database "/Users/MacBookPro/Developer/Swift/Hezzni Pessenger/DerivedData/Hezzni/Build/Intermediates.noindex/XCBuildData/build.db": database is locked Possibly there are two concurrent builds running in the same filesystem location.
+warning: no rule to process file '/Users/MacBookPro/Developer/Swift/Hezzni Pessenger/.swift' of type 'text' for architecture 'arm64' (in target 'Hezzni Pessenger' from project 'Hezzni')

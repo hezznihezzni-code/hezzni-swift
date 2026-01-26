@@ -1,0 +1,11 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project Hezzni.xcodeproj -scheme "Hezzni Pessenger" -destination "platform=iOS Simulator,name=iPhone 15" clean build
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  FlagsKit: https://github.com/pichukov/FlagsKit @ 1.0.0
+  GoogleMaps: https://github.com/googlemaps/ios-maps-sdk @ 10.6.0
+  Inject: https://github.com/krzysztofzablocki/Inject.git @ 1.5.2
+

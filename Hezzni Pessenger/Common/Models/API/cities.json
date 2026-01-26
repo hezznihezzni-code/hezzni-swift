@@ -1,0 +1,50 @@
+[
+    {
+        "name": "Casablanca",
+        "countryCode": "MA",
+        "latitude": 33.5731,
+        "longitude": -7.5898
+    },
+    {
+        "name": "Rabat",
+        "countryCode": "MA",
+        "latitude": 34.0209,
+        "longitude": -6.8416
+    },
+    {
+        "name": "Marrakech",
+        "countryCode": "MA",
+        "latitude": 31.6295,
+        "longitude": -7.9811
+    },
+    {
+        "name": "Karachi",
+        "countryCode": "PK",
+        "latitude": 24.8607,
+        "longitude": 67.0011
+    },
+    {
+        "name": "Lahore",
+        "countryCode": "PK",
+        "latitude": 31.5204,
+        "longitude": 74.3587
+    },
+    {
+        "name": "Islamabad",
+        "countryCode": "PK",
+        "latitude": 33.6844,
+        "longitude": 73.0479
+    },
+    {
+        "name": "New York",
+        "countryCode": "US",
+        "latitude": 40.7128,
+        "longitude": -74.0060
+    },
+    {
+        "name": "Los Angeles",
+        "countryCode": "US",
+        "latitude": 34.0522,
+        "longitude": -118.2437
+    }
+]

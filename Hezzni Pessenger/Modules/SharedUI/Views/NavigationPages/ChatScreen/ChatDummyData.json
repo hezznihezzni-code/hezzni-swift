@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1",
+    "name": "Atlas Car Rental",
+    "avatar": "car_avatar",
+    "lastMessage": "Perfect! I can confirm availability and make..",
+    "lastMessageTime": "3 hour ago",
+    "unreadCount": 2,
+    "messages": [
+      {"id": "m1", "sender": "other", "type": "text", "content": "Hello! I’m on my way to pick you up. I’ll be there in 3 minutes.", "time": "10:03 PM"},
+      {"id": "m2", "sender": "me", "type": "text", "content": "Great, thanks! I’ll be waiting outside.", "time": "10:03 PM"},
+      {"id": "m3", "sender": "other", "type": "text", "content": "I’m in a white Toyota Camry, license plate ABC-1234", "time": "10:03 PM"},
+      {"id": "m4", "sender": "me", "type": "text", "content": "On my way", "time": "10:03 PM"},
+      {"id": "m5", "sender": "other", "type": "audio", "content": "audio_sample_1.mp3", "time": "10:03 PM"},
+      {"id": "m6", "sender": "me", "type": "audio", "content": "audio_sample_2.mp3", "time": "10:03 PM"},
+      {"id": "m7", "sender": "other", "type": "text", "content": "Waiting for you", "time": "10:03 PM"},
+      {"id": "m8", "sender": "me", "type": "text", "content": "ok", "time": "10:03 PM"}
+    ]
+  }
+]

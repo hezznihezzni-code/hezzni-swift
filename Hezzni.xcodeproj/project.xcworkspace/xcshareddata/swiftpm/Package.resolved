@@ -1,0 +1,33 @@
+{
+  "originHash" : "48d89e3b16ca32b5284ca9d4ca62388829dd36c983701fb2b2a8a122f2f2a6cf",
+  "pins" : [
+    {
+      "identity" : "flagskit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pichukov/FlagsKit",
+      "state" : {
+        "revision" : "fc98238228d15285eb1b89ec3c5c96c83170101d",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "inject",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzysztofzablocki/Inject.git",
+      "state" : {
+        "revision" : "728c56639ecb3df441d51d5bc6747329afabcfc9",
+        "version" : "1.5.2"
+      }
+    },
+    {
+      "identity" : "ios-maps-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/googlemaps/ios-maps-sdk",
+      "state" : {
+        "revision" : "71e09fe4c751d59d7b1e524e998f786b429b1b14",
+        "version" : "10.6.0"
+      }
+    }
+  ],
+  "version" : 3
+}

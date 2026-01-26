@@ -1,0 +1,42 @@
+[
+    {
+        "code": "MA",
+        "name": "Morocco",
+        "flag": "🇲🇦",
+        "dialCode": "+212",
+        "pattern": "^[6-7]\\d{8}$",
+        "placeholder": "Enter your 9-digit mobile number starting with 6 or 7"
+    },
+    {
+        "code": "PK",
+        "name": "Pakistan",
+        "flag": "🇵🇰",
+        "dialCode": "+92",
+        "pattern": "^3\\d{9}$",
+        "placeholder": "Enter your 10-digit mobile number starting with 3"
+    },
+    {
+        "code": "US",
+        "name": "United States",
+        "flag": "🇺🇸",
+        "dialCode": "+1",
+        "pattern": "^\\d{10}$",
+        "placeholder": "Enter your 10-digit phone number"
+    },
+    {
+        "code": "FR",
+        "name": "France",
+        "flag": "🇫🇷",
+        "dialCode": "+33",
+        "pattern": "^[6-7]\\d{8}$",
+        "placeholder": "Enter your 9-digit mobile number"
+    },
+    {
+        "code": "ES",
+        "name": "Spain",
+        "flag": "🇪🇸",
+        "dialCode": "+34",
+        "pattern": "^[6-7]\\d{8}$",
+        "placeholder": "Enter your 9-digit mobile number"
+    }
+]

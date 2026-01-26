@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24412" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24405"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="EHf-IW-A2E">
+            <objects>
+                <viewController id="01J-lp-oVM" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="YAh-ZC-ctv">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="hezzni-logo" translatesAutoresizingMaskIntoConstraints="NO" id="oyi-v1-ZD0">
+                                <rect key="frame" x="75" y="389" width="243" height="74"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="243" id="0z1-Up-EWj"/>
+                                    <constraint firstAttribute="height" constant="74" id="PvZ-o0-OZ5"/>
+                                    <constraint firstAttribute="width" secondItem="oyi-v1-ZD0" secondAttribute="height" multiplier="243:74" id="fEU-RK-RU9"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="MfI-qu-Mts"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="oyi-v1-ZD0" firstAttribute="centerY" secondItem="YAh-ZC-ctv" secondAttribute="centerY" id="S5H-vM-d2n"/>
+                            <constraint firstItem="oyi-v1-ZD0" firstAttribute="leading" secondItem="MfI-qu-Mts" secondAttribute="leading" constant="75" id="bhL-Wj-aBm"/>
+                            <constraint firstItem="oyi-v1-ZD0" firstAttribute="top" secondItem="MfI-qu-Mts" secondAttribute="top" constant="271" id="nQz-bm-VsF"/>
+                            <constraint firstItem="oyi-v1-ZD0" firstAttribute="centerX" secondItem="YAh-ZC-ctv" secondAttribute="centerX" id="o6n-mu-vTI"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="52.671755725190835" y="374.64788732394368"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="hezzni-logo" width="302" height="110"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
