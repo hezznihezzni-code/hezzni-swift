@@ -1,6 +1,7 @@
 import SwiftUI
 import Foundation
 import OSLog
+internal import Combine
 
 @MainActor
 final class PassengerServicesViewModel: ObservableObject {
