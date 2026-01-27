@@ -1,0 +1,24 @@
+//
+//  .gitignore
+//  Hezzni Pessenger
+//
+//  Created by Zohaib Ahmed on 9/12/25.
+//
+
+# Environment files
+.env
+*.env
+
+# Xcode
+.DS_Store
+*/build/*
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+xcuserdata
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.xcuserstate
