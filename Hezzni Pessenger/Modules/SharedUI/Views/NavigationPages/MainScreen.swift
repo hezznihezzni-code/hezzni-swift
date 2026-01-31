@@ -10,8 +10,7 @@ import SwiftUI
 struct MainScreen: View {
     @State private var selectedTab: BottomNavigationBar.Tab = .home
     @EnvironmentObject private var navigationState: NavigationStateManager
-    // Dark mode state using AppStorage to persist across app launches
-    @AppStorage("isDarkModeEnabled") private var storedDarkModeEnabled = false
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -39,10 +38,6 @@ struct MainScreen: View {
                     .transition(.move(edge: .bottom))
                     .edgesIgnoringSafeArea(.all)
                 }
-            }
-            .onAppear{
-                // Apply dark mode on appear
-                applyDarkMode(storedDarkModeEnabled)
             }
             .navigationBarHidden(true)
         }

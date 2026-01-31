@@ -7,8 +7,19 @@ import UIKit
 struct CameraCaptureView: UIViewControllerRepresentable {
     typealias UIViewControllerType = UIImagePickerController
 
+    enum CameraDevice {
+        case rear
+        case front
+    }
+
     var onImagePicked: (UIImage) -> Void
     var onCancel: () -> Void
+
+    /// Optional camera device preference (best-effort). Default: `.rear`.
+    var preferredCameraDevice: CameraDevice = .rear
+
+    /// If true, the returned image is horizontally mirrored. Useful for selfies.
+    var shouldMirrorForFrontCamera: Bool = false
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
@@ -20,6 +31,17 @@ struct CameraCaptureView: UIViewControllerRepresentable {
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
             picker.sourceType = .camera
             picker.cameraCaptureMode = .photo
+
+            switch preferredCameraDevice {
+            case .rear:
+                if UIImagePickerController.isCameraDeviceAvailable(.rear) {
+                    picker.cameraDevice = .rear
+                }
+            case .front:
+                if UIImagePickerController.isCameraDeviceAvailable(.front) {
+                    picker.cameraDevice = .front
+                }
+            }
         } else {
             // Graceful fallback (e.g. simulator, restricted devices, some iPad configs)
             picker.sourceType = .photoLibrary
@@ -35,16 +57,30 @@ struct CameraCaptureView: UIViewControllerRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(onImagePicked: onImagePicked, onCancel: onCancel)
+        Coordinator(
+            onImagePicked: onImagePicked,
+            onCancel: onCancel,
+            shouldMirrorForFrontCamera: shouldMirrorForFrontCamera,
+            preferredCameraDevice: preferredCameraDevice
+        )
     }
 
     final class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
         private let onImagePicked: (UIImage) -> Void
         private let onCancel: () -> Void
+        private let shouldMirrorForFrontCamera: Bool
+        private let preferredCameraDevice: CameraDevice
 
-        init(onImagePicked: @escaping (UIImage) -> Void, onCancel: @escaping () -> Void) {
+        init(
+            onImagePicked: @escaping (UIImage) -> Void,
+            onCancel: @escaping () -> Void,
+            shouldMirrorForFrontCamera: Bool,
+            preferredCameraDevice: CameraDevice
+        ) {
             self.onImagePicked = onImagePicked
             self.onCancel = onCancel
+            self.shouldMirrorForFrontCamera = shouldMirrorForFrontCamera
+            self.preferredCameraDevice = preferredCameraDevice
         }
 
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -58,11 +94,18 @@ struct CameraCaptureView: UIViewControllerRepresentable {
         ) {
             defer { picker.dismiss(animated: true) }
 
-            if let image = info[.originalImage] as? UIImage {
-                onImagePicked(image)
-            } else {
+            guard var image = info[.originalImage] as? UIImage else {
                 onCancel()
+                return
             }
+
+            if shouldMirrorForFrontCamera, preferredCameraDevice == .front {
+                if let cgImage = image.cgImage {
+                    image = UIImage(cgImage: cgImage, scale: image.scale, orientation: .leftMirrored)
+                }
+            }
+
+            onImagePicked(image)
         }
     }
 }

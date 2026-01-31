@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct NotificationScreen: View {
+    @Binding var showNotification: Bool
     @EnvironmentObject private var navigationState: NavigationStateManager
     @Environment(\.dismiss) private var dismiss
     
@@ -16,7 +17,7 @@ struct NotificationScreen: View {
             CustomAppBar(
                 title: "Notifications", backButtonAction: {
                     navigationState.showBottomBar()
-                    dismiss()
+                    showNotification = !showNotification
                     
                 }
             )
@@ -211,5 +212,5 @@ struct NotificationItem: View {
 }
 
 #Preview{
-    NotificationScreen()
+    NotificationScreen(showNotification: .constant(true))
 }

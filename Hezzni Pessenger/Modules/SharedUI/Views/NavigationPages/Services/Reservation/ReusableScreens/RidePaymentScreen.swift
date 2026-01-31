@@ -195,7 +195,7 @@ struct RidePaymentScreen: View {
                     }
                     .padding(EdgeInsets(top: 15, leading: 0, bottom: 35, trailing: 0))
                     .frame(width: 402)
-                    .background(.whiteblack)
+                    .background(.white)
                 }
             }
            

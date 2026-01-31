@@ -1409,9 +1409,9 @@ struct CarVehicleDetailsPayload {
     let model: String
     let year: Int
     let plateNumber: String
-    let color: String
-    let seats: Int
-    let region: String
+//    let color: String
+//    let seats: Int
+//    let region: String
     let cityId: Int
 
     var asParameters: [String: Any] {
@@ -1420,9 +1420,9 @@ struct CarVehicleDetailsPayload {
             "model": model,
             "year": year,
             "plateNumber": plateNumber,
-            "color": color,
-            "seats": seats,
-            "region": region,
+//            "color": color,
+//            "seats": seats,
+//            "region": region,
             "cityId": cityId
         ]
     }

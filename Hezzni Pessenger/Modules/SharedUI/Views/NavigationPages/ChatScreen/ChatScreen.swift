@@ -115,7 +115,7 @@ struct ChatScreen: View {
                 .background(Color.white)
             }
         }
-        .background(.whiteblack)
+        .background(.white)
         .fullScreenCover(isPresented: $showChatDetail) {
             ChatDetailedScreen()
         }

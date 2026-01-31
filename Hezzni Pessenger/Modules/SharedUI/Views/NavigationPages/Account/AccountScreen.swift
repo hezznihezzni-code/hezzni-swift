@@ -761,7 +761,7 @@ struct AccountListTile: View {
             HStack(alignment: .center, spacing: 11) {
                 iconView
                     .frame(width: 40, height: 40)
-                    .background(.whiteblack)
+                    .background(.white)
                     .foregroundStyle(.hezzniGreen)
                 
                 VStack(alignment: .leading, spacing: 0) {
@@ -804,7 +804,7 @@ struct AccountListTile: View {
             }
         }
         .padding(16)
-        .background(.whiteblack)
+        .background(.white)
         .cornerRadius(7.5)
         .overlay(
             RoundedRectangle(cornerRadius: 15)

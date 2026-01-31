@@ -75,7 +75,9 @@ struct OTPScreen: View {
                         }
                     }
                 }
+                .background(.white)
         }
+        
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 focusedField = 0
@@ -107,16 +109,16 @@ struct OTPScreen: View {
             
             Text("Verify Your Number")
                 .font(.poppins(.semiBold, size: 24))
-                .foregroundColor(.primary)
+                .foregroundColor(.black)
             
             VStack(spacing: 0){
                 Text("We sent a 6-digit code to \(phoneNumber).")
                     .font(.poppins(.regular, size: 13))
-                    .foregroundStyle(.black500)
+                    .foregroundStyle(.black.opacity(0.5))
 
                 Text("Please check your WhatsApp for the code.")
                     .font(.poppins(.regular, size: 13))
-                    .foregroundStyle(.black500)
+                    .foregroundStyle(.black.opacity(0.5))
             }
         }
         .padding(.top, 40)

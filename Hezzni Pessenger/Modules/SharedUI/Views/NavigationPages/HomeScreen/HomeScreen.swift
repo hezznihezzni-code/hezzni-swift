@@ -51,7 +51,10 @@ struct HomeScreen: View {
     private let midSheetHeight: CGFloat = 530
     private let maxSheetHeight: CGFloat = UIScreen.main.bounds.height * 0.85
     @EnvironmentObject private var navigationState: NavigationStateManager
-    
+
+    // Notifications presentation (avoid navigationDestination)
+    @State private var isShowingNotifications = false
+
     // List of services
     private let services = [
         Service(id: "car", icon: "car-service-icon", title: "Car"),
@@ -82,33 +85,35 @@ struct HomeScreen: View {
     }
     
     var body: some View {
-        NavigationStack(path: $navigationState.path){
-            ZStack(alignment: .bottom) {
-                // Map view with overlay
-                mapContentView
-                    .onAppear{
-                        configureMap()
-                    }
-                
-                // Custom draggable sheet
-                draggableSheet
-            }
-            .edgesIgnoringSafeArea(.bottom)
-            .onAppear {
-                locationManager.startUpdatingLocation()
-            }
-            .onChange(of: locationManager.currentLocation) { location in
-                updateCameraPosition(location: location)
-            }
-            .onAppear {
-                navigationState.showBottomBar()
-            }
-            .navigationDestination(for: NavigationRoutes.self) { route in
-                switch route {
-                case .notificationScreen:
-                    NotificationScreen()
-                case .schedulePicker, .reservationDetail:
-                    EmptyView() // Or your actual destination views
+        NavigationStack(path: $navigationState.path) {
+            ZStack {
+                // Home content
+                ZStack(alignment: .bottom) {
+                    // Map view with overlay
+                    mapContentView
+                        .onAppear {
+                            configureMap()
+                        }
+
+                    // Custom draggable sheet
+                    draggableSheet
+                }
+                .edgesIgnoringSafeArea(.bottom)
+                .onAppear {
+                    locationManager.startUpdatingLocation()
+                }
+                .onChange(of: locationManager.currentLocation) { location in
+                    updateCameraPosition(location: location)
+                }
+                .onAppear {
+                    navigationState.showBottomBar()
+                }
+
+                // Notification overlay
+                if isShowingNotifications {
+                    NotificationScreen(showNotification: $isShowingNotifications)
+                        .transition(.move(edge: .trailing).combined(with: .opacity))
+                        .zIndex(10)
                 }
             }
         }
@@ -160,8 +165,9 @@ struct HomeScreen: View {
                     Spacer()
                     NotificationButton(action: {
                         navigationState.hideBottomBar()
-                        navigationState.navigateToNotificationScreen()
-                        
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                            isShowingNotifications = true
+                        }
                     })
                 }
                 .padding(.horizontal, 16)

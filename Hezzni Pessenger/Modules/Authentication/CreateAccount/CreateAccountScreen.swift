@@ -57,10 +57,11 @@ struct CreateAccountScreen: View {
                     VStack(spacing: 4){
                         Text("Get started with Hezzni")
                             .font(.poppins(.semiBold, size: 22))
+                            .foregroundStyle(.black)
                             .padding(.top, 16)
                         Text("Enter your phone number to continue. We’ll send you a one-time code to verify your number.")
                             .font(.poppins(.regular, size: 13))
-                            .foregroundStyle(.black500)
+                            .foregroundStyle(.black.opacity(0.5))
                             .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.horizontal, 16)

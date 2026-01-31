@@ -10,7 +10,7 @@ struct HelpSupportScreen: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showChatScreen = false
     @State private var selectedChat: SupportChat? = nil
-    var onBack: (() -> Void)? = nil
+    var onBack: (() -> Void)?
     private let recentChats: [SupportChat] = [
         SupportChat(title: "Payment Issue", lastMessage: "Sara: We've processed your refund", timeAgo: "3 hour ago", unreadCount: 2, isResolved: true),
         SupportChat(title: "Driver Rating Issue", lastMessage: "Karla: We've updated your review successfully", timeAgo: "Last Week", unreadCount: 0, isResolved: true),
@@ -74,7 +74,7 @@ struct HelpSupportScreen: View {
         .padding(.bottom, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .overlay(alignment: .topLeading) {
-            Button(action: { dismiss() }) {
+            Button(action: { onBack}) {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundColor(.white)

@@ -1,1200 +1,1211 @@
 // !$*UTF8*$!
 {
-	archiveVersion = 1;
-	classes = {
-	};
-	objectVersion = 77;
-	objects = {
+    archiveVersion = 1;
+    classes = {
+    };
+    objectVersion = 77;
+    objects = {
 
 /* Begin PBXBuildFile section */
-		520D44992E9F85A6003B2E73 /* FlagsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 520D44982E9F85A6003B2E73 /* FlagsKit */; };
-		524AF9572EE3791D0083519A /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 524AF9562EE3791D0083519A /* GoogleMaps */; };
-		524AF9592EE379210083519A /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 524AF9582EE379210083519A /* Inject */; };
-		524AF95B2EE379240083519A /* FlagsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 524AF95A2EE379240083519A /* FlagsKit */; };
-		525A02942E79C6E300D6136E /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 525A02932E79C6E300D6136E /* GoogleMaps */; };
-		525A02962E79CE4D00D6136E /* .swift in Sources */ = {isa = PBXBuildFile; fileRef = 525A02952E79CE3600D6136E /* .swift */; };
-		5265F5C32E8661CB0040CCEF /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 5265F5C22E8661CB0040CCEF /* Inject */; };
-		52DBF8DB2E73F070005C094C /* .env in Resources */ = {isa = PBXBuildFile; fileRef = 52DBF8DA2E73F067005C094C /* .env */; };
-		52DBF8E52E73F429005C094C /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 52DBF8E42E73F425005C094C /* .gitignore */; };
+        520D44992E9F85A6003B2E73 /* FlagsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 520D44982E9F85A6003B2E73 /* FlagsKit */; };
+        524AF9572EE3791D0083519A /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 524AF9562EE3791D0083519A /* GoogleMaps */; };
+        524AF9592EE379210083519A /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 524AF9582EE379210083519A /* Inject */; };
+        524AF95B2EE379240083519A /* FlagsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 524AF95A2EE379240083519A /* FlagsKit */; };
+        525A02942E79C6E300D6136E /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 525A02932E79C6E300D6136E /* GoogleMaps */; };
+        525A02962E79CE4D00D6136E /* .swift in Sources */ = {isa = PBXBuildFile; fileRef = 525A02952E79CE3600D6136E /* .swift */; };
+        5265F5C32E8661CB0040CCEF /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 5265F5C22E8661CB0040CCEF /* Inject */; };
+        52DBF8DB2E73F070005C094C /* .env in Resources */ = {isa = PBXBuildFile; fileRef = 52DBF8DA2E73F067005C094C /* .env */; };
+        52DBF8E52E73F429005C094C /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 52DBF8E42E73F425005C094C /* .gitignore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		521B782B2E6FE3C6004C5A3C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 521B78152E6FE3C3004C5A3C /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 521B781C2E6FE3C3004C5A3C;
-			remoteInfo = "Hezzni Pessenger";
-		};
-		521B78352E6FE3C6004C5A3C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 521B78152E6FE3C3004C5A3C /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 521B781C2E6FE3C3004C5A3C;
-			remoteInfo = "Hezzni Pessenger";
-		};
-		52CD68DE2EDF346800D898E4 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 521B78152E6FE3C3004C5A3C /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 52CD68D02EDF346600D898E4;
-			remoteInfo = "Hezzni Driver";
-		};
-		52CD68E82EDF346800D898E4 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 521B78152E6FE3C3004C5A3C /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 52CD68D02EDF346600D898E4;
-			remoteInfo = "Hezzni Driver";
-		};
+        521B782B2E6FE3C6004C5A3C /* PBXContainerItemProxy */ = {
+            isa = PBXContainerItemProxy;
+            containerPortal = 521B78152E6FE3C3004C5A3C /* Project object */;
+            proxyType = 1;
+            remoteGlobalIDString = 521B781C2E6FE3C3004C5A3C;
+            remoteInfo = "Hezzni Pessenger";
+        };
+        521B78352E6FE3C6004C5A3C /* PBXContainerItemProxy */ = {
+            isa = PBXContainerItemProxy;
+            containerPortal = 521B78152E6FE3C3004C5A3C /* Project object */;
+            proxyType = 1;
+            remoteGlobalIDString = 521B781C2E6FE3C3004C5A3C;
+            remoteInfo = "Hezzni Pessenger";
+        };
+        52CD68DE2EDF346800D898E4 /* PBXContainerItemProxy */ = {
+            isa = PBXContainerItemProxy;
+            containerPortal = 521B78152E6FE3C3004C5A3C /* Project object */;
+            proxyType = 1;
+            remoteGlobalIDString = 52CD68D02EDF346600D898E4;
+            remoteInfo = "Hezzni Driver";
+        };
+        52CD68E82EDF346800D898E4 /* PBXContainerItemProxy */ = {
+            isa = PBXContainerItemProxy;
+            containerPortal = 521B78152E6FE3C3004C5A3C /* Project object */;
+            proxyType = 1;
+            remoteGlobalIDString = 52CD68D02EDF346600D898E4;
+            remoteInfo = "Hezzni Driver";
+        };
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		521B781D2E6FE3C3004C5A3C /* Hezzni Pessenger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hezzni Pessenger.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		521B782A2E6FE3C6004C5A3C /* Hezzni PessengerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hezzni PessengerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		521B78342E6FE3C6004C5A3C /* Hezzni PessengerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hezzni PessengerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		525A02952E79CE3600D6136E /* .swift */ = {isa = PBXFileReference; lastKnownFileType = text; path = .swift; sourceTree = "<group>"; };
-		52CD68D12EDF346600D898E4 /* Hezzni Driver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hezzni Driver.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		52CD68DD2EDF346800D898E4 /* Hezzni DriverTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hezzni DriverTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		52CD68E72EDF346800D898E4 /* Hezzni DriverUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hezzni DriverUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		52DBF8DA2E73F067005C094C /* .env */ = {isa = PBXFileReference; lastKnownFileType = text; path = .env; sourceTree = "<group>"; };
-		52DBF8E42E73F425005C094C /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+        521B781D2E6FE3C3004C5A3C /* Hezzni Pessenger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hezzni Pessenger.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+        521B782A2E6FE3C6004C5A3C /* Hezzni PessengerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hezzni PessengerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+        521B78342E6FE3C6004C5A3C /* Hezzni PessengerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hezzni PessengerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+        525A02952E79CE3600D6136E /* .swift */ = {isa = PBXFileReference; lastKnownFileType = text; path = .swift; sourceTree = "<group>"; };
+        52CD68D12EDF346600D898E4 /* Hezzni Driver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hezzni Driver.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+        52CD68DD2EDF346800D898E4 /* Hezzni DriverTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hezzni DriverTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+        52CD68E72EDF346800D898E4 /* Hezzni DriverUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hezzni DriverUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+        52DBF8DA2E73F067005C094C /* .env */ = {isa = PBXFileReference; lastKnownFileType = text; path = .env; sourceTree = "<group>"; };
+        52DBF8E42E73F425005C094C /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		52535A952F1A8410009BF648 /* Exceptions for "Hezzni Driver" folder in "Hezzni Pessenger" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				DriverServiceSelectionView.swift,
-				DriverServicesViewModel.swift,
-			);
-			target = 521B781C2E6FE3C3004C5A3C /* Hezzni Pessenger */;
-		};
-		52CD68F92EDF387300D898E4 /* Exceptions for "Hezzni Pessenger" folder in "Hezzni Driver" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Assets.xcassets,
-				Common/Controllers/AuthController.swift,
-				Common/Controllers/AuthControllerCommented.swift,
-				Common/Extensions/Color.swift,
-				Common/Extensions/DatatypeExtension.swift,
-				Common/Extensions/FontsExtension.swift,
-				Common/Extensions/View.swift,
-				Common/Models/API/APIService.swift,
-				Common/Models/API/cities.json,
-				Common/Models/API/coutries.json,
-				Common/Models/API/EnvironmentLoader.swift,
-				Common/Models/API/LocationDataService.swift,
-				Common/Models/API/URLEnvironment.swift,
-				Common/Models/Country.swift,
-				Common/Models/Driver/DriverPreferenceModels.swift,
-				Common/Models/GoogleMaps/GoogleMapView.swift,
-				Common/Models/GoogleMaps/LocationManager.swift,
-				"Common/Models/GoogleMaps/map-style.json",
-				Common/Models/GoogleMaps/MapStyleHelper.swift,
-				Common/Models/HezzniService.swift,
-				Common/Models/NavigationStateManager.swift,
-				Common/Models/PassengerService.swift,
-				Common/Models/Person.swift,
-				Common/ViewModels/CitiesViewModel.swift,
-				Common/ViewModels/DriverPreferencesViewModel.swift,
-				Common/ViewModels/PassengerServicesViewModel.swift,
-				Modules/Authentication/CreateAccount/CreateAccountScreen.swift,
-				Modules/SharedUI/Components/Reusables/Buttons.swift,
-				Modules/SharedUI/Components/Reusables/Cards.swift,
-				Modules/SharedUI/Components/Reusables/CustomAppBar.swift,
-				Modules/SharedUI/Components/Reusables/ErrorPopups/WifiError.swift,
-				Modules/SharedUI/Components/Reusables/Location/ProfileLocationView.swift,
-				Modules/SharedUI/Components/Reusables/MatchedGeometry.swift,
-				Modules/SharedUI/Components/Reusables/NewProfileCard.swift,
-				Modules/SharedUI/Components/Reusables/OTP/OTPComponents.swift,
-				Modules/SharedUI/Components/Reusables/ProfileCard.swift,
-				Modules/SharedUI/Components/Reusables/RangeSliderRepresentable.swift,
-				Modules/SharedUI/Components/Reusables/RatingScreen.swift,
-				Modules/SharedUI/Components/Reusables/ReusableViews.swift,
-				Modules/SharedUI/Components/Reusables/Screens/ServiceWelcomeScreen.swift,
-				Modules/SharedUI/Components/Reusables/SearchableDropDown.swift,
-				Modules/SharedUI/Components/Reusables/TermsCaption.swift,
-				Modules/SharedUI/Components/Reusables/TripStatsView.swift,
-				Modules/SharedUI/ViewModels/DriverDocumentsStatusViewModel.swift,
-				Modules/SharedUI/Views/LaunchScreen.storyboard,
-				Modules/SharedUI/Views/NavigationPages/Account/AccountScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/AppSettingScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/ChangePhoneScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/EditProfileScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/HelpSupport/ChatBotScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/HelpSupport/Components/ChatComponents.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/HelpSupport/Components/MessageBubbles.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/HelpSupport/HelpSupportScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/HelpSupport/Models/ChatModels.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/LanguageSettingsScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/PaymentScreens/Add_EditCard.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/PaymentScreens/AddFunds.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/PaymentScreens/FundsAddReceipt.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/PaymentScreens/PaymentMethodScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/PaymentScreens/WalletBalanceCard.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/ReviewScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/TransactionHistoryCard.swift,
-				Modules/SharedUI/Views/NavigationPages/Account/TransactionHistoryScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/BottomNavigationBar.swift,
-				Modules/SharedUI/Views/NavigationPages/ChatScreen/ChatDetailedScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/ChatScreen/ChatDummyData.json,
-				Modules/SharedUI/Views/NavigationPages/ChatScreen/ChatScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HistoryScreen/HistoryScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HistoryScreen/TripSummaryDetail.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/AddWalletScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/EarningScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/FundsWithdrawReceipt.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/DemoNavigationScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/EarningsScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/InviteFriendsScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/VehicleChangeScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/VehicleDetailsScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/WalletFilterSheet.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/WalletHistoryScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/WalletHomeScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/WalletModels.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/WalletHistory.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/WithdrawFunds.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/DriverHomeComplete.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/HomeScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/PathSelectionScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/AddNewVehicleScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/MyVehiclesScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/RejectedVehiclesScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/RentalHome.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/RentalMainScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/UnderReviewVehiclesScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/VehicleFiltersSheet.swift,
-				Modules/SharedUI/Views/NavigationPages/MainScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/AirportRideWelcomeScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/BikeRide/BikeRideWelcomeScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/CityRideWelcomeScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/DeliveryRideWelcomeScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/GroupRideWelcomeScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/RentalRideWelcomeScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/Reservation/FindingReservationScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReservationConfirmedScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReservationDetailScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReusableScreens/NoDriverFoundScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReusableScreens/PaymentConfirmationScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReusableScreens/RidePaymentScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/Reservation/RideProcessScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/Reservation/SchedulePickerScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/Reservation/TripCompleteScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/RideCancelScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/ServicesHome.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/TaxiRideWelcomeScreen.swift,
-				Modules/SharedUI/Views/NotificationScreen.swift,
-				Modules/SharedUI/Views/OnboardingAgainScreen.swift,
-				Modules/SharedUI/Views/OnboardingScreen.swift,
-				Modules/SharedUI/Views/OTPScreen.swift,
-				Modules/SharedUI/Views/SplashScreen.swift,
-				Modules/SharedUI/Views/User/CompleteProfile.swift,
-				Modules/SharedUI/Views/VerifiedScreen.swift,
-				Modules/SharedUI/Views/WelcomeScreens/BasicInfo.swift,
-				Modules/SharedUI/Views/WelcomeScreens/CameraCaptureView.swift,
-				Modules/SharedUI/Views/WelcomeScreens/OnBoardingDriver.swift,
-			);
-			target = 52CD68D02EDF346600D898E4 /* Hezzni Driver */;
-		};
+        52535A952F1A8410009BF648 /* Exceptions for "Hezzni Driver" folder in "Hezzni Pessenger" target */ = {
+            isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+            membershipExceptions = (
+                DriverServiceSelectionView.swift,
+                DriverServicesViewModel.swift,
+            );
+            target = 521B781C2E6FE3C3004C5A3C /* Hezzni Pessenger */;
+        };
+        52CD68F92EDF387300D898E4 /* Exceptions for "Hezzni Pessenger" folder in "Hezzni Driver" target */ = {
+            isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+            membershipExceptions = (
+                Assets.xcassets,
+                Common/Controllers/AuthController.swift,
+                Common/Controllers/AuthControllerCommented.swift,
+                Common/Extensions/Color.swift,
+                Common/Extensions/DatatypeExtension.swift,
+                Common/Extensions/FontsExtension.swift,
+                Common/Extensions/View.swift,
+                Common/Models/API/APIService.swift,
+                Common/Models/API/cities.json,
+                Common/Models/API/coutries.json,
+                Common/Models/API/EnvironmentLoader.swift,
+                Common/Models/API/LocationDataService.swift,
+                Common/Models/API/URLEnvironment.swift,
+                Common/Models/Country.swift,
+                Common/Models/Driver/DriverPreferenceModels.swift,
+                Common/Models/GoogleMaps/GoogleMapView.swift,
+                Common/Models/GoogleMaps/LocationManager.swift,
+                "Common/Models/GoogleMaps/map-style.json",
+                Common/Models/GoogleMaps/MapStyleHelper.swift,
+                Common/Models/HezzniService.swift,
+                Common/Models/NavigationStateManager.swift,
+                Common/Models/PassengerService.swift,
+                Common/Models/Person.swift,
+                Common/ViewModels/CitiesViewModel.swift,
+                Common/ViewModels/DriverPreferencesViewModel.swift,
+                Common/ViewModels/PassengerServicesViewModel.swift,
+                Modules/Authentication/CreateAccount/CreateAccountScreen.swift,
+                Modules/SharedUI/Components/Reusables/Buttons.swift,
+                Modules/SharedUI/Components/Reusables/Cards.swift,
+                Modules/SharedUI/Components/Reusables/CustomAppBar.swift,
+                Modules/SharedUI/Components/Reusables/ErrorPopups/WifiError.swift,
+                Modules/SharedUI/Components/Reusables/Location/ProfileLocationView.swift,
+                Modules/SharedUI/Components/Reusables/MatchedGeometry.swift,
+                Modules/SharedUI/Components/Reusables/NewProfileCard.swift,
+                Modules/SharedUI/Components/Reusables/OTP/OTPComponents.swift,
+                Modules/SharedUI/Components/Reusables/ProfileCard.swift,
+                Modules/SharedUI/Components/Reusables/RangeSliderRepresentable.swift,
+                Modules/SharedUI/Components/Reusables/RatingScreen.swift,
+                Modules/SharedUI/Components/Reusables/ReusableViews.swift,
+                Modules/SharedUI/Components/Reusables/Screens/ServiceWelcomeScreen.swift,
+                Modules/SharedUI/Components/Reusables/SearchableDropDown.swift,
+                Modules/SharedUI/Components/Reusables/TermsCaption.swift,
+                Modules/SharedUI/Components/Reusables/TripStatsView.swift,
+                Modules/SharedUI/ViewModels/DriverDocumentsStatusViewModel.swift,
+                Modules/SharedUI/Views/LaunchScreen.storyboard,
+                Modules/SharedUI/Views/NavigationPages/Account/AccountScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/AppSettingScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/ChangePhoneScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/EditProfileScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/HelpSupport/ChatBotScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/HelpSupport/Components/ChatComponents.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/HelpSupport/Components/MessageBubbles.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/HelpSupport/HelpSupportScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/HelpSupport/Models/ChatModels.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/LanguageSettingsScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/PaymentScreens/Add_EditCard.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/PaymentScreens/AddFunds.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/PaymentScreens/FundsAddReceipt.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/PaymentScreens/PaymentMethodScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/PaymentScreens/WalletBalanceCard.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/ReviewScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/TransactionHistoryCard.swift,
+                Modules/SharedUI/Views/NavigationPages/Account/TransactionHistoryScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/BottomNavigationBar.swift,
+                Modules/SharedUI/Views/NavigationPages/ChatScreen/ChatDetailedScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/ChatScreen/ChatDummyData.json,
+                Modules/SharedUI/Views/NavigationPages/ChatScreen/ChatScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HistoryScreen/HistoryScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HistoryScreen/TripSummaryDetail.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/AddWalletScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/EarningScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/FundsWithdrawReceipt.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/DemoNavigationScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/EarningsScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/InviteFriendsScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/VehicleChangeScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/VehicleDetailsScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/WalletFilterSheet.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/WalletHistoryScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/WalletHomeScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/WalletModels.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/WalletHistory.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/WithdrawFunds.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/DriverHomeComplete.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/HomeScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/PathSelectionScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/AddNewVehicleScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/MyVehiclesScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/RejectedVehiclesScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/RentalHome.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/RentalMainScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/UnderReviewVehiclesScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/VehicleFiltersSheet.swift,
+                Modules/SharedUI/Views/NavigationPages/MainScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/AirportRideWelcomeScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/BikeRide/BikeRideWelcomeScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/CityRideWelcomeScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/DeliveryRideWelcomeScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/GroupRideWelcomeScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/RentalRideWelcomeScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/Reservation/FindingReservationScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReservationConfirmedScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReservationDetailScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReusableScreens/NoDriverFoundScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReusableScreens/PaymentConfirmationScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReusableScreens/RidePaymentScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/Reservation/RideProcessScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/Reservation/SchedulePickerScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/Reservation/TripCompleteScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/RideCancelScreen.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/ServicesHome.swift,
+                Modules/SharedUI/Views/NavigationPages/Services/TaxiRideWelcomeScreen.swift,
+                Modules/SharedUI/Views/NotificationScreen.swift,
+                Modules/SharedUI/Views/OnboardingAgainScreen.swift,
+                Modules/SharedUI/Views/OnboardingScreen.swift,
+                Modules/SharedUI/Views/OTPScreen.swift,
+                Modules/SharedUI/Views/SplashScreen.swift,
+                Modules/SharedUI/Views/User/CompleteProfile.swift,
+                Modules/SharedUI/Views/VerifiedScreen.swift,
+                Modules/SharedUI/Views/WelcomeScreens/BasicInfo.swift,
+                Modules/SharedUI/Views/WelcomeScreens/CameraCaptureView.swift,
+                Modules/SharedUI/Views/WelcomeScreens/DocumentScannerView.swift,
+                Modules/SharedUI/Views/WelcomeScreens/OnBoardingDriver.swift,
+            );
+            target = 52CD68D02EDF346600D898E4 /* Hezzni Driver */;
+        };
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		521B781F2E6FE3C3004C5A3C /* Hezzni Pessenger */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				52CD68F92EDF387300D898E4 /* Exceptions for "Hezzni Pessenger" folder in "Hezzni Driver" target */,
-			);
-			path = "Hezzni Pessenger";
-			sourceTree = "<group>";
-		};
-		521B782D2E6FE3C6004C5A3C /* Hezzni PessengerTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Hezzni PessengerTests";
-			sourceTree = "<group>";
-		};
-		521B78372E6FE3C6004C5A3C /* Hezzni PessengerUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Hezzni PessengerUITests";
-			sourceTree = "<group>";
-		};
-		528182E02E6FF43800543C93 /* fonts */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = fonts;
-			sourceTree = "<group>";
-		};
-		52CD68D22EDF346600D898E4 /* Hezzni Driver */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				52535A952F1A8410009BF648 /* Exceptions for "Hezzni Driver" folder in "Hezzni Pessenger" target */,
-			);
-			path = "Hezzni Driver";
-			sourceTree = "<group>";
-		};
-		52CD68E02EDF346800D898E4 /* Hezzni DriverTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Hezzni DriverTests";
-			sourceTree = "<group>";
-		};
-		52CD68EA2EDF346800D898E4 /* Hezzni DriverUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Hezzni DriverUITests";
-			sourceTree = "<group>";
-		};
+        521B781F2E6FE3C3004C5A3C /* Hezzni Pessenger */ = {
+            isa = PBXFileSystemSynchronizedRootGroup;
+            exceptions = (
+                52CD68F92EDF387300D898E4 /* Exceptions for "Hezzni Pessenger" folder in "Hezzni Driver" target */,
+            );
+            path = "Hezzni Pessenger";
+            sourceTree = "<group>";
+        };
+        521B782D2E6FE3C6004C5A3C /* Hezzni PessengerTests */ = {
+            isa = PBXFileSystemSynchronizedRootGroup;
+            path = "Hezzni PessengerTests";
+            sourceTree = "<group>";
+        };
+        521B78372E6FE3C6004C5A3C /* Hezzni PessengerUITests */ = {
+            isa = PBXFileSystemSynchronizedRootGroup;
+            path = "Hezzni PessengerUITests";
+            sourceTree = "<group>";
+        };
+        528182E02E6FF43800543C93 /* fonts */ = {
+            isa = PBXFileSystemSynchronizedRootGroup;
+            path = fonts;
+            sourceTree = "<group>";
+        };
+        52CD68D22EDF346600D898E4 /* Hezzni Driver */ = {
+            isa = PBXFileSystemSynchronizedRootGroup;
+            exceptions = (
+                52535A952F1A8410009BF648 /* Exceptions for "Hezzni Driver" folder in "Hezzni Pessenger" target */,
+            );
+            path = "Hezzni Driver";
+            sourceTree = "<group>";
+        };
+        52CD68E02EDF346800D898E4 /* Hezzni DriverTests */ = {
+            isa = PBXFileSystemSynchronizedRootGroup;
+            path = "Hezzni DriverTests";
+            sourceTree = "<group>";
+        };
+        52CD68EA2EDF346800D898E4 /* Hezzni DriverUITests */ = {
+            isa = PBXFileSystemSynchronizedRootGroup;
+            path = "Hezzni DriverUITests";
+            sourceTree = "<group>";
+        };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		521B781A2E6FE3C3004C5A3C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				525A02942E79C6E300D6136E /* GoogleMaps in Frameworks */,
-				520D44992E9F85A6003B2E73 /* FlagsKit in Frameworks */,
-				5265F5C32E8661CB0040CCEF /* Inject in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		521B78272E6FE3C6004C5A3C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		521B78312E6FE3C6004C5A3C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		52CD68CE2EDF346600D898E4 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				524AF9572EE3791D0083519A /* GoogleMaps in Frameworks */,
-				524AF95B2EE379240083519A /* FlagsKit in Frameworks */,
-				524AF9592EE379210083519A /* Inject in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		52CD68DA2EDF346800D898E4 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		52CD68E42EDF346800D898E4 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
+        521B781A2E6FE3C3004C5A3C /* Frameworks */ = {
+            isa = PBXFrameworksBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+                525A02942E79C6E300D6136E /* GoogleMaps in Frameworks */,
+                520D44992E9F85A6003B2E73 /* FlagsKit in Frameworks */,
+                5265F5C32E8661CB0040CCEF /* Inject in Frameworks */,
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        521B78272E6FE3C6004C5A3C /* Frameworks */ = {
+            isa = PBXFrameworksBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        521B78312E6FE3C6004C5A3C /* Frameworks */ = {
+            isa = PBXFrameworksBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        52CD68CE2EDF346600D898E4 /* Frameworks */ = {
+            isa = PBXFrameworksBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+                524AF9572EE3791D0083519A /* GoogleMaps in Frameworks */,
+                524AF95B2EE379240083519A /* FlagsKit in Frameworks */,
+                524AF9592EE379210083519A /* Inject in Frameworks */,
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        52CD68DA2EDF346800D898E4 /* Frameworks */ = {
+            isa = PBXFrameworksBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        52CD68E42EDF346800D898E4 /* Frameworks */ = {
+            isa = PBXFrameworksBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		521B78142E6FE3C3004C5A3C = {
-			isa = PBXGroup;
-			children = (
-				525A02952E79CE3600D6136E /* .swift */,
-				52DBF8E42E73F425005C094C /* .gitignore */,
-				52DBF8DA2E73F067005C094C /* .env */,
-				528182E02E6FF43800543C93 /* fonts */,
-				521B781F2E6FE3C3004C5A3C /* Hezzni Pessenger */,
-				521B782D2E6FE3C6004C5A3C /* Hezzni PessengerTests */,
-				521B78372E6FE3C6004C5A3C /* Hezzni PessengerUITests */,
-				52CD68D22EDF346600D898E4 /* Hezzni Driver */,
-				52CD68E02EDF346800D898E4 /* Hezzni DriverTests */,
-				52CD68EA2EDF346800D898E4 /* Hezzni DriverUITests */,
-				524AF9552EE379110083519A /* Frameworks */,
-				521B781E2E6FE3C3004C5A3C /* Products */,
-			);
-			sourceTree = "<group>";
-		};
-		521B781E2E6FE3C3004C5A3C /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				521B781D2E6FE3C3004C5A3C /* Hezzni Pessenger.app */,
-				521B782A2E6FE3C6004C5A3C /* Hezzni PessengerTests.xctest */,
-				521B78342E6FE3C6004C5A3C /* Hezzni PessengerUITests.xctest */,
-				52CD68D12EDF346600D898E4 /* Hezzni Driver.app */,
-				52CD68DD2EDF346800D898E4 /* Hezzni DriverTests.xctest */,
-				52CD68E72EDF346800D898E4 /* Hezzni DriverUITests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		524AF9552EE379110083519A /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
+        521B78142E6FE3C3004C5A3C = {
+            isa = PBXGroup;
+            children = (
+                525A02952E79CE3600D6136E /* .swift */,
+                52DBF8E42E73F425005C094C /* .gitignore */,
+                52DBF8DA2E73F067005C094C /* .env */,
+                528182E02E6FF43800543C93 /* fonts */,
+                521B781F2E6FE3C3004C5A3C /* Hezzni Pessenger */,
+                521B782D2E6FE3C6004C5A3C /* Hezzni PessengerTests */,
+                521B78372E6FE3C6004C5A3C /* Hezzni PessengerUITests */,
+                52CD68D22EDF346600D898E4 /* Hezzni Driver */,
+                52CD68E02EDF346800D898E4 /* Hezzni DriverTests */,
+                52CD68EA2EDF346800D898E4 /* Hezzni DriverUITests */,
+                524AF9552EE379110083519A /* Frameworks */,
+                521B781E2E6FE3C3004C5A3C /* Products */,
+            );
+            sourceTree = "<group>";
+        };
+        521B781E2E6FE3C3004C5A3C /* Products */ = {
+            isa = PBXGroup;
+            children = (
+                521B781D2E6FE3C3004C5A3C /* Hezzni Pessenger.app */,
+                521B782A2E6FE3C6004C5A3C /* Hezzni PessengerTests.xctest */,
+                521B78342E6FE3C6004C5A3C /* Hezzni PessengerUITests.xctest */,
+                52CD68D12EDF346600D898E4 /* Hezzni Driver.app */,
+                52CD68DD2EDF346800D898E4 /* Hezzni DriverTests.xctest */,
+                52CD68E72EDF346800D898E4 /* Hezzni DriverUITests.xctest */,
+            );
+            name = Products;
+            sourceTree = "<group>";
+        };
+        524AF9552EE379110083519A /* Frameworks */ = {
+            isa = PBXGroup;
+            children = (
+            );
+            name = Frameworks;
+            sourceTree = "<group>";
+        };
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		521B781C2E6FE3C3004C5A3C /* Hezzni Pessenger */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 521B783E2E6FE3C6004C5A3C /* Build configuration list for PBXNativeTarget "Hezzni Pessenger" */;
-			buildPhases = (
-				521B78192E6FE3C3004C5A3C /* Sources */,
-				521B781A2E6FE3C3004C5A3C /* Frameworks */,
-				521B781B2E6FE3C3004C5A3C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				521B781F2E6FE3C3004C5A3C /* Hezzni Pessenger */,
-				528182E02E6FF43800543C93 /* fonts */,
-			);
-			name = "Hezzni Pessenger";
-			packageProductDependencies = (
-				525A02932E79C6E300D6136E /* GoogleMaps */,
-				5265F5C22E8661CB0040CCEF /* Inject */,
-				520D44982E9F85A6003B2E73 /* FlagsKit */,
-			);
-			productName = "Hezzni Pessenger";
-			productReference = 521B781D2E6FE3C3004C5A3C /* Hezzni Pessenger.app */;
-			productType = "com.apple.product-type.application";
-		};
-		521B78292E6FE3C6004C5A3C /* Hezzni PessengerTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 521B78412E6FE3C6004C5A3C /* Build configuration list for PBXNativeTarget "Hezzni PessengerTests" */;
-			buildPhases = (
-				521B78262E6FE3C6004C5A3C /* Sources */,
-				521B78272E6FE3C6004C5A3C /* Frameworks */,
-				521B78282E6FE3C6004C5A3C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				521B782C2E6FE3C6004C5A3C /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				521B782D2E6FE3C6004C5A3C /* Hezzni PessengerTests */,
-			);
-			name = "Hezzni PessengerTests";
-			packageProductDependencies = (
-			);
-			productName = "Hezzni PessengerTests";
-			productReference = 521B782A2E6FE3C6004C5A3C /* Hezzni PessengerTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		521B78332E6FE3C6004C5A3C /* Hezzni PessengerUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 521B78442E6FE3C6004C5A3C /* Build configuration list for PBXNativeTarget "Hezzni PessengerUITests" */;
-			buildPhases = (
-				521B78302E6FE3C6004C5A3C /* Sources */,
-				521B78312E6FE3C6004C5A3C /* Frameworks */,
-				521B78322E6FE3C6004C5A3C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				521B78362E6FE3C6004C5A3C /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				521B78372E6FE3C6004C5A3C /* Hezzni PessengerUITests */,
-			);
-			name = "Hezzni PessengerUITests";
-			packageProductDependencies = (
-			);
-			productName = "Hezzni PessengerUITests";
-			productReference = 521B78342E6FE3C6004C5A3C /* Hezzni PessengerUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
-		52CD68D02EDF346600D898E4 /* Hezzni Driver */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 52CD68EF2EDF346800D898E4 /* Build configuration list for PBXNativeTarget "Hezzni Driver" */;
-			buildPhases = (
-				52CD68CD2EDF346600D898E4 /* Sources */,
-				52CD68CE2EDF346600D898E4 /* Frameworks */,
-				52CD68CF2EDF346600D898E4 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				528182E02E6FF43800543C93 /* fonts */,
-				52CD68D22EDF346600D898E4 /* Hezzni Driver */,
-			);
-			name = "Hezzni Driver";
-			packageProductDependencies = (
-				524AF9562EE3791D0083519A /* GoogleMaps */,
-				524AF9582EE379210083519A /* Inject */,
-				524AF95A2EE379240083519A /* FlagsKit */,
-			);
-			productName = "Hezzni Driver";
-			productReference = 52CD68D12EDF346600D898E4 /* Hezzni Driver.app */;
-			productType = "com.apple.product-type.application";
-		};
-		52CD68DC2EDF346800D898E4 /* Hezzni DriverTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 52CD68F22EDF346800D898E4 /* Build configuration list for PBXNativeTarget "Hezzni DriverTests" */;
-			buildPhases = (
-				52CD68D92EDF346800D898E4 /* Sources */,
-				52CD68DA2EDF346800D898E4 /* Frameworks */,
-				52CD68DB2EDF346800D898E4 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				52CD68DF2EDF346800D898E4 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				52CD68E02EDF346800D898E4 /* Hezzni DriverTests */,
-			);
-			name = "Hezzni DriverTests";
-			packageProductDependencies = (
-			);
-			productName = "Hezzni DriverTests";
-			productReference = 52CD68DD2EDF346800D898E4 /* Hezzni DriverTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		52CD68E62EDF346800D898E4 /* Hezzni DriverUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 52CD68F52EDF346800D898E4 /* Build configuration list for PBXNativeTarget "Hezzni DriverUITests" */;
-			buildPhases = (
-				52CD68E32EDF346800D898E4 /* Sources */,
-				52CD68E42EDF346800D898E4 /* Frameworks */,
-				52CD68E52EDF346800D898E4 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				52CD68E92EDF346800D898E4 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				52CD68EA2EDF346800D898E4 /* Hezzni DriverUITests */,
-			);
-			name = "Hezzni DriverUITests";
-			packageProductDependencies = (
-			);
-			productName = "Hezzni DriverUITests";
-			productReference = 52CD68E72EDF346800D898E4 /* Hezzni DriverUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
+        521B781C2E6FE3C3004C5A3C /* Hezzni Pessenger */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = 521B783E2E6FE3C6004C5A3C /* Build configuration list for PBXNativeTarget "Hezzni Pessenger" */;
+            buildPhases = (
+                521B78192E6FE3C3004C5A3C /* Sources */,
+                521B781A2E6FE3C3004C5A3C /* Frameworks */,
+                521B781B2E6FE3C3004C5A3C /* Resources */,
+            );
+            buildRules = (
+            );
+            dependencies = (
+            );
+            fileSystemSynchronizedGroups = (
+                521B781F2E6FE3C3004C5A3C /* Hezzni Pessenger */,
+                528182E02E6FF43800543C93 /* fonts */,
+            );
+            name = "Hezzni Pessenger";
+            packageProductDependencies = (
+                525A02932E79C6E300D6136E /* GoogleMaps */,
+                5265F5C22E8661CB0040CCEF /* Inject */,
+                520D44982E9F85A6003B2E73 /* FlagsKit */,
+            );
+            productName = "Hezzni Pessenger";
+            productReference = 521B781D2E6FE3C3004C5A3C /* Hezzni Pessenger.app */;
+            productType = "com.apple.product-type.application";
+        };
+        521B78292E6FE3C6004C5A3C /* Hezzni PessengerTests */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = 521B78412E6FE3C6004C5A3C /* Build configuration list for PBXNativeTarget "Hezzni PessengerTests" */;
+            buildPhases = (
+                521B78262E6FE3C6004C5A3C /* Sources */,
+                521B78272E6FE3C6004C5A3C /* Frameworks */,
+                521B78282E6FE3C6004C5A3C /* Resources */,
+            );
+            buildRules = (
+            );
+            dependencies = (
+                521B782C2E6FE3C6004C5A3C /* PBXTargetDependency */,
+            );
+            fileSystemSynchronizedGroups = (
+                521B782D2E6FE3C6004C5A3C /* Hezzni PessengerTests */,
+            );
+            name = "Hezzni PessengerTests";
+            packageProductDependencies = (
+            );
+            productName = "Hezzni PessengerTests";
+            productReference = 521B782A2E6FE3C6004C5A3C /* Hezzni PessengerTests.xctest */;
+            productType = "com.apple.product-type.bundle.unit-test";
+        };
+        521B78332E6FE3C6004C5A3C /* Hezzni PessengerUITests */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = 521B78442E6FE3C6004C5A3C /* Build configuration list for PBXNativeTarget "Hezzni PessengerUITests" */;
+            buildPhases = (
+                521B78302E6FE3C6004C5A3C /* Sources */,
+                521B78312E6FE3C6004C5A3C /* Frameworks */,
+                521B78322E6FE3C6004C5A3C /* Resources */,
+            );
+            buildRules = (
+            );
+            dependencies = (
+                521B78362E6FE3C6004C5A3C /* PBXTargetDependency */,
+            );
+            fileSystemSynchronizedGroups = (
+                521B78372E6FE3C6004C5A3C /* Hezzni PessengerUITests */,
+            );
+            name = "Hezzni PessengerUITests";
+            packageProductDependencies = (
+            );
+            productName = "Hezzni PessengerUITests";
+            productReference = 521B78342E6FE3C6004C5A3C /* Hezzni PessengerUITests.xctest */;
+            productType = "com.apple.product-type.bundle.ui-testing";
+        };
+        52CD68D02EDF346600D898E4 /* Hezzni Driver */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = 52CD68EF2EDF346800D898E4 /* Build configuration list for PBXNativeTarget "Hezzni Driver" */;
+            buildPhases = (
+                52CD68CD2EDF346600D898E4 /* Sources */,
+                52CD68CE2EDF346600D898E4 /* Frameworks */,
+                52CD68CF2EDF346600D898E4 /* Resources */,
+            );
+            buildRules = (
+            );
+            dependencies = (
+            );
+            fileSystemSynchronizedGroups = (
+                528182E02E6FF43800543C93 /* fonts */,
+                52CD68D22EDF346600D898E4 /* Hezzni Driver */,
+            );
+            name = "Hezzni Driver";
+            packageProductDependencies = (
+                524AF9562EE3791D0083519A /* GoogleMaps */,
+                524AF9582EE379210083519A /* Inject */,
+                524AF95A2EE379240083519A /* FlagsKit */,
+            );
+            productName = "Hezzni Driver";
+            productReference = 52CD68D12EDF346600D898E4 /* Hezzni Driver.app */;
+            productType = "com.apple.product-type.application";
+        };
+        52CD68DC2EDF346800D898E4 /* Hezzni DriverTests */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = 52CD68F22EDF346800D898E4 /* Build configuration list for PBXNativeTarget "Hezzni DriverTests" */;
+            buildPhases = (
+                52CD68D92EDF346800D898E4 /* Sources */,
+                52CD68DA2EDF346800D898E4 /* Frameworks */,
+                52CD68DB2EDF346800D898E4 /* Resources */,
+            );
+            buildRules = (
+            );
+            dependencies = (
+                52CD68DF2EDF346800D898E4 /* PBXTargetDependency */,
+            );
+            fileSystemSynchronizedGroups = (
+                52CD68E02EDF346800D898E4 /* Hezzni DriverTests */,
+            );
+            name = "Hezzni DriverTests";
+            packageProductDependencies = (
+            );
+            productName = "Hezzni DriverTests";
+            productReference = 52CD68DD2EDF346800D898E4 /* Hezzni DriverTests.xctest */;
+            productType = "com.apple.product-type.bundle.unit-test";
+        };
+        52CD68E62EDF346800D898E4 /* Hezzni DriverUITests */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = 52CD68F52EDF346800D898E4 /* Build configuration list for PBXNativeTarget "Hezzni DriverUITests" */;
+            buildPhases = (
+                52CD68E32EDF346800D898E4 /* Sources */,
+                52CD68E42EDF346800D898E4 /* Frameworks */,
+                52CD68E52EDF346800D898E4 /* Resources */,
+            );
+            buildRules = (
+            );
+            dependencies = (
+                52CD68E92EDF346800D898E4 /* PBXTargetDependency */,
+            );
+            fileSystemSynchronizedGroups = (
+                52CD68EA2EDF346800D898E4 /* Hezzni DriverUITests */,
+            );
+            name = "Hezzni DriverUITests";
+            packageProductDependencies = (
+            );
+            productName = "Hezzni DriverUITests";
+            productReference = 52CD68E72EDF346800D898E4 /* Hezzni DriverUITests.xctest */;
+            productType = "com.apple.product-type.bundle.ui-testing";
+        };
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		521B78152E6FE3C3004C5A3C /* Project object */ = {
-			isa = PBXProject;
-			attributes = {
-				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2610;
-				LastUpgradeCheck = 1640;
-				TargetAttributes = {
-					521B781C2E6FE3C3004C5A3C = {
-						CreatedOnToolsVersion = 16.4;
-					};
-					521B78292E6FE3C6004C5A3C = {
-						CreatedOnToolsVersion = 16.4;
-						TestTargetID = 521B781C2E6FE3C3004C5A3C;
-					};
-					521B78332E6FE3C6004C5A3C = {
-						CreatedOnToolsVersion = 16.4;
-						TestTargetID = 521B781C2E6FE3C3004C5A3C;
-					};
-					52CD68D02EDF346600D898E4 = {
-						CreatedOnToolsVersion = 26.1.1;
-					};
-					52CD68DC2EDF346800D898E4 = {
-						CreatedOnToolsVersion = 26.1.1;
-						TestTargetID = 52CD68D02EDF346600D898E4;
-					};
-					52CD68E62EDF346800D898E4 = {
-						CreatedOnToolsVersion = 26.1.1;
-						TestTargetID = 52CD68D02EDF346600D898E4;
-					};
-				};
-			};
-			buildConfigurationList = 521B78182E6FE3C3004C5A3C /* Build configuration list for PBXProject "Hezzni" */;
-			developmentRegion = en;
-			hasScannedForEncodings = 0;
-			knownRegions = (
-				en,
-				Base,
-			);
-			mainGroup = 521B78142E6FE3C3004C5A3C;
-			minimizedProjectReferenceProxies = 1;
-			packageReferences = (
-				525A02922E79C6E200D6136E /* XCRemoteSwiftPackageReference "ios-maps-sdk" */,
-				52BBE4AF2E865F83000DC61A /* XCRemoteSwiftPackageReference "Inject" */,
-				520D44972E9F85A6003B2E73 /* XCRemoteSwiftPackageReference "FlagsKit" */,
-			);
-			preferredProjectObjectVersion = 77;
-			productRefGroup = 521B781E2E6FE3C3004C5A3C /* Products */;
-			projectDirPath = "";
-			projectRoot = "";
-			targets = (
-				521B781C2E6FE3C3004C5A3C /* Hezzni Pessenger */,
-				521B78292E6FE3C6004C5A3C /* Hezzni PessengerTests */,
-				521B78332E6FE3C6004C5A3C /* Hezzni PessengerUITests */,
-				52CD68D02EDF346600D898E4 /* Hezzni Driver */,
-				52CD68DC2EDF346800D898E4 /* Hezzni DriverTests */,
-				52CD68E62EDF346800D898E4 /* Hezzni DriverUITests */,
-			);
-		};
+        521B78152E6FE3C3004C5A3C /* Project object */ = {
+            isa = PBXProject;
+            attributes = {
+                BuildIndependentTargetsInParallel = 1;
+                LastSwiftUpdateCheck = 2610;
+                LastUpgradeCheck = 1640;
+                TargetAttributes = {
+                    521B781C2E6FE3C3004C5A3C = {
+                        CreatedOnToolsVersion = 16.4;
+                    };
+                    521B78292E6FE3C6004C5A3C = {
+                        CreatedOnToolsVersion = 16.4;
+                        TestTargetID = 521B781C2E6FE3C3004C5A3C;
+                    };
+                    521B78332E6FE3C6004C5A3C = {
+                        CreatedOnToolsVersion = 16.4;
+                        TestTargetID = 521B781C2E6FE3C3004C5A3C;
+                    };
+                    52CD68D02EDF346600D898E4 = {
+                        CreatedOnToolsVersion = 26.1.1;
+                    };
+                    52CD68DC2EDF346800D898E4 = {
+                        CreatedOnToolsVersion = 26.1.1;
+                        TestTargetID = 52CD68D02EDF346600D898E4;
+                    };
+                    52CD68E62EDF346800D898E4 = {
+                        CreatedOnToolsVersion = 26.1.1;
+                        TestTargetID = 52CD68D02EDF346600D898E4;
+                    };
+                };
+            };
+            buildConfigurationList = 521B78182E6FE3C3004C5A3C /* Build configuration list for PBXProject "Hezzni" */;
+            developmentRegion = en;
+            hasScannedForEncodings = 0;
+            knownRegions = (
+                en,
+                Base,
+            );
+            mainGroup = 521B78142E6FE3C3004C5A3C;
+            minimizedProjectReferenceProxies = 1;
+            packageReferences = (
+                525A02922E79C6E200D6136E /* XCRemoteSwiftPackageReference "ios-maps-sdk" */,
+                52BBE4AF2E865F83000DC61A /* XCRemoteSwiftPackageReference "Inject" */,
+                520D44972E9F85A6003B2E73 /* XCRemoteSwiftPackageReference "FlagsKit" */,
+            );
+            preferredProjectObjectVersion = 77;
+            productRefGroup = 521B781E2E6FE3C3004C5A3C /* Products */;
+            projectDirPath = "";
+            projectRoot = "";
+            targets = (
+                521B781C2E6FE3C3004C5A3C /* Hezzni Pessenger */,
+                521B78292E6FE3C6004C5A3C /* Hezzni PessengerTests */,
+                521B78332E6FE3C6004C5A3C /* Hezzni PessengerUITests */,
+                52CD68D02EDF346600D898E4 /* Hezzni Driver */,
+                52CD68DC2EDF346800D898E4 /* Hezzni DriverTests */,
+                52CD68E62EDF346800D898E4 /* Hezzni DriverUITests */,
+            );
+        };
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		521B781B2E6FE3C3004C5A3C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				52DBF8DB2E73F070005C094C /* .env in Resources */,
-				52DBF8E52E73F429005C094C /* .gitignore in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		521B78282E6FE3C6004C5A3C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		521B78322E6FE3C6004C5A3C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		52CD68CF2EDF346600D898E4 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		52CD68DB2EDF346800D898E4 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		52CD68E52EDF346800D898E4 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
+        521B781B2E6FE3C3004C5A3C /* Resources */ = {
+            isa = PBXResourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+                52DBF8DB2E73F070005C094C /* .env in Resources */,
+                52DBF8E52E73F429005C094C /* .gitignore in Resources */,
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        521B78282E6FE3C6004C5A3C /* Resources */ = {
+            isa = PBXResourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        521B78322E6FE3C6004C5A3C /* Resources */ = {
+            isa = PBXResourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        52CD68CF2EDF346600D898E4 /* Resources */ = {
+            isa = PBXResourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        52CD68DB2EDF346800D898E4 /* Resources */ = {
+            isa = PBXResourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        52CD68E52EDF346800D898E4 /* Resources */ = {
+            isa = PBXResourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		521B78192E6FE3C3004C5A3C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				525A02962E79CE4D00D6136E /* .swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		521B78262E6FE3C6004C5A3C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		521B78302E6FE3C6004C5A3C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		52CD68CD2EDF346600D898E4 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		52CD68D92EDF346800D898E4 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		52CD68E32EDF346800D898E4 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
+        521B78192E6FE3C3004C5A3C /* Sources */ = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+                525A02962E79CE4D00D6136E /* .swift in Sources */,
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        521B78262E6FE3C6004C5A3C /* Sources */ = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        521B78302E6FE3C6004C5A3C /* Sources */ = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        52CD68CD2EDF346600D898E4 /* Sources */ = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        52CD68D92EDF346800D898E4 /* Sources */ = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        52CD68E32EDF346800D898E4 /* Sources */ = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		521B782C2E6FE3C6004C5A3C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 521B781C2E6FE3C3004C5A3C /* Hezzni Pessenger */;
-			targetProxy = 521B782B2E6FE3C6004C5A3C /* PBXContainerItemProxy */;
-		};
-		521B78362E6FE3C6004C5A3C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 521B781C2E6FE3C3004C5A3C /* Hezzni Pessenger */;
-			targetProxy = 521B78352E6FE3C6004C5A3C /* PBXContainerItemProxy */;
-		};
-		52CD68DF2EDF346800D898E4 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 52CD68D02EDF346600D898E4 /* Hezzni Driver */;
-			targetProxy = 52CD68DE2EDF346800D898E4 /* PBXContainerItemProxy */;
-		};
-		52CD68E92EDF346800D898E4 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 52CD68D02EDF346600D898E4 /* Hezzni Driver */;
-			targetProxy = 52CD68E82EDF346800D898E4 /* PBXContainerItemProxy */;
-		};
+        521B782C2E6FE3C6004C5A3C /* PBXTargetDependency */ = {
+            isa = PBXTargetDependency;
+            target = 521B781C2E6FE3C3004C5A3C /* Hezzni Pessenger */;
+            targetProxy = 521B782B2E6FE3C6004C5A3C /* PBXContainerItemProxy */;
+        };
+        521B78362E6FE3C6004C5A3C /* PBXTargetDependency */ = {
+            isa = PBXTargetDependency;
+            target = 521B781C2E6FE3C3004C5A3C /* Hezzni Pessenger */;
+            targetProxy = 521B78352E6FE3C6004C5A3C /* PBXContainerItemProxy */;
+        };
+        52CD68DF2EDF346800D898E4 /* PBXTargetDependency */ = {
+            isa = PBXTargetDependency;
+            target = 52CD68D02EDF346600D898E4 /* Hezzni Driver */;
+            targetProxy = 52CD68DE2EDF346800D898E4 /* PBXContainerItemProxy */;
+        };
+        52CD68E92EDF346800D898E4 /* PBXTargetDependency */ = {
+            isa = PBXTargetDependency;
+            target = 52CD68D02EDF346600D898E4 /* Hezzni Driver */;
+            targetProxy = 52CD68E82EDF346800D898E4 /* PBXContainerItemProxy */;
+        };
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		521B783C2E6FE3C6004C5A3C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = (
-					"-Xlinker",
-					"-interposable",
-				);
-				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			};
-			name = Debug;
-		};
-		521B783D2E6FE3C6004C5A3C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				OTHER_LDFLAGS = (
-					"-Xlinker",
-					"-interposable",
-				);
-				SDKROOT = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		521B783F2E6FE3C6004C5A3C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Hezzni-Pessenger-Info.plist";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-Pessenger";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				"SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*]" = PASSENGER;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		521B78402E6FE3C6004C5A3C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Hezzni-Pessenger-Info.plist";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-Pessenger";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		521B78422E6FE3C6004C5A3C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-PessengerTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Hezzni Pessenger.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Hezzni Pessenger";
-			};
-			name = Debug;
-		};
-		521B78432E6FE3C6004C5A3C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-PessengerTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Hezzni Pessenger.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Hezzni Pessenger";
-			};
-			name = Release;
-		};
-		521B78452E6FE3C6004C5A3C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-PessengerUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "Hezzni Pessenger";
-			};
-			name = Debug;
-		};
-		521B78462E6FE3C6004C5A3C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-PessengerUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "Hezzni Pessenger";
-			};
-			name = Release;
-		};
-		52CD68F02EDF346800D898E4 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4TJ99LZG37;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Hezzni-Driver-Info.plist";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UIUserInterfaceStyle = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-Pessenger";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				"SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*]" = DRIVER;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		52CD68F12EDF346800D898E4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4TJ99LZG37;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Hezzni-Driver-Info.plist";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UIUserInterfaceStyle = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-Pessenger";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		52CD68F32EDF346800D898E4 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.zohaib.Hezzni-DriverTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Hezzni Driver.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Hezzni Driver";
-			};
-			name = Debug;
-		};
-		52CD68F42EDF346800D898E4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.zohaib.Hezzni-DriverTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Hezzni Driver.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Hezzni Driver";
-			};
-			name = Release;
-		};
-		52CD68F62EDF346800D898E4 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.zohaib.Hezzni-DriverUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "Hezzni Driver";
-			};
-			name = Debug;
-		};
-		52CD68F72EDF346800D898E4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.zohaib.Hezzni-DriverUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "Hezzni Driver";
-			};
-			name = Release;
-		};
+        521B783C2E6FE3C6004C5A3C /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                ALWAYS_SEARCH_USER_PATHS = NO;
+                ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+                CLANG_ANALYZER_NONNULL = YES;
+                CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+                CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+                CLANG_ENABLE_MODULES = YES;
+                CLANG_ENABLE_OBJC_ARC = YES;
+                CLANG_ENABLE_OBJC_WEAK = YES;
+                CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+                CLANG_WARN_BOOL_CONVERSION = YES;
+                CLANG_WARN_COMMA = YES;
+                CLANG_WARN_CONSTANT_CONVERSION = YES;
+                CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+                CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+                CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+                CLANG_WARN_EMPTY_BODY = YES;
+                CLANG_WARN_ENUM_CONVERSION = YES;
+                CLANG_WARN_INFINITE_RECURSION = YES;
+                CLANG_WARN_INT_CONVERSION = YES;
+                CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+                CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+                CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+                CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+                CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+                CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+                CLANG_WARN_STRICT_PROTOTYPES = YES;
+                CLANG_WARN_SUSPICIOUS_MOVE = YES;
+                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+                CLANG_WARN_UNREACHABLE_CODE = YES;
+                CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+                COPY_PHASE_STRIP = NO;
+                DEBUG_INFORMATION_FORMAT = dwarf;
+                ENABLE_STRICT_OBJC_MSGSEND = YES;
+                ENABLE_TESTABILITY = YES;
+                ENABLE_USER_SCRIPT_SANDBOXING = YES;
+                GCC_C_LANGUAGE_STANDARD = gnu17;
+                GCC_DYNAMIC_NO_PIC = NO;
+                GCC_NO_COMMON_BLOCKS = YES;
+                GCC_OPTIMIZATION_LEVEL = 0;
+                GCC_PREPROCESSOR_DEFINITIONS = (
+                    "DEBUG=1",
+                    "$(inherited)",
+                );
+                GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+                GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+                GCC_WARN_UNDECLARED_SELECTOR = YES;
+                GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+                GCC_WARN_UNUSED_FUNCTION = YES;
+                GCC_WARN_UNUSED_VARIABLE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+                LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+                MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+                MTL_FAST_MATH = YES;
+                ONLY_ACTIVE_ARCH = YES;
+                OTHER_LDFLAGS = (
+                    "-Xlinker",
+                    "-interposable",
+                );
+                SDKROOT = iphoneos;
+                SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+                SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+            };
+            name = Debug;
+        };
+        521B783D2E6FE3C6004C5A3C /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                ALWAYS_SEARCH_USER_PATHS = NO;
+                ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+                CLANG_ANALYZER_NONNULL = YES;
+                CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+                CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+                CLANG_ENABLE_MODULES = YES;
+                CLANG_ENABLE_OBJC_ARC = YES;
+                CLANG_ENABLE_OBJC_WEAK = YES;
+                CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+                CLANG_WARN_BOOL_CONVERSION = YES;
+                CLANG_WARN_COMMA = YES;
+                CLANG_WARN_CONSTANT_CONVERSION = YES;
+                CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+                CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+                CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+                CLANG_WARN_EMPTY_BODY = YES;
+                CLANG_WARN_ENUM_CONVERSION = YES;
+                CLANG_WARN_INFINITE_RECURSION = YES;
+                CLANG_WARN_INT_CONVERSION = YES;
+                CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+                CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+                CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+                CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+                CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+                CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+                CLANG_WARN_STRICT_PROTOTYPES = YES;
+                CLANG_WARN_SUSPICIOUS_MOVE = YES;
+                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+                CLANG_WARN_UNREACHABLE_CODE = YES;
+                CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+                COPY_PHASE_STRIP = NO;
+                DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+                ENABLE_NS_ASSERTIONS = NO;
+                ENABLE_STRICT_OBJC_MSGSEND = YES;
+                ENABLE_USER_SCRIPT_SANDBOXING = YES;
+                GCC_C_LANGUAGE_STANDARD = gnu17;
+                GCC_NO_COMMON_BLOCKS = YES;
+                GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+                GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+                GCC_WARN_UNDECLARED_SELECTOR = YES;
+                GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+                GCC_WARN_UNUSED_FUNCTION = YES;
+                GCC_WARN_UNUSED_VARIABLE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+                LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+                MTL_ENABLE_DEBUG_INFO = NO;
+                MTL_FAST_MATH = YES;
+                OTHER_LDFLAGS = (
+                    "-Xlinker",
+                    "-interposable",
+                );
+                SDKROOT = iphoneos;
+                SWIFT_COMPILATION_MODE = wholemodule;
+                VALIDATE_PRODUCT = YES;
+            };
+            name = Release;
+        };
+        521B783F2E6FE3C6004C5A3C /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+                ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                ENABLE_PREVIEWS = YES;
+                GENERATE_INFOPLIST_FILE = YES;
+                INFOPLIST_FILE = "Hezzni-Pessenger-Info.plist";
+                INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to take photos of your ID documents for verification.";
+                INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need photo library access so you can select document photos if camera isn’t available.";
+                INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+                INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+                INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
+                INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+                INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+                INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+                LD_RUNPATH_SEARCH_PATHS = (
+                    "$(inherited)",
+                    "@executable_path/Frameworks",
+                );
+                MARKETING_VERSION = 1.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-Pessenger";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                "SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*]" = PASSENGER;
+                SWIFT_EMIT_LOC_STRINGS = YES;
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+            };
+            name = Debug;
+        };
+        521B78402E6FE3C6004C5A3C /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+                ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                ENABLE_PREVIEWS = YES;
+                GENERATE_INFOPLIST_FILE = YES;
+                INFOPLIST_FILE = "Hezzni-Pessenger-Info.plist";
+                INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to take photos of your ID documents for verification.";
+                INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need photo library access so you can select document photos if camera isn’t available.";
+                INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+                INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+                INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
+                INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+                INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+                INFOPLIST_KEY_UIUserInterfaceStyle = "";
+                LD_RUNPATH_SEARCH_PATHS = (
+                    "$(inherited)",
+                    "@executable_path/Frameworks",
+                );
+                MARKETING_VERSION = 1.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-Pessenger";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_EMIT_LOC_STRINGS = YES;
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+            };
+            name = Release;
+        };
+        521B78422E6FE3C6004C5A3C /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+                MARKETING_VERSION = 1.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-PessengerTests";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Hezzni Pessenger.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Hezzni Pessenger";
+            };
+            name = Debug;
+        };
+        521B78432E6FE3C6004C5A3C /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+                MARKETING_VERSION = 1.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-PessengerTests";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Hezzni Pessenger.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Hezzni Pessenger";
+            };
+            name = Release;
+        };
+        521B78452E6FE3C6004C5A3C /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                GENERATE_INFOPLIST_FILE = YES;
+                MARKETING_VERSION = 1.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-PessengerUITests";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_TARGET_NAME = "Hezzni Pessenger";
+            };
+            name = Debug;
+        };
+        521B78462E6FE3C6004C5A3C /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                GENERATE_INFOPLIST_FILE = YES;
+                MARKETING_VERSION = 1.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-PessengerUITests";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_TARGET_NAME = "Hezzni Pessenger";
+            };
+            name = Release;
+        };
+        52CD68F02EDF346800D898E4 /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+                ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                DEVELOPMENT_TEAM = 4TJ99LZG37;
+                ENABLE_PREVIEWS = YES;
+                GENERATE_INFOPLIST_FILE = YES;
+                INFOPLIST_FILE = "Hezzni-Driver-Info.plist";
+                INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to take photos of your ID documents for verification.";
+                INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need photo library access so you can select document photos if camera isn’t available.";
+                INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+                INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+                INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+                INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
+                INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+                INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+                INFOPLIST_KEY_UIUserInterfaceStyle = "";
+                IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+                LD_RUNPATH_SEARCH_PATHS = (
+                    "$(inherited)",
+                    "@executable_path/Frameworks",
+                );
+                MARKETING_VERSION = 1.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-Driver";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                STRING_CATALOG_GENERATE_SYMBOLS = YES;
+                "SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*]" = DRIVER;
+                SWIFT_APPROACHABLE_CONCURRENCY = YES;
+                SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+                SWIFT_EMIT_LOC_STRINGS = YES;
+                SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+            };
+            name = Debug;
+        };
+        52CD68F12EDF346800D898E4 /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+                ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                DEVELOPMENT_TEAM = 4TJ99LZG37;
+                ENABLE_PREVIEWS = YES;
+                GENERATE_INFOPLIST_FILE = YES;
+                INFOPLIST_FILE = "Hezzni-Driver-Info.plist";
+                INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to take photos of your ID documents for verification.";
+                INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need photo library access so you can select document photos if camera isn’t available.";
+                INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+                INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+                INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+                INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
+                INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+                INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+                INFOPLIST_KEY_UIUserInterfaceStyle = "";
+                IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+                LD_RUNPATH_SEARCH_PATHS = (
+                    "$(inherited)",
+                    "@executable_path/Frameworks",
+                );
+                MARKETING_VERSION = 1.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.hezzni.Hezzni-Driver";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                STRING_CATALOG_GENERATE_SYMBOLS = YES;
+                SWIFT_APPROACHABLE_CONCURRENCY = YES;
+                SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+                SWIFT_EMIT_LOC_STRINGS = YES;
+                SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+            };
+            name = Release;
+        };
+        52CD68F32EDF346800D898E4 /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+                MARKETING_VERSION = 1.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.zohaib.Hezzni-DriverTests";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                STRING_CATALOG_GENERATE_SYMBOLS = NO;
+                SWIFT_APPROACHABLE_CONCURRENCY = YES;
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Hezzni Driver.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Hezzni Driver";
+            };
+            name = Debug;
+        };
+        52CD68F42EDF346800D898E4 /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                BUNDLE_LOADER = "$(TEST_HOST)";
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+                MARKETING_VERSION = 1.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.zohaib.Hezzni-DriverTests";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                STRING_CATALOG_GENERATE_SYMBOLS = NO;
+                SWIFT_APPROACHABLE_CONCURRENCY = YES;
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Hezzni Driver.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Hezzni Driver";
+            };
+            name = Release;
+        };
+        52CD68F62EDF346800D898E4 /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+                MARKETING_VERSION = 1.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.zohaib.Hezzni-DriverUITests";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                STRING_CATALOG_GENERATE_SYMBOLS = NO;
+                SWIFT_APPROACHABLE_CONCURRENCY = YES;
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_TARGET_NAME = "Hezzni Driver";
+            };
+            name = Debug;
+        };
+        52CD68F72EDF346800D898E4 /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                CODE_SIGN_STYLE = Automatic;
+                CURRENT_PROJECT_VERSION = 1;
+                GENERATE_INFOPLIST_FILE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+                MARKETING_VERSION = 1.0;
+                PRODUCT_BUNDLE_IDENTIFIER = "com.zohaib.Hezzni-DriverUITests";
+                PRODUCT_NAME = "$(TARGET_NAME)";
+                STRING_CATALOG_GENERATE_SYMBOLS = NO;
+                SWIFT_APPROACHABLE_CONCURRENCY = YES;
+                SWIFT_EMIT_LOC_STRINGS = NO;
+                SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+                TEST_TARGET_NAME = "Hezzni Driver";
+            };
+            name = Release;
+        };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		521B78182E6FE3C3004C5A3C /* Build configuration list for PBXProject "Hezzni" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				521B783C2E6FE3C6004C5A3C /* Debug */,
-				521B783D2E6FE3C6004C5A3C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		521B783E2E6FE3C6004C5A3C /* Build configuration list for PBXNativeTarget "Hezzni Pessenger" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				521B783F2E6FE3C6004C5A3C /* Debug */,
-				521B78402E6FE3C6004C5A3C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		521B78412E6FE3C6004C5A3C /* Build configuration list for PBXNativeTarget "Hezzni PessengerTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				521B78422E6FE3C6004C5A3C /* Debug */,
-				521B78432E6FE3C6004C5A3C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		521B78442E6FE3C6004C5A3C /* Build configuration list for PBXNativeTarget "Hezzni PessengerUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				521B78452E6FE3C6004C5A3C /* Debug */,
-				521B78462E6FE3C6004C5A3C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		52CD68EF2EDF346800D898E4 /* Build configuration list for PBXNativeTarget "Hezzni Driver" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				52CD68F02EDF346800D898E4 /* Debug */,
-				52CD68F12EDF346800D898E4 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		52CD68F22EDF346800D898E4 /* Build configuration list for PBXNativeTarget "Hezzni DriverTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				52CD68F32EDF346800D898E4 /* Debug */,
-				52CD68F42EDF346800D898E4 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		52CD68F52EDF346800D898E4 /* Build configuration list for PBXNativeTarget "Hezzni DriverUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				52CD68F62EDF346800D898E4 /* Debug */,
-				52CD68F72EDF346800D898E4 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
+        521B78182E6FE3C3004C5A3C /* Build configuration list for PBXProject "Hezzni" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                521B783C2E6FE3C6004C5A3C /* Debug */,
+                521B783D2E6FE3C6004C5A3C /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        521B783E2E6FE3C6004C5A3C /* Build configuration list for PBXNativeTarget "Hezzni Pessenger" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                521B783F2E6FE3C6004C5A3C /* Debug */,
+                521B78402E6FE3C6004C5A3C /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        521B78412E6FE3C6004C5A3C /* Build configuration list for PBXNativeTarget "Hezzni PessengerTests" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                521B78422E6FE3C6004C5A3C /* Debug */,
+                521B78432E6FE3C6004C5A3C /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        521B78442E6FE3C6004C5A3C /* Build configuration list for PBXNativeTarget "Hezzni PessengerUITests" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                521B78452E6FE3C6004C5A3C /* Debug */,
+                521B78462E6FE3C6004C5A3C /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        52CD68EF2EDF346800D898E4 /* Build configuration list for PBXNativeTarget "Hezzni Driver" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                52CD68F02EDF346800D898E4 /* Debug */,
+                52CD68F12EDF346800D898E4 /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        52CD68F22EDF346800D898E4 /* Build configuration list for PBXNativeTarget "Hezzni DriverTests" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                52CD68F32EDF346800D898E4 /* Debug */,
+                52CD68F42EDF346800D898E4 /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        52CD68F52EDF346800D898E4 /* Build configuration list for PBXNativeTarget "Hezzni DriverUITests" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                52CD68F62EDF346800D898E4 /* Debug */,
+                52CD68F72EDF346800D898E4 /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		520D44972E9F85A6003B2E73 /* XCRemoteSwiftPackageReference "FlagsKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pichukov/FlagsKit";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-		525A02922E79C6E200D6136E /* XCRemoteSwiftPackageReference "ios-maps-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/googlemaps/ios-maps-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 10.3.0;
-			};
-		};
-		52BBE4AF2E865F83000DC61A /* XCRemoteSwiftPackageReference "Inject" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/krzysztofzablocki/Inject.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.5.2;
-			};
-		};
+        520D44972E9F85A6003B2E73 /* XCRemoteSwiftPackageReference "FlagsKit" */ = {
+            isa = XCRemoteSwiftPackageReference;
+            repositoryURL = "https://github.com/pichukov/FlagsKit";
+            requirement = {
+                kind = upToNextMajorVersion;
+                minimumVersion = 1.0.0;
+            };
+        };
+        525A02922E79C6E200D6136E /* XCRemoteSwiftPackageReference "ios-maps-sdk" */ = {
+            isa = XCRemoteSwiftPackageReference;
+            repositoryURL = "https://github.com/googlemaps/ios-maps-sdk";
+            requirement = {
+                kind = upToNextMajorVersion;
+                minimumVersion = 10.3.0;
+            };
+        };
+        52BBE4AF2E865F83000DC61A /* XCRemoteSwiftPackageReference "Inject" */ = {
+            isa = XCRemoteSwiftPackageReference;
+            repositoryURL = "https://github.com/krzysztofzablocki/Inject.git";
+            requirement = {
+                kind = upToNextMajorVersion;
+                minimumVersion = 1.5.2;
+            };
+        };
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		520D44982E9F85A6003B2E73 /* FlagsKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 520D44972E9F85A6003B2E73 /* XCRemoteSwiftPackageReference "FlagsKit" */;
-			productName = FlagsKit;
-		};
-		524AF9562EE3791D0083519A /* GoogleMaps */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 525A02922E79C6E200D6136E /* XCRemoteSwiftPackageReference "ios-maps-sdk" */;
-			productName = GoogleMaps;
-		};
-		524AF9582EE379210083519A /* Inject */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 52BBE4AF2E865F83000DC61A /* XCRemoteSwiftPackageReference "Inject" */;
-			productName = Inject;
-		};
-		524AF95A2EE379240083519A /* FlagsKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 520D44972E9F85A6003B2E73 /* XCRemoteSwiftPackageReference "FlagsKit" */;
-			productName = FlagsKit;
-		};
-		525A02932E79C6E300D6136E /* GoogleMaps */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 525A02922E79C6E200D6136E /* XCRemoteSwiftPackageReference "ios-maps-sdk" */;
-			productName = GoogleMaps;
-		};
-		5265F5C22E8661CB0040CCEF /* Inject */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 52BBE4AF2E865F83000DC61A /* XCRemoteSwiftPackageReference "Inject" */;
-			productName = Inject;
-		};
+        520D44982E9F85A6003B2E73 /* FlagsKit */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = 520D44972E9F85A6003B2E73 /* XCRemoteSwiftPackageReference "FlagsKit" */;
+            productName = FlagsKit;
+        };
+        524AF9562EE3791D0083519A /* GoogleMaps */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = 525A02922E79C6E200D6136E /* XCRemoteSwiftPackageReference "ios-maps-sdk" */;
+            productName = GoogleMaps;
+        };
+        524AF9582EE379210083519A /* Inject */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = 52BBE4AF2E865F83000DC61A /* XCRemoteSwiftPackageReference "Inject" */;
+            productName = Inject;
+        };
+        524AF95A2EE379240083519A /* FlagsKit */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = 520D44972E9F85A6003B2E73 /* XCRemoteSwiftPackageReference "FlagsKit" */;
+            productName = FlagsKit;
+        };
+        525A02932E79C6E300D6136E /* GoogleMaps */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = 525A02922E79C6E200D6136E /* XCRemoteSwiftPackageReference "ios-maps-sdk" */;
+            productName = GoogleMaps;
+        };
+        5265F5C22E8661CB0040CCEF /* Inject */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = 52BBE4AF2E865F83000DC61A /* XCRemoteSwiftPackageReference "Inject" */;
+            productName = Inject;
+        };
 /* End XCSwiftPackageProductDependency section */
-	};
-	rootObject = 521B78152E6FE3C3004C5A3C /* Project object */;
+    };
+    rootObject = 521B78152E6FE3C3004C5A3C /* Project object */;
 }

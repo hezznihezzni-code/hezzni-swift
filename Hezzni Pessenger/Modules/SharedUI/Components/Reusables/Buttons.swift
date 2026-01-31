@@ -54,7 +54,7 @@ struct NotificationButton: View {
                 .padding()
                 .background(
                     Circle()
-                        .fill(.whiteblack)
+                        .fill(.white)
                         .stroke(.white200, lineWidth: 1)
                 )
         }

@@ -140,7 +140,7 @@ struct PaymentMethodScreen: View {
                         Spacer()
                     }
                     .padding(EdgeInsets(top: 15, leading: 0, bottom: 35, trailing: 0))
-                    .background(.whiteblack)
+                    .background(.white)
                 }
                 
             }
@@ -267,7 +267,7 @@ struct WalletTopUpScreen: View {
                             Spacer()
                         }
                         .padding(EdgeInsets(top: 15, leading: 0, bottom: 35, trailing: 0))
-                        .background(.whiteblack)
+                        .background(.white)
                     }
                     
                 }

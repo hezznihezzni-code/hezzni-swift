@@ -23,7 +23,7 @@ struct OnboardingView: View {
                         
                         Text("Become part of our expanding network of drivers. Earn on your own schedule and unlock exclusive rewards.")
                             .font(.system(size: 14))
-                            .foregroundColor(Color("onboarding-text-color"))
+                            .foregroundColor(.black500)
                             .multilineTextAlignment(.leading)
                             .lineLimit(nil)
                     }
