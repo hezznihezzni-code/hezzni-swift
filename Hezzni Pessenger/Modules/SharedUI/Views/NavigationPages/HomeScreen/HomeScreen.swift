@@ -7,6 +7,7 @@
 
 import SwiftUI
 import GoogleMaps
+import FlagsKit
 import CoreLocation
 
 enum BottomSheetState {
@@ -18,13 +19,21 @@ enum BottomSheetState {
     case findingRide
     case reservationConfirmation
     case reservation
+    case nowRide
+    case deliveryService
 }
 
 struct HomeScreen: View {
-    @State private var bottomSheetState: BottomSheetState = .initial
+    
+    //-----------Inital Screen Variables -----------------------//
     @State private var selectedService: String = "Car"
-    @State private var pickupLocation: String = "Current Location, Marrakech"
-    @State private var destinationLocation: String = "Menara Mall, Gueliz District"
+    @State private var isNowSelected: Bool = true
+    @State private var pickupLocation: String = "From?"
+    @State private var destinationLocation: String = "Where To?"
+    
+    @State private var bottomSheetState: BottomSheetState = .initial
+    
+   
     @State private var isEditingPickup = false
     @State private var isEditingDestination = false
     @State private var showSuggestions = false
@@ -54,6 +63,10 @@ struct HomeScreen: View {
 
     // Notifications presentation (avoid navigationDestination)
     @State private var isShowingNotifications = false
+
+    // Country picker presentation (full-screen overlay)
+    @State private var showCountryPicker: Bool = false
+    @State private var selectedCountryForDelivery: Country = .morocco
 
     // List of services
     private let services = [
@@ -136,6 +149,70 @@ struct HomeScreen: View {
                 .edgesIgnoringSafeArea(.bottom)
                 .transition(.move(edge: .bottom))
                 .animation(.easeInOut, value: showSchedulePicker)
+            }
+        }
+        .overlay {
+            // Country picker overlay
+            if showCountryPicker {
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        showCountryPicker = false
+                    }
+
+                VStack {
+                    Spacer()
+
+                    VStack(spacing: 0) {
+                        HStack {
+                            Button("Cancel") {
+                                showCountryPicker = false
+                            }
+                            .foregroundColor(.blue)
+                            .font(.body)
+
+                            Spacer()
+
+                            Text("Select Country")
+                                .font(.headline)
+
+                            Spacer()
+
+                            Button("Done") {
+                                showCountryPicker = false
+                            }
+                            .foregroundColor(.blue)
+                            .font(.body)
+                        }
+                        .padding()
+                        .background(Color(.systemGray6))
+
+                        Picker("Select Country", selection: $selectedCountryForDelivery) {
+                            ForEach(Country.countries) { country in
+                                HStack {
+                                    FlagView(countryCode: country.code, style: .circle)
+                                        .frame(width: 22, height: 22)
+
+                                    Text(country.name)
+                                        .foregroundColor(.primary)
+                                    Spacer()
+                                    Text(country.dialCode)
+                                        .foregroundColor(.gray)
+                                }
+                                .tag(country)
+                            }
+                        }
+                        .pickerStyle(WheelPickerStyle())
+                        .frame(height: 200)
+                        .background(Color.white)
+                    }
+                    .background(Color.white)
+                    .cornerRadius(16)
+                    .padding(.horizontal)
+                    .padding(.bottom, 8)
+                }
+                .transition(.move(edge: .bottom))
+                .zIndex(100)
             }
         }
     }
@@ -228,6 +305,7 @@ struct HomeScreen: View {
             // Drag handle
             dragHandle
             
+            // ----------- Titles ------------
             if bottomSheetState == .journey {
                 CustomAppBar(
                     title: selectedService,
@@ -242,7 +320,20 @@ struct HomeScreen: View {
                     trailingView: {
                         Button(action: {
                             withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                                bottomSheetState = .reservation
+                                if !isNowSelected {
+                                    if selectedService == "Delivery" || selectedService == "Group Ride"{
+                                        selectedService = "Car"
+                                    }
+                                        bottomSheetState = .reservation
+                                    
+                                } else{
+                                    if selectedService == "Delivery" {
+                                        bottomSheetState = .deliveryService
+                                    }else {
+                                        bottomSheetState = .nowRide
+                                    }
+                                    
+                                }
                                 sheetHeight = maxSheetHeight
                             }
                         }) {
@@ -254,10 +345,22 @@ struct HomeScreen: View {
                 )
                 .padding(.horizontal, 16)
             }
-            
             if bottomSheetState == .reservation {
                 CustomAppBar(
-                    title: "Reservation",
+                    title: "Reservation Details",
+                    weight: .medium,
+                    backButtonAction: {
+                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                            bottomSheetState = .journey
+                            sheetHeight = maxSheetHeight
+                        }
+                    }
+                )
+                .padding(.horizontal, 16)
+            }
+            if bottomSheetState == .nowRide {
+                CustomAppBar(
+                    title: "Trip Details",
                     weight: .medium,
                     backButtonAction: {
                         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
@@ -309,8 +412,27 @@ struct HomeScreen: View {
                 ReservationDetailScreen(
                     bottomSheetState: $bottomSheetState,
                     namespace: animations,
+                    selectedService: $selectedService,
                     showSchedulePicker: $showSchedulePicker,
                     selectedDate: $selectedDate
+                )
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+            else if bottomSheetState == .nowRide {
+                NowRideDetailScreen(
+                    bottomSheetState: $bottomSheetState,
+                    namespace: animations,
+                    selectedService: selectedService,
+                )
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+            else if bottomSheetState == .deliveryService {
+                DeliveryDetailScreen(
+                    bottomSheetState: $bottomSheetState,
+                    showCountryPicker: $showCountryPicker,
+                    namespace: animations,
+                    selectedCountry: $selectedCountryForDelivery,
+                    selectedService: selectedService
                 )
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
@@ -392,7 +514,7 @@ struct HomeScreen: View {
     private var servicesScrollView: some View {
         HorizontalServicesScrollView(
             items: services,
-            padding: EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16), // ← Change this line
+            padding: EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16),
             backgroundColor: .white
         ) { service in
             ServiceCardBuilder.createCard(
@@ -408,7 +530,7 @@ struct HomeScreen: View {
         ScrollView {
             VStack(spacing: 10) {
                 if bottomSheetState == .initial {
-                    NowReservationToggleButton()
+                    NowReservationToggleButton(isNowSelected: $isNowSelected)
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 
@@ -421,7 +543,7 @@ struct HomeScreen: View {
                             LocationCardView(
                                 imageName: "pickup_ellipse",
                                 heading: "Pickup",
-                                content: "Current Location, Marrakech",
+                                content: pickupLocation,
                                 onTap: {
                                     withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                                         showSuggestions = true
@@ -443,7 +565,7 @@ struct HomeScreen: View {
                         LocationCardView(
                             imageName: "dropoff_ellipse",
                             heading: "Destination",
-                            content: "Menara Mall, Gueliz District",
+                            content: destinationLocation,
                             roundedEdges: .bottom
                         ).matchedGeometryEffect(id: "destination", in: animations)
                         
@@ -817,7 +939,7 @@ struct ServiceCardHorizontal: View {
     }
 }
 
-
 #Preview {
     HomeScreen()
+        .environmentObject(NavigationStateManager())
 }

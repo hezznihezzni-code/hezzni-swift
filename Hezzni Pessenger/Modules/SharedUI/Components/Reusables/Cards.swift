@@ -376,6 +376,7 @@ struct RideOptionCard: View {
     let icon: String
     let title: String
     let subtitle: String
+    let seats: Int
     let timeEstimate: String
     let price: String
     @Binding var isSelected: Bool
@@ -402,8 +403,14 @@ struct RideOptionCard: View {
                     }
                     
                     HStack(alignment: .center, spacing: 4) {
-                        Image(systemName: "person.fill")
-                            .frame(width: 16, height: 16)
+                        Image("account_icon_filled")
+                            .resizable()
+                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
+                            .frame(width: 10, height: 11)
+                        
+                        Text(String(seats) + " · ")
+                            .font(.poppins(.regular, size: 12))
+                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
                         
                         Text(timeEstimate)
                             .font(.poppins(.regular, size: 12))
@@ -451,6 +458,7 @@ struct RideOptionCard: View {
         icon: "car-service-icon",
         title: "Hezzni Comfort",
         subtitle: "Luxury vehicles",
+        seats: 4,
         timeEstimate: "5-10 min",
         price: "45 MAD",
         isSelected: $value

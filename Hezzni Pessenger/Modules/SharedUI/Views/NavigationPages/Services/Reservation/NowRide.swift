@@ -1,31 +1,116 @@
 //
-//  ReservationDetailScreen.swift
-//  Hezzni Pessenger
+//  NowRide.swift
+//  Hezzni
 //
-//  Created by Zohaib Ahmed on 9/23/25.
+//  Created by Zohaib Ahmed on 2/1/26.
 //
-
 import SwiftUI
 
-// Applied coupon model
-struct AppliedCoupon {
-    let code: String
-    let discount: String
-    let validity: String
-}
+let rideOptions = [
+    VehicleSubOptionsView.RideOption(
+        id: "standard",
+        icon: "car-service-icon",
+        title: "Hezzni Standard",
+        subtitle: "Comfortable vehicles",
+        seats: 4,
+        timeEstimate: "3-8 min",
+        price: "25 MAD"
+    ),
+    VehicleSubOptionsView.RideOption(
+        id: "comfort",
+        icon: "car-service-comfort-icon",
+        title: "Hezzni Comfort",
+        subtitle: "Luxury vehicles",
+        seats: 4,
+        timeEstimate: "5-10 min",
+        price: "45 MAD"
+    ),
+    VehicleSubOptionsView.RideOption(
+        id: "xl",
+        icon: "car-service-xl-icon",
+        title: "Hezzni  XL",
+        subtitle: "Confortable vehicles",
+        seats: 6,
+        timeEstimate: "5-10 min",
+        price: "45 MAD"
+    )
+]
+// Car ride options (with Taxi)
+let carRideOptions = [
+    VehicleSubOptionsView.RideOption(
+        id: "standard",
+        icon: "car-service-icon",
+        title: "Hezzni Standard",
+        subtitle: "Comfortable vehicles",
+        seats: 4,
+        timeEstimate: "3-8 min",
+        price: "25 MAD"
+    ),
+    VehicleSubOptionsView.RideOption(
+        id: "comfort",
+        icon: "car-service-comfort-icon",
+        title: "Hezzni Comfort",
+        subtitle: "Comfortable vehicles",
+        seats: 4,
+        timeEstimate: "3-8 min",
+        price: "35 MAD"
+    ),
+    VehicleSubOptionsView.RideOption(
+        id: "xl",
+        icon: "car-service-xl-icon",
+        title: "Hezzni XL",
+        subtitle: "Comfortable vehicles",
+        seats: 6,
+        timeEstimate: "3-8 min",
+        price: "50 MAD"
+    ),
+    VehicleSubOptionsView.RideOption(
+        id: "taxi",
+        icon: "taxi-service-icon",
+        title: "Taxi",
+        subtitle: "Comfortable vehicles",
+        seats: 6,
+        timeEstimate: "3-8 min",
+        price: "100 MAD"
+    )
+]
 
+// Bike ride option
+let bikeRideOptions = [
+    VehicleSubOptionsView.RideOption(
+        id: "bike-standard",
+        icon: "motorcycle-service-icon",
+        title: "Hezzni Standard",
+        subtitle: "Comfortable vehicles",
+        seats: 1,
+        timeEstimate: "3-8 min",
+        price: "25 MAD"
+    )
+]
 
-struct ReservationDetailScreen : View {
+// Taxi ride option (if you want a separate array)
+let taxiRideOptions = [
+    VehicleSubOptionsView.RideOption(
+        id: "taxi",
+        icon: "taxi-service-icon",
+        title: "Taxi",
+        subtitle: "Comfortable vehicles",
+        seats: 6,
+        timeEstimate: "3-8 min",
+        price: "100 MAD"
+    )
+]
+
+struct NowRideDetailScreen : View {
     @Binding var bottomSheetState: BottomSheetState
     var namespace: Namespace.ID?
-    
+    var selectedService: String = "Car"
     @State private var selectedOption: String? = "standard"
     @State var couponField: String = ""
     @State private var showCouponError: Bool = false
     @State private var appliedCoupon: AppliedCoupon? = nil
-    @Binding var selectedService: String
-    @Binding var showSchedulePicker: Bool
-    @Binding var selectedDate: Date  // Changed from @State to @Binding
+    
+    
     
     //    @Namespace private var animations
     // Valid coupon
@@ -36,12 +121,14 @@ struct ReservationDetailScreen : View {
         Service(id: "car", icon: "car-service-icon", title: "Car"),
         Service(id: "motorcycle", icon: "motorcycle-service-icon", title: "Motorcycle"),
         Service(id: "airport", icon: "airport-service-icon", title: "Ride to Airport"),
-        
+        Service(id: "rental", icon: "rental-service-icon", title: "Rental Car"),
+        Service(id: "reservation", icon: "reservation-service-icon", title: "Reservation"),
         Service(id: "city", icon: "city-service-icon", title: "City to City"),
         Service(id: "taxi", icon: "taxi-service-icon", title: "Taxi"),
-//        Service(id: "delivery", icon: "delivery-service-icon", title: "Delivery"),
-//        Service(id: "group", icon: "shared-service-icon", title: "Group Ride")
+        Service(id: "delivery", icon: "delivery-service-icon", title: "Delivery"),
+        Service(id: "group", icon: "shared-service-icon", title: "Group Ride")
     ]
+    
     
     // Computed properties for coupon logic
     private var isCouponFieldEmpty: Bool {
@@ -56,18 +143,7 @@ struct ReservationDetailScreen : View {
         !isCouponFieldEmpty && !shouldShowError
     }
     
-    private var formattedDate: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d MMMM, yyyy"
-        return formatter.string(from: selectedDate)
-    }
-    
-    private var formattedTime: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        return formatter.string(from: selectedDate)
-    }
-    
+   
     // Apply coupon action
     private func applyCoupon() {
         if couponField == validCoupon {
@@ -89,9 +165,10 @@ struct ReservationDetailScreen : View {
         couponField = ""
         showCouponError = false
     }
-    
     private var options: [VehicleSubOptionsView.RideOption] {
         switch selectedService.lowercased() {
+        case "car":
+            return carRideOptions
         case "motorcycle":
             return bikeRideOptions
         case "taxi":
@@ -100,7 +177,9 @@ struct ReservationDetailScreen : View {
             return rideOptions
         }
     }
+    
     var body: some View {
+        
         ZStack {
             VStack{
                 ScrollView {
@@ -140,15 +219,7 @@ struct ReservationDetailScreen : View {
                                 roundedEdges: .bottom
                             )
 //                            .matchedGeometryEffect(id: "destination", in: namespace!)
-                            ScheduleCardView(
-                                dateTime: formattedDate + " at " + formattedTime,
-                                trailingIcon: "pencil_icon",
-                                onTap: {
-                                    withAnimation {
-                                        showSchedulePicker = true
-                                    }
-                                }
-                            )
+                            
                             // MARK: - Vehicle Option
                             Text("Vehicle Options")
                                 .font(
@@ -157,11 +228,11 @@ struct ReservationDetailScreen : View {
                                 )
                                 .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
                                 .frame(maxWidth: .infinity, alignment: .topLeading)
-                            ServiceSelectorView(
-                                services: services,
-                                selectedService: $selectedService,
+//                            ServiceSelectorView(services: services, selectedService: $selectedService)
+                            VehicleSubOptionsView(
+                                selectedOption: $selectedOption,
+                                options: options
                             )
-                            VehicleSubOptionsView(selectedOption: $selectedOption, options: options)
 //                                .matchedGeometryEffect(id: "selected_vehicle", in: namespace!)
                             // MARK: - Coupon section
                             CouponView(
@@ -267,58 +338,46 @@ struct ReservationDetailScreen : View {
         }
     }
     
-    struct ServiceSelectorView: View {
-        let services: [Service]
-        @Binding var selectedService: String
-        var body: some View {
-            HorizontalServicesScrollView(items: services) { service in
-                ServiceCardBuilder.createCard(
-                    icon: service.icon,
-                    title: service.title,
-                    isSelected: selectedService == service.title,
-                    action: {
-                        selectedService = service.title
-                    }
-                )
-            }
-        }
-    }
+    
     
 }
 
 #Preview {
-    ReservationDetailScreen(
-        bottomSheetState: .constant(.reservation),
-        selectedService: .constant("Car"),
-        showSchedulePicker: .constant(false),
-        selectedDate: .constant(Date())
+    NowRideDetailScreen(
+        bottomSheetState: .constant(.nowRide) // Provide a default BottomSheetState value
     )
 }
 
-// MARK: - BottomSheetContent for dynamic height
-struct BottomSheetContent: View {
-    @Binding var showSchedulePicker: Bool
-    @Binding var selectedDate: Date
-    @State private var contentHeight: CGFloat = 0
+struct VehicleSubOptionsView: View {
+    @Binding var selectedOption: String?
+    let options: [RideOption]
+    struct RideOption {
+        let id: String
+        let icon: String
+        let title: String
+        let subtitle: String
+        let seats: Int
+        let timeEstimate: String
+        let price: String
+    }
     var body: some View {
-        VStack(spacing: 0) {
-            SchedulePickerScreen(showSchedulePicker: $showSchedulePicker, selectedDate: $selectedDate)
-                .background(
-                    GeometryReader { proxy in
-                        Color.clear
-                            .onAppear {
-                                contentHeight = proxy.size.height
-                            }
-                            .onChange(of: proxy.size.height) { newHeight in
-                                contentHeight = newHeight
-                            }
-                    }
+        VStack(spacing: 16) {
+            ForEach(options, id: \ .id) { option in
+                RideOptionCard(
+                    icon: option.icon,
+                    title: option.title,
+                    subtitle: option.subtitle,
+                    seats: option.seats,
+                    timeEstimate: option.timeEstimate,
+                    price: option.price,
+                    isSelected: Binding(
+                        get: { selectedOption == option.id },
+                        set: { if $0 { selectedOption = option.id } }
+                    )
+                    
                 )
+                
+            }
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: contentHeight > 0 ? contentHeight + 48 : nil) // 48 for close button spacing
-        .background(Color.white)
-        .cornerRadius(20)
-        .shadow(radius: 10)
     }
 }

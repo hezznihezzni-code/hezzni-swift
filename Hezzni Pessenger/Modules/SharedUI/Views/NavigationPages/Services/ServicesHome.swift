@@ -142,4 +142,5 @@ struct ServiceCard: View {
 
 #Preview {
     ServicesHome()
+        .environmentObject(NavigationStateManager())
 }

@@ -61,7 +61,7 @@ struct NotificationButton: View {
     }
 }
 struct NowReservationToggleButton: View {
-    @State private var isNowSelected = true
+    @Binding var isNowSelected: Bool
     
     var body: some View {
         HStack(alignment: .center, spacing: 10) {
@@ -120,7 +120,7 @@ struct NowReservationToggleButton: View {
 }
 
 #Preview{
-    NowReservationToggleButton()
+    NowReservationToggleButton(isNowSelected: .constant(true))
 }
 
 #Preview{

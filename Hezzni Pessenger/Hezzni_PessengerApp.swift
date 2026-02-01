@@ -6,9 +6,13 @@
 //
 
 import SwiftUI
+import GoogleMaps
 
 @main
 struct Hezzni_PessengerApp: App {
+    init() {
+            GMSServices.provideAPIKey("AIzaSyAGlfVLO31MsYNRfiJooK3-e38vAVkkij0")
+        }
     var body: some Scene {
         WindowGroup {
             ContentView()

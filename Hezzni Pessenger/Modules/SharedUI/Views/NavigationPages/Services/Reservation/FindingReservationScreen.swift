@@ -12,11 +12,12 @@ struct FindingReservationScreen: View {
     var namespace: Namespace.ID?
     @Binding var sheetHeight: CGFloat
     // Props for trip info
-    var vehicle: ReservationDetailScreen.VehicleOptionsView.RideOption = .init(
+    var vehicle: VehicleSubOptionsView.RideOption = .init(
         id: "standard",
         icon: "car-service-icon",
         title: "Hezzni Standard",
         subtitle: "Comfortable vehicles",
+        seats: 4,
         timeEstimate: "3-8 min",
         price: "25 MAD"
     )
@@ -60,7 +61,8 @@ struct FindingReservationScreen: View {
                     icon: "car-service-icon",
                     title: "Hezzni Standard",
                     subtitle: "Comfortable vehicles",
-                    timeEstimate: "4 * 3-8 min",
+                    seats: 4,
+                    timeEstimate: "3-8 min",
                     price: "25 MAD",
                     isSelected: .constant(true)
                 )

@@ -613,13 +613,16 @@ struct ProfileSetupView: View {
     }
 }
 
+import SwiftUI
+
 struct FormField: View {
     let title: String
     let placeholder: String
     @Binding var text: String
     var icon: String? = nil
     var errorMessage: String? = nil
-    
+    var isMultiline: Bool = false
+
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
@@ -630,16 +633,34 @@ struct FormField: View {
             .padding(.horizontal, 5)
             
             HStack(spacing: 8) {
-                if icon != nil {
-                    Image(icon ?? "")
+                if let icon = icon {
+                    Image(icon)
                         .frame(width: 25, height: 25)
                         .foregroundColor(.gray)
                 }
-                TextField(placeholder, text: $text)
-                    .font(.poppins(.regular, size: 14))
+                if isMultiline {
+                    ZStack(alignment: .topLeading) {
+                        if text.isEmpty {
+                            Text(placeholder)
+                                .font(.poppins(.regular, size: 14))
+                                .foregroundColor(Color.black.opacity(0.4))
+                                .padding(.top, 8)
+                                .padding(.leading, 4)
+                        }
+                        TextEditor(text: $text)
+                            .font(.poppins(.regular, size: 14))
+                            .frame(height: 80) // ~3 lines
+                            .padding(4)
+                            .background(Color.white)
+                            .cornerRadius(8)
+                    }
+                } else {
+                    TextField(placeholder, text: $text)
+                        .font(.poppins(.regular, size: 14))
+                }
             }
             .padding(10)
-            .frame(height: 50)
+            .frame(height: isMultiline ? 90 : 50)
             .background(.white)
             .cornerRadius(10)
             .overlay(

@@ -173,6 +173,7 @@ struct RidePaymentScreen: View {
                                 icon: "car-service-icon",
                                 title: "Hezzni Standard",
                                 subtitle: "Comfortable vehicles",
+                                seats: 4,
                                 timeEstimate: "3-8 min",
                                 price: "50 MAD",
                                 isSelected: .constant(true)

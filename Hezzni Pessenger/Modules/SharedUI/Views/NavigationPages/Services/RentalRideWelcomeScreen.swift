@@ -29,4 +29,5 @@ struct RentalRideWelcomeScreen: View {
 
 #Preview {
     RentalRideWelcomeScreen()
+        .environmentObject(NavigationStateManager())
 }

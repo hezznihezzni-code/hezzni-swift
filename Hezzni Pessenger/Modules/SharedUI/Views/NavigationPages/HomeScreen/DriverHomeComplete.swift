@@ -1512,7 +1512,7 @@ struct SideDrawerView: View {
                     navigateToEarnings = true
                 })
                 
-                DrawerMenuItem(icon: "hezzni_wallet_icon", text: "Hezzni Wallet", action: {
+                DrawerMenuItem(icon: "hezzni_wallet_icon_green", text: "Hezzni Wallet", action: {
                     withAnimation { isOpen = false }
                     navigateToHezzniWallet = true
                 })
@@ -1522,7 +1522,7 @@ struct SideDrawerView: View {
                     navigateToTripHistory = true
                 })
                 
-                DrawerMenuItem(icon: "account_icon_filled", text: "Account", action: {
+                DrawerMenuItem(icon: "account_icon_filled_green", text: "Account", action: {
                     withAnimation { isOpen = false }
                     navigateToAccount = true
                 })
