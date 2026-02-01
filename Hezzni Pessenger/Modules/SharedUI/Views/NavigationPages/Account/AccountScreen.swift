@@ -332,25 +332,25 @@ struct AccountScreen: View {
                                     }
                                 )
                                 
-                                Text("----For Testing only----")
-                                AccountListTile(
-                                    iconName: "logout_icon",
-                                    title: "Cancel Ride",
-                                    titleColor: Color.red,
-                                    subtitle: "Cancellation testing screen",
-                                    includeShadow: true,
-                                    isSystemImage: false,
-                                    action: {
-                                        print("Sign out Tapped")
-                                        currentRoute = .cancelRide
-                                        navigationState.hideBottomBar()
-                                        
-                                    }
-                                )
+//                                Text("----For Testing only----")
+//                                AccountListTile(
+//                                    iconName: "logout_icon",
+//                                    title: "Cancel Ride",
+//                                    titleColor: Color.red,
+//                                    subtitle: "Cancellation testing screen",
+//                                    includeShadow: true,
+//                                    isSystemImage: false,
+//                                    action: {
+//                                        print("Sign out Tapped")
+//                                        currentRoute = .cancelRide
+//                                        navigationState.hideBottomBar()
+//                                        
+//                                    }
+//                                )
                             }
                         }
                         .padding(0)
-                        .frame(width: 372, alignment: .topLeading)
+                        .frame(width: .infinity, alignment: .center)
                         Spacer()
                     }
                     .padding()
@@ -381,7 +381,7 @@ struct AccountScreen: View {
 }
 
 #Preview {
-    DriverAccountScreen()
+    AccountScreen()
 }
 
 struct DriverAccountScreen: View {
@@ -692,7 +692,7 @@ struct DriverAccountScreen: View {
                                 }
                             }
                             .padding(0)
-                            .frame(width: 372, alignment: .topLeading)
+                            .frame(width: .infinity, alignment: .center)
                             Spacer()
                         }
                         .padding(.horizontal, 16)
@@ -786,7 +786,6 @@ struct AccountListTile: View {
             } else {
                 Spacer()
             }
-            
             // Trailing Content - Chevron or Toggle
             if showChevron {
                 Image(systemName: "chevron.forward")

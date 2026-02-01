@@ -26,12 +26,12 @@ enum BottomSheetState {
 struct HomeScreen: View {
     
     //-----------Inital Screen Variables -----------------------//
-    @State private var selectedService: String = "Car"
-    @State private var isNowSelected: Bool = true
-    @State private var pickupLocation: String = "From?"
-    @State private var destinationLocation: String = "Where To?"
+    @Binding var selectedService: String
+    @Binding var isNowSelected: Bool
+    @Binding var pickupLocation: String
+    @Binding var destinationLocation: String
     
-    @State private var bottomSheetState: BottomSheetState = .initial
+    @Binding private var bottomSheetState: BottomSheetState
     
    
     @State private var isEditingPickup = false
@@ -91,7 +91,19 @@ struct HomeScreen: View {
         "Jamaâ El Fna Square"
     ]
     
-    init() {
+    init(
+        selectedService: Binding<String>,
+        isNowSelected: Binding<Bool>,
+        pickupLocation: Binding<String>,
+        destinationLocation: Binding<String>,
+        bottomSheetState: Binding<BottomSheetState>
+    ) {
+        self._selectedService = selectedService
+        self._isNowSelected = isNowSelected
+        self._pickupLocation = pickupLocation
+        self._destinationLocation = destinationLocation
+        self._bottomSheetState = bottomSheetState
+    
         // Default camera position for New York 40.629255690273595, -73.98749804295893
         let marrakech = CLLocationCoordinate2D(latitude: 40.629255690273595, longitude: -73.98749804295893)
         _cameraPosition = State(initialValue: GMSCameraPosition.camera(withTarget: marrakech, zoom: 14))
@@ -119,7 +131,10 @@ struct HomeScreen: View {
                     updateCameraPosition(location: location)
                 }
                 .onAppear {
-                    navigationState.showBottomBar()
+                    if bottomSheetState == .initial {
+                        navigationState.showBottomBar()
+                    }
+                    
                 }
 
                 // Notification overlay
@@ -149,6 +164,12 @@ struct HomeScreen: View {
                 .edgesIgnoringSafeArea(.bottom)
                 .transition(.move(edge: .bottom))
                 .animation(.easeInOut, value: showSchedulePicker)
+            }
+        }
+        .onAppear{
+            if bottomSheetState != .initial {
+//                navigationState.hideBottomBar()
+                sheetHeight = maxSheetHeight
             }
         }
         .overlay {
@@ -939,7 +960,25 @@ struct ServiceCardHorizontal: View {
     }
 }
 
+// Swift
 #Preview {
-    HomeScreen()
-        .environmentObject(NavigationStateManager())
+    struct HomeScreenPreviewWrapper: View {
+        @State private var selectedService = "Car"
+        @State private var isNowSelected = true
+        @State private var pickupLocation = "From?"
+        @State private var destinationLocation = "Where To?"
+        @State private var bottomSheetState = BottomSheetState.initial
+
+        var body: some View {
+            HomeScreen(
+                selectedService: $selectedService,
+                isNowSelected: $isNowSelected,
+                pickupLocation: $pickupLocation,
+                destinationLocation: $destinationLocation,
+                bottomSheetState: $bottomSheetState
+            )
+            .environmentObject(NavigationStateManager())
+        }
+    }
+    return HomeScreenPreviewWrapper()
 }

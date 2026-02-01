@@ -10,7 +10,15 @@ import SwiftUI
 struct MainScreen: View {
     @State private var selectedTab: BottomNavigationBar.Tab = .home
     @EnvironmentObject private var navigationState: NavigationStateManager
-
+    
+    //---------- Components For Home Screen ----------------///
+    @State var selectedService: String = "Car"
+    @State var isNowSelected: Bool = true
+    @State var pickupLocation: String = "From?"
+    @State var destinationLocation: String = "Where To?"
+    
+    @State private var bottomSheetState: BottomSheetState = .initial
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -18,9 +26,22 @@ struct MainScreen: View {
                 Group {
                     switch selectedTab {
                     case .home:
-                        HomeScreen()
+                        HomeScreen(
+                            selectedService: $selectedService,
+                            isNowSelected: $isNowSelected,
+                            pickupLocation: $pickupLocation,
+                            destinationLocation: $destinationLocation,
+                            bottomSheetState: $bottomSheetState
+                        )
                     case .services:
-                        ServicesHome()
+                        ServicesHome(
+                            selectedTab: $selectedTab,
+                            selectedService: $selectedService,
+                            isNowSelected: $isNowSelected,
+                            pickupLocation: $pickupLocation,
+                            destinationLocation: $destinationLocation,
+                            bottomSheetState: $bottomSheetState
+                        )
                     case .history:
                         HistoryScreen()
                     case .chat:
@@ -58,4 +79,5 @@ struct MainScreen: View {
 
 #Preview {
     MainScreen()
+        .environmentObject(NavigationStateManager())
 }

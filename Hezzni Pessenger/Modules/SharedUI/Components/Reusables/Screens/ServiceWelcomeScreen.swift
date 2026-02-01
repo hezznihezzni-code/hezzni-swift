@@ -14,32 +14,21 @@ struct ServiceWelcomeScreen : View {
     let onGetStarted: () -> Void
     
     var body: some View {
-        VStack (spacing: -14){
+        VStack {
 //            // Background image
+            
             ZStack(alignment: .top){
                 
                 Image(image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
+                    .clipped()
                     .ignoresSafeArea()
-//                HStack{
-//                    Button(action: {
-//                        
-//                    }){
-//                        Image(systemName: "arrow.left")
-//                            .foregroundStyle(.white)
-//                    }
-//                    Spacer()
-//                }.padding(36)
+                    
             }
-                
-                // Bottom content section
             VStack(spacing:24) {
-//                Image("hezzni-logo")
-//                    .resizable()
-//                    .frame(width: 110.0, height: 40)
-//                    .padding(.top, 10)
                     VStack(alignment: .leading, spacing:16) {
+                        
                         HStack{
                             Text(title)
                                 .font(.poppins(.semiBold, size: 32))
@@ -85,8 +74,8 @@ struct ServiceWelcomeScreen : View {
 #Preview {
     ServiceWelcomeScreen(
         image: "bike-ride-background",
-        title: "Your Trusted Ride",
-        bodyContent: "Fast and safe motorcycle ride",
+        title: "Getting to Airport is Easy with Hezzni",
+        bodyContent: "Table airport rides with ease. Enjoy seamless booking, real-time updates, and reliable service to make your journey stress-free.",
         onGetStarted: {}
     )
 }

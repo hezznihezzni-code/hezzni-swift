@@ -146,6 +146,7 @@ struct CompleteProfile: View {
             // If cities arrive after user, resolve selectedCity -> index.
             prefillFromCurrentUserIfNeeded()
         }
+        
     }
     
     private var cityNames: [String] {
@@ -566,7 +567,9 @@ struct ProfileSetupView: View {
             .presentationDetents([.height(300)])
             .presentationDragIndicator(.hidden)
         }
-        .sheet(isPresented: $showCityPicker) {
+        .sheet(isPresented: $showCityPicker, onDismiss: {
+            validateFields()
+        }) {
             PickerPopup(
                 title: "Select City",
                 currentSelected: $selectedCity,
@@ -575,6 +578,7 @@ struct ProfileSetupView: View {
             )
             .presentationDetents([.height(300)])
             .presentationDragIndicator(.visible)
+            
         }
     }
     
@@ -595,7 +599,7 @@ struct ProfileSetupView: View {
         emailErrorMessage = nil
 
         if !emailAddress.isEmpty {
-            let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+            let emailRegex = "[A-Z0-9a-z._%+-]+@[A-ZaZ0-9.-]+\\.[A-Za-z]{2,64}"
             let emailPredicate = NSPredicate(format: "SELF MATCHES %@", emailRegex)
             isEmailValid = emailPredicate.evaluate(with: emailAddress)
 
