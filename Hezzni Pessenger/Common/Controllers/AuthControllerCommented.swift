@@ -87,3 +87,42 @@
 //        }
 //    }
 //
+
+
+
+//----------------------------- Ride Info inside rideSummary Homescreen -----------------------------//
+//
+//            HStack(spacing: 0) {
+//                // Distance
+//                HStack(spacing: 4) {
+//                    Text(String(format: "%.1f", estimatedDistance))
+//                        .font(Font.custom("Poppins", size: 16).weight(.bold))
+//                        .foregroundColor(.white)
+//                    Text("KM")
+//                        .font(Font.custom("Poppins", size: 12).weight(.medium))
+//                        .foregroundColor(.white)
+//                }
+//                .padding(.horizontal, 12)
+//                .padding(.vertical, 8)
+//                .background(Color(red: 0.22, green: 0.65, blue: 0.33))
+//                .cornerRadius(8, corners: [.topLeft, .bottomLeft])
+//
+//                // Duration
+//                HStack(spacing: 4) {
+//                    Text("\(estimatedDuration)")
+//                        .font(Font.custom("Poppins", size: 16).weight(.bold))
+//                        .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+//                    Text("min")
+//                        .font(Font.custom("Poppins", size: 12).weight(.medium))
+//                        .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+//                }
+//                .padding(.horizontal, 12)
+//                .padding(.vertical, 8)
+//                .background(Color.white)
+//                .cornerRadius(8, corners: [.topRight, .bottomRight])
+//                .overlay(
+//                    RoundedCorner(radius: 8, corners: [.topRight, .bottomRight])
+//                        .stroke(Color(red: 0.92, green: 0.92, blue: 0.92), lineWidth: 1)
+//                )
+//            }
+            

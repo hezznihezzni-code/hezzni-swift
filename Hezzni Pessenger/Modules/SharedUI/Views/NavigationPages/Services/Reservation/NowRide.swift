@@ -8,101 +8,113 @@ import SwiftUI
 
 let rideOptions = [
     VehicleSubOptionsView.RideOption(
-        id: "standard",
+        id: 1,
+        text_id: "standard",
         icon: "car-service-icon",
         title: "Hezzni Standard",
         subtitle: "Comfortable vehicles",
         seats: 4,
         timeEstimate: "3-8 min",
-        price: "25 MAD"
+        price: 25
     ),
     VehicleSubOptionsView.RideOption(
-        id: "comfort",
+        id: 2,
+        text_id: "comfort",
         icon: "car-service-comfort-icon",
         title: "Hezzni Comfort",
         subtitle: "Luxury vehicles",
         seats: 4,
         timeEstimate: "5-10 min",
-        price: "45 MAD"
+        price: 45
     ),
     VehicleSubOptionsView.RideOption(
-        id: "xl",
+        id: 3,
+        text_id: "xl",
         icon: "car-service-xl-icon",
         title: "Hezzni  XL",
         subtitle: "Confortable vehicles",
         seats: 6,
         timeEstimate: "5-10 min",
-        price: "45 MAD"
+        price: 45
     )
 ]
 // Car ride options (with Taxi)
 let carRideOptions = [
     VehicleSubOptionsView.RideOption(
-        id: "standard",
+        id: 1,
+        text_id: "standard",
         icon: "car-service-icon",
         title: "Hezzni Standard",
         subtitle: "Comfortable vehicles",
         seats: 4,
         timeEstimate: "3-8 min",
-        price: "25 MAD"
+        price: 25
     ),
     VehicleSubOptionsView.RideOption(
-        id: "comfort",
+        id: 2,
+        text_id: "comfort",
         icon: "car-service-comfort-icon",
         title: "Hezzni Comfort",
         subtitle: "Comfortable vehicles",
         seats: 4,
         timeEstimate: "3-8 min",
-        price: "35 MAD"
+        price: 35
     ),
     VehicleSubOptionsView.RideOption(
-        id: "xl",
+        id: 3,
+        text_id: "xl",
         icon: "car-service-xl-icon",
         title: "Hezzni XL",
         subtitle: "Comfortable vehicles",
         seats: 6,
         timeEstimate: "3-8 min",
-        price: "50 MAD"
+        price: 50
     ),
     VehicleSubOptionsView.RideOption(
-        id: "taxi",
+        id: 5,
+        text_id: "taxi",
         icon: "taxi-service-icon",
         title: "Taxi",
         subtitle: "Comfortable vehicles",
         seats: 6,
         timeEstimate: "3-8 min",
-        price: "100 MAD"
+        price: 100
     )
 ]
 
 // Bike ride option
 let bikeRideOptions = [
     VehicleSubOptionsView.RideOption(
-        id: "bike-standard",
+        id: 6,
+        text_id: "bike-standard",
         icon: "motorcycle-service-icon",
         title: "Hezzni Standard",
         subtitle: "Comfortable vehicles",
         seats: 1,
         timeEstimate: "3-8 min",
-        price: "25 MAD"
+        price: 25
     )
 ]
 
 // Taxi ride option (if you want a separate array)
 let taxiRideOptions = [
     VehicleSubOptionsView.RideOption(
-        id: "taxi",
+        id: 5,
+        text_id: "taxi",
         icon: "taxi-service-icon",
         title: "Taxi",
         subtitle: "Comfortable vehicles",
         seats: 6,
         timeEstimate: "3-8 min",
-        price: "100 MAD"
+        price: 100
     )
 ]
 
 struct NowRideDetailScreen : View {
+    var pickup: String
+    var destination: String
     @Binding var bottomSheetState: BottomSheetState
+    var rideInformation: [CalculateRidePriceResponse.RideOption]
     var namespace: Namespace.ID?
     var selectedService: String = "Car"
     @State private var selectedOption: String? = "standard"
@@ -115,19 +127,6 @@ struct NowRideDetailScreen : View {
     //    @Namespace private var animations
     // Valid coupon
     private let validCoupon = "ABC123"
-    
-    
-    private let services = [
-        Service(id: "car", icon: "car-service-icon", title: "Car"),
-        Service(id: "motorcycle", icon: "motorcycle-service-icon", title: "Motorcycle"),
-        Service(id: "airport", icon: "airport-service-icon", title: "Ride to Airport"),
-        Service(id: "rental", icon: "rental-service-icon", title: "Rental Car"),
-        Service(id: "reservation", icon: "reservation-service-icon", title: "Reservation"),
-        Service(id: "city", icon: "city-service-icon", title: "City to City"),
-        Service(id: "taxi", icon: "taxi-service-icon", title: "Taxi"),
-        Service(id: "delivery", icon: "delivery-service-icon", title: "Delivery"),
-        Service(id: "group", icon: "shared-service-icon", title: "Group Ride")
-    ]
     
     
     // Computed properties for coupon logic
@@ -166,15 +165,33 @@ struct NowRideDetailScreen : View {
         showCouponError = false
     }
     private var options: [VehicleSubOptionsView.RideOption] {
+        let baseOptions: [VehicleSubOptionsView.RideOption]
         switch selectedService.lowercased() {
         case "car":
-            return carRideOptions
+            baseOptions = carRideOptions
         case "motorcycle":
-            return bikeRideOptions
+            baseOptions = bikeRideOptions
         case "taxi":
-            return taxiRideOptions
+            baseOptions = taxiRideOptions
         default:
-            return rideOptions
+            baseOptions = rideOptions
+        }
+        // Map and update price from rideInformation
+        return baseOptions.map { option in
+            if let info = rideInformation.first(where: { $0.id == option.id }) {
+                return VehicleSubOptionsView.RideOption(
+                    id: option.id,
+                    text_id: option.text_id,
+                    icon: option.icon,
+                    title: option.title,
+                    subtitle: option.subtitle,
+                    seats: option.seats,
+                    timeEstimate: option.timeEstimate,
+                    price: info.price // Use price from rideInformation
+                )
+            } else {
+                return option
+            }
         }
     }
     
@@ -195,10 +212,10 @@ struct NowRideDetailScreen : View {
                             LocationCardView(
                                 imageName: "pickup_ellipse",
                                 heading: "Pickup Location",
-                                content: "Current Location, Marrakech",
+                                content: pickup,
                                 roundedEdges: .top
                             )
-//                            .matchedGeometryEffect(id: "pickup", in: namespace!)
+                            .matchedGeometryEffect(id: "pickup", in: namespace!)
                             HStack(spacing: 10) {
                                 Image("pickup_destination_separator_icon")
                                     .frame(width: 24, height: 24)
@@ -215,10 +232,10 @@ struct NowRideDetailScreen : View {
                             LocationCardView(
                                 imageName: "dropoff_ellipse",
                                 heading: "Destination",
-                                content: "Menara Mall, Gueliz District",
+                                content: destination,
                                 roundedEdges: .bottom
                             )
-//                            .matchedGeometryEffect(id: "destination", in: namespace!)
+                            .matchedGeometryEffect(id: "destination", in: namespace!)
                             
                             // MARK: - Vehicle Option
                             Text("Vehicle Options")
@@ -233,7 +250,7 @@ struct NowRideDetailScreen : View {
                                 selectedOption: $selectedOption,
                                 options: options
                             )
-//                                .matchedGeometryEffect(id: "selected_vehicle", in: namespace!)
+                                .matchedGeometryEffect(id: "selected_vehicle", in: namespace!)
                             // MARK: - Coupon section
                             CouponView(
                                 couponField: $couponField,
@@ -250,9 +267,9 @@ struct NowRideDetailScreen : View {
                             VStack(spacing: 48){
                                 TripSummaryView(
                                     serviceType: selectedService,
-                                    vehicle: options.first(where: { $0.id == selectedOption })?.title ?? "-",
-                                    estimatedTime: options.first(where: { $0.id == selectedOption })?.timeEstimate ?? "-",
-                                    price: options.first(where: { $0.id == selectedOption })?.price ?? "-"
+                                    vehicle: options.first(where: { $0.text_id == selectedOption })?.title ?? "-",
+                                    estimatedTime: options.first(where: { $0.text_id == selectedOption })?.timeEstimate ?? "-",
+                                    price: options.first(where: { $0.text_id == selectedOption }).flatMap { String(format: "%.0f", $0.price) } ?? "-"
                                 )
                                 PrimaryButton(text: "Confirm Trip", action: {
                                     withAnimation{
@@ -273,70 +290,7 @@ struct NowRideDetailScreen : View {
     
     // MARK: - Reusable Components
     
-    struct TripSummaryView: View {
-        let serviceType: String
-        let vehicle: String
-        let estimatedTime: String
-        let price: String
-        var body: some View {
-            VStack(alignment: .leading, spacing: 24) {
-                Text("Trip Summary")
-                    .font(Font.custom("Poppins", size: 16).weight(.medium))
-                    .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Service Type")
-                            .font(Font.custom("Poppins", size: 14))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
-                        Spacer()
-                        Text(serviceType)
-                            .font(Font.custom("Poppins", size: 14).weight(.medium))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    }
-                    HStack {
-                        Text("Vehicle")
-                            .font(Font.custom("Poppins", size: 14))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
-                        Spacer()
-                        Text(vehicle)
-                            .font(Font.custom("Poppins", size: 14).weight(.medium))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    }
-                    HStack {
-                        Text("Estimated tme")
-                            .font(Font.custom("Poppins", size: 14))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
-                        Spacer()
-                        Text(estimatedTime)
-                            .font(Font.custom("Poppins", size: 14).weight(.medium))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    }
-                }
-                Rectangle()
-                    .foregroundColor(.clear)
-                    .frame(width: 322, height: 1)
-                    .background(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.08))
-                HStack(alignment: .top) {
-                    Text("Estimate price")
-                        .font(Font.custom("Poppins", size: 16).weight(.medium))
-                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    Spacer()
-                    Text(price)
-                        .font(Font.custom("Poppins", size: 18).weight(.semibold))
-                        .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
-                }
-            }
-            .padding(14)
-            .background(.white)
-            .cornerRadius(12)
-            .shadow(color: .black.opacity(0.08), radius: 5, x: 0, y: 0)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .inset(by: 0.5)
-                    .stroke(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.1), lineWidth: 1)
-            )
-        }
-    }
+    
     
     
     
@@ -344,25 +298,92 @@ struct NowRideDetailScreen : View {
 
 #Preview {
     NowRideDetailScreen(
-        bottomSheetState: .constant(.nowRide) // Provide a default BottomSheetState value
+        pickup: "Current",
+        destination: "Morrocco",
+        bottomSheetState: .constant(.nowRide),
+        rideInformation: []
     )
 }
-
+struct TripSummaryView: View {
+    let serviceType: String
+    let vehicle: String
+    let estimatedTime: String
+    let price: String
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            Text("Trip Summary")
+                .font(Font.custom("Poppins", size: 16).weight(.medium))
+                .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("Service Type")
+                        .font(Font.custom("Poppins", size: 14))
+                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
+                    Spacer()
+                    Text(serviceType)
+                        .font(Font.custom("Poppins", size: 14).weight(.medium))
+                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                }
+                HStack {
+                    Text("Vehicle")
+                        .font(Font.custom("Poppins", size: 14))
+                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
+                    Spacer()
+                    Text(vehicle)
+                        .font(Font.custom("Poppins", size: 14).weight(.medium))
+                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                }
+                HStack {
+                    Text("Estimated tme")
+                        .font(Font.custom("Poppins", size: 14))
+                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
+                    Spacer()
+                    Text(estimatedTime)
+                        .font(Font.custom("Poppins", size: 14).weight(.medium))
+                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                }
+            }
+            Rectangle()
+                .foregroundColor(.clear)
+                .frame(width: 322, height: 1)
+                .background(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.08))
+            HStack(alignment: .top) {
+                Text("Estimate price")
+                    .font(Font.custom("Poppins", size: 16).weight(.medium))
+                    .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                Spacer()
+                Text(price +  " MAD")
+                    .font(Font.custom("Poppins", size: 18).weight(.semibold))
+                    .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+            }
+        }
+        .padding(14)
+        .background(.white)
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.08), radius: 5, x: 0, y: 0)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .inset(by: 0.5)
+                .stroke(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.1), lineWidth: 1)
+        )
+    }
+}
 struct VehicleSubOptionsView: View {
     @Binding var selectedOption: String?
     let options: [RideOption]
     struct RideOption {
-        let id: String
+        let id: Int
+        let text_id: String
         let icon: String
         let title: String
         let subtitle: String
         let seats: Int
         let timeEstimate: String
-        let price: String
+        let price: Double
     }
     var body: some View {
         VStack(spacing: 16) {
-            ForEach(options, id: \ .id) { option in
+            ForEach(options, id: \ .text_id) { option in
                 RideOptionCard(
                     icon: option.icon,
                     title: option.title,
@@ -371,8 +392,8 @@ struct VehicleSubOptionsView: View {
                     timeEstimate: option.timeEstimate,
                     price: option.price,
                     isSelected: Binding(
-                        get: { selectedOption == option.id },
-                        set: { if $0 { selectedOption = option.id } }
+                        get: { selectedOption == option.text_id },
+                        set: { if $0 { selectedOption = option.text_id } }
                     )
                     
                 )

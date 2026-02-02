@@ -8,6 +8,8 @@ import SwiftUI
 import FlagsKit
 
 struct DeliveryDetailScreen : View {
+    var pickup: String
+    var destination: String
     @Binding var bottomSheetState: BottomSheetState
     // Present the picker at HomeScreen level (full-screen)
     @Binding var showCountryPicker: Bool
@@ -28,13 +30,14 @@ struct DeliveryDetailScreen : View {
     @FocusState private var isPhoneFieldFocused: Bool
     
     let deliveryService = VehicleSubOptionsView.RideOption(
-        id: "standard",
+        id: 1,
+        text_id: "standard",
         icon: "car-service-icon",
         title: "Hezzni Standard",
         subtitle: "Comfortable vehicles",
         seats: 4,
         timeEstimate: "3-8 min",
-        price: "25 MAD"
+        price: 25
     );
     //    @Namespace private var animations
     // Valid coupon
@@ -106,10 +109,10 @@ struct DeliveryDetailScreen : View {
                             LocationCardView(
                                 imageName: "pickup_ellipse",
                                 heading: "Pickup Location",
-                                content: "Current Location, Marrakech",
+                                content: pickup,
                                 roundedEdges: .top
                             )
-//                            .matchedGeometryEffect(id: "pickup", in: namespace!)
+                            .matchedGeometryEffect(id: "pickup", in: namespace!)
                             HStack(spacing: 10) {
                                 Image("pickup_destination_separator_icon")
                                     .frame(width: 24, height: 24)
@@ -126,10 +129,10 @@ struct DeliveryDetailScreen : View {
                             LocationCardView(
                                 imageName: "dropoff_ellipse",
                                 heading: "Destination",
-                                content: "Menara Mall, Gueliz District",
+                                content: destination,
                                 roundedEdges: .bottom
                             )
-//                            .matchedGeometryEffect(id: "destination", in: namespace!)
+                            .matchedGeometryEffect(id: "destination", in: namespace!)
                             
                             
                             Text("Delivery Details")
@@ -196,7 +199,7 @@ struct DeliveryDetailScreen : View {
                                 isSelected: .constant(true)
                                 
                             )
-//                                .matchedGeometryEffect(id: "selected_vehicle", in: namespace!)
+                                .matchedGeometryEffect(id: "selected_vehicle", in: namespace!)
                             // MARK: - Coupon section
                             CouponView(
                                 couponField: $couponField,
@@ -213,9 +216,9 @@ struct DeliveryDetailScreen : View {
                             VStack(spacing: 48){
                                 TripSummaryView(
                                     serviceType: selectedService,
-                                    vehicle: options.first(where: { $0.id == selectedOption })?.title ?? "-",
-                                    estimatedTime: options.first(where: { $0.id == selectedOption })?.timeEstimate ?? "-",
-                                    price: options.first(where: { $0.id == selectedOption })?.price ?? "-"
+                                    vehicle: options.first(where: { $0.text_id == selectedOption })?.title ?? "-",
+                                    estimatedTime: options.first(where: { $0.text_id == selectedOption })?.timeEstimate ?? "-",
+                                    price: options.first(where: { $0.text_id == selectedOption }).flatMap { String(format: "%.0f", $0.price) } ?? "-" + " MAD"
                                 )
                                 PrimaryButton(text: "Confirm Trip", action: {
                                     withAnimation{
@@ -242,73 +245,6 @@ struct DeliveryDetailScreen : View {
         }
         .onAppear {
             validateFields()
-        }
-    }
-    
-    // MARK: - Reusable Components
-    
-    struct TripSummaryView: View {
-        let serviceType: String
-        let vehicle: String
-        let estimatedTime: String
-        let price: String
-        var body: some View {
-            VStack(alignment: .leading, spacing: 24) {
-                Text("Trip Summary")
-                    .font(Font.custom("Poppins", size: 16).weight(.medium))
-                    .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Service Type")
-                            .font(Font.custom("Poppins", size: 14))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
-                        Spacer()
-                        Text(serviceType)
-                            .font(Font.custom("Poppins", size: 14).weight(.medium))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    }
-                    HStack {
-                        Text("Vehicle")
-                            .font(Font.custom("Poppins", size: 14))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
-                        Spacer()
-                        Text(vehicle)
-                            .font(Font.custom("Poppins", size: 14).weight(.medium))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    }
-                    HStack {
-                        Text("Estimated tme")
-                            .font(Font.custom("Poppins", size: 14))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
-                        Spacer()
-                        Text(estimatedTime)
-                            .font(Font.custom("Poppins", size: 14).weight(.medium))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    }
-                }
-                Rectangle()
-                    .foregroundColor(.clear)
-                    .frame(width: 322, height: 1)
-                    .background(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.08))
-                HStack(alignment: .top) {
-                    Text("Estimate price")
-                        .font(Font.custom("Poppins", size: 16).weight(.medium))
-                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    Spacer()
-                    Text(price)
-                        .font(Font.custom("Poppins", size: 18).weight(.semibold))
-                        .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
-                }
-            }
-            .padding(14)
-            .background(.white)
-            .cornerRadius(12)
-            .shadow(color: .black.opacity(0.08), radius: 5, x: 0, y: 0)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .inset(by: 0.5)
-                    .stroke(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.1), lineWidth: 1)
-            )
         }
     }
     
@@ -356,22 +292,22 @@ struct DeliveryDetailScreen : View {
 }
 
 
-#Preview {
-    DeliveryDetailScreen_PreviewWrapper()
-}
-
-private struct DeliveryDetailScreen_PreviewWrapper: View {
-    @State private var bottomSheetState: BottomSheetState = .deliveryService
-    @State private var selectedCountry: Country = .morocco
-
-    var body: some View {
-        DeliveryDetailScreen(
-            bottomSheetState: $bottomSheetState,
-            showCountryPicker: .constant(false),
-            selectedCountry: $selectedCountry
-        )
-    }
-}
+//#Preview {
+//    DeliveryDetailScreen_PreviewWrapper()
+//}
+//
+//private struct DeliveryDetailScreen_PreviewWrapper: View {
+//    @State private var bottomSheetState: BottomSheetState = .deliveryService
+//    @State private var selectedCountry: Country = .morocco
+//
+//    var body: some View {
+//        DeliveryDetailScreen(
+//            bottomSheetState: $bottomSheetState,
+//            showCountryPicker: .constant(false),
+//            selectedCountry: $selectedCountry
+//        )
+//    }
+//}
 
 struct PhoneNumberInputView: View {
     @Binding var selectedCountry: Country

@@ -16,9 +16,11 @@ struct AppliedCoupon {
 
 
 struct ReservationDetailScreen : View {
+    var pickup: String
+    var destination: String
     @Binding var bottomSheetState: BottomSheetState
+    var rideInformation: [CalculateRidePriceResponse.RideOption] = []
     var namespace: Namespace.ID?
-    
     @State private var selectedOption: String? = "standard"
     @State var couponField: String = ""
     @State private var showCouponError: Bool = false
@@ -39,8 +41,8 @@ struct ReservationDetailScreen : View {
         
         Service(id: "city", icon: "city-service-icon", title: "City to City"),
         Service(id: "taxi", icon: "taxi-service-icon", title: "Taxi"),
-//        Service(id: "delivery", icon: "delivery-service-icon", title: "Delivery"),
-//        Service(id: "group", icon: "shared-service-icon", title: "Group Ride")
+        Service(id: "delivery", icon: "delivery-service-icon", title: "Delivery"),
+        Service(id: "group", icon: "shared-service-icon", title: "Group Ride")
     ]
     
     // Computed properties for coupon logic
@@ -91,13 +93,33 @@ struct ReservationDetailScreen : View {
     }
     
     private var options: [VehicleSubOptionsView.RideOption] {
+        let baseOptions: [VehicleSubOptionsView.RideOption]
         switch selectedService.lowercased() {
+        case "car":
+            baseOptions = carRideOptions
         case "motorcycle":
-            return bikeRideOptions
+            baseOptions = bikeRideOptions
         case "taxi":
-            return taxiRideOptions
+            baseOptions = taxiRideOptions
         default:
-            return rideOptions
+            baseOptions = rideOptions
+        }
+        // Map and update price from rideInformation
+        return baseOptions.map { option in
+            if let info = rideInformation.first(where: { $0.id == option.id }) {
+                return VehicleSubOptionsView.RideOption(
+                    id: option.id,
+                    text_id: option.text_id,
+                    icon: option.icon,
+                    title: option.title,
+                    subtitle: option.subtitle,
+                    seats: option.seats,
+                    timeEstimate: option.timeEstimate,
+                    price: info.price // Use price from rideInformation
+                )
+            } else {
+                return option
+            }
         }
     }
     var body: some View {
@@ -116,10 +138,10 @@ struct ReservationDetailScreen : View {
                             LocationCardView(
                                 imageName: "pickup_ellipse",
                                 heading: "Pickup Location",
-                                content: "Current Location, Marrakech",
+                                content: pickup,
                                 roundedEdges: .top
                             )
-//                            .matchedGeometryEffect(id: "pickup", in: namespace!)
+                            .matchedGeometryEffect(id: "pickup", in: namespace!)
                             HStack(spacing: 10) {
                                 Image("pickup_destination_separator_icon")
                                     .frame(width: 24, height: 24)
@@ -136,10 +158,10 @@ struct ReservationDetailScreen : View {
                             LocationCardView(
                                 imageName: "dropoff_ellipse",
                                 heading: "Destination",
-                                content: "Menara Mall, Gueliz District",
+                                content: destination,
                                 roundedEdges: .bottom
                             )
-//                            .matchedGeometryEffect(id: "destination", in: namespace!)
+                            .matchedGeometryEffect(id: "destination", in: namespace!)
                             ScheduleCardView(
                                 dateTime: formattedDate + " at " + formattedTime,
                                 trailingIcon: "pencil_icon",
@@ -162,7 +184,7 @@ struct ReservationDetailScreen : View {
                                 selectedService: $selectedService,
                             )
                             VehicleSubOptionsView(selectedOption: $selectedOption, options: options)
-//                                .matchedGeometryEffect(id: "selected_vehicle", in: namespace!)
+                                .matchedGeometryEffect(id: "selected_vehicle", in: namespace!)
                             // MARK: - Coupon section
                             CouponView(
                                 couponField: $couponField,
@@ -179,9 +201,9 @@ struct ReservationDetailScreen : View {
                             VStack(spacing: 48){
                                 TripSummaryView(
                                     serviceType: selectedService,
-                                    vehicle: options.first(where: { $0.id == selectedOption })?.title ?? "-",
-                                    estimatedTime: options.first(where: { $0.id == selectedOption })?.timeEstimate ?? "-",
-                                    price: options.first(where: { $0.id == selectedOption })?.price ?? "-"
+                                    vehicle: options.first(where: { $0.text_id == selectedOption })?.title ?? "-",
+                                    estimatedTime: options.first(where: { $0.text_id == selectedOption })?.timeEstimate ?? "-",
+                                    price: options.first(where: { $0.text_id == selectedOption }).flatMap { String(format: "%.0f", $0.price) } ?? "-"
                                 )
                                 PrimaryButton(text: "Confirm Trip", action: {
                                     withAnimation{
@@ -197,73 +219,6 @@ struct ReservationDetailScreen : View {
             }
             .navigationBarBackButtonHidden(true)
             
-        }
-    }
-    
-    // MARK: - Reusable Components
-    
-    struct TripSummaryView: View {
-        let serviceType: String
-        let vehicle: String
-        let estimatedTime: String
-        let price: String
-        var body: some View {
-            VStack(alignment: .leading, spacing: 24) {
-                Text("Trip Summary")
-                    .font(Font.custom("Poppins", size: 16).weight(.medium))
-                    .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Service Type")
-                            .font(Font.custom("Poppins", size: 14))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
-                        Spacer()
-                        Text(serviceType)
-                            .font(Font.custom("Poppins", size: 14).weight(.medium))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    }
-                    HStack {
-                        Text("Vehicle")
-                            .font(Font.custom("Poppins", size: 14))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
-                        Spacer()
-                        Text(vehicle)
-                            .font(Font.custom("Poppins", size: 14).weight(.medium))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    }
-                    HStack {
-                        Text("Estimated tme")
-                            .font(Font.custom("Poppins", size: 14))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
-                        Spacer()
-                        Text(estimatedTime)
-                            .font(Font.custom("Poppins", size: 14).weight(.medium))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    }
-                }
-                Rectangle()
-                    .foregroundColor(.clear)
-                    .frame(width: 322, height: 1)
-                    .background(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.08))
-                HStack(alignment: .top) {
-                    Text("Estimate price")
-                        .font(Font.custom("Poppins", size: 16).weight(.medium))
-                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    Spacer()
-                    Text(price)
-                        .font(Font.custom("Poppins", size: 18).weight(.semibold))
-                        .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
-                }
-            }
-            .padding(14)
-            .background(.white)
-            .cornerRadius(12)
-            .shadow(color: .black.opacity(0.08), radius: 5, x: 0, y: 0)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .inset(by: 0.5)
-                    .stroke(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.1), lineWidth: 1)
-            )
         }
     }
     
@@ -288,6 +243,8 @@ struct ReservationDetailScreen : View {
 
 #Preview {
     ReservationDetailScreen(
+        pickup: "pickupLocation",
+        destination: "destinationLocation",
         bottomSheetState: .constant(.reservation),
         selectedService: .constant("Car"),
         showSchedulePicker: .constant(false),

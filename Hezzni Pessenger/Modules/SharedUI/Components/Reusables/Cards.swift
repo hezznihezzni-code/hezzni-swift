@@ -378,7 +378,7 @@ struct RideOptionCard: View {
     let subtitle: String
     let seats: Int
     let timeEstimate: String
-    let price: String
+    let price: Double
     @Binding var isSelected: Bool
     
     var body: some View {
@@ -423,7 +423,7 @@ struct RideOptionCard: View {
             
             // Right Content
             VStack(alignment: .trailing, spacing: 10) {
-                Text(price)
+                Text(String(price) +  " MAD")
                     .font(.poppins(.semiBold, size: 16))
                     .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
                 
@@ -460,7 +460,7 @@ struct RideOptionCard: View {
         subtitle: "Luxury vehicles",
         seats: 4,
         timeEstimate: "5-10 min",
-        price: "45 MAD",
+        price: 45,
         isSelected: $value
     )
 }

@@ -175,7 +175,7 @@ struct RidePaymentScreen: View {
                                 subtitle: "Comfortable vehicles",
                                 seats: 4,
                                 timeEstimate: "3-8 min",
-                                price: "50 MAD",
+                                price: 50,
                                 isSelected: .constant(true)
                             )
                             .matchedGeometryEffect(id: "selected_vehicle", in: namespace!)

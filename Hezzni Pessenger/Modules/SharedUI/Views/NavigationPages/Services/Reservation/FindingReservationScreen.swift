@@ -13,13 +13,14 @@ struct FindingReservationScreen: View {
     @Binding var sheetHeight: CGFloat
     // Props for trip info
     var vehicle: VehicleSubOptionsView.RideOption = .init(
-        id: "standard",
+        id: 1,
+        text_id: "standard",
         icon: "car-service-icon",
         title: "Hezzni Standard",
         subtitle: "Comfortable vehicles",
         seats: 4,
         timeEstimate: "3-8 min",
-        price: "25 MAD"
+        price: 25
     )
     var pickupLocation: String = "Current Location, Marrakech"
     var destinationLocation: String = "Current Location, Marrakech"
@@ -63,7 +64,7 @@ struct FindingReservationScreen: View {
                     subtitle: "Comfortable vehicles",
                     seats: 4,
                     timeEstimate: "3-8 min",
-                    price: "25 MAD",
+                    price: 25,
                     isSelected: .constant(true)
                 )
                 // Source & Destination with Line overlay (reuse from HomeScreen)

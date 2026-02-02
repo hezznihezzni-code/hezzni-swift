@@ -118,6 +118,7 @@
 				Modules/SharedUI/Components/Reusables/TermsCaption.swift,
 				Modules/SharedUI/Components/Reusables/TripStatsView.swift,
 				Modules/SharedUI/ViewModels/DriverDocumentsStatusViewModel.swift,
+				Modules/SharedUI/Views/Components/Shimmer/Shimmer.swift,
 				Modules/SharedUI/Views/LaunchScreen.storyboard,
 				Modules/SharedUI/Views/NavigationPages/Account/AccountScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/Account/AppSettingScreen.swift,

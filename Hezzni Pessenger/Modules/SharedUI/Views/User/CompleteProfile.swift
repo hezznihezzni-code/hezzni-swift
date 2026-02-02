@@ -288,16 +288,15 @@ struct CompleteProfile: View {
             isEmailValid = emailPredicate.evaluate(with: emailAddress)
         }
 
-        let isProfilePictureUploaded = selectedImage != nil
 
         if isUpdateProfile {
             let isPhoneValid = (phoneNumber?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false)
             let isDOBValid = !dateOfBirth.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             let isCityValid = selectedCity >= 0 && selectedCity < citiesVM.cities.count
-            return isNameValid && isPhoneValid && isDOBValid && isCityValid && isProfilePictureUploaded && (emailAddress.isEmpty || isEmailValid)
+            return isNameValid && isPhoneValid && isDOBValid && isCityValid && (emailAddress.isEmpty || isEmailValid)
         }
 
-        return isNameValid && isProfilePictureUploaded && (emailAddress.isEmpty || isEmailValid)
+        return isNameValid && (emailAddress.isEmpty || isEmailValid)
     }
 
     private func parseDOBToDate(_ dob: String) -> Date? {
@@ -558,7 +557,12 @@ struct ProfileSetupView: View {
             .padding(.horizontal, 20)
             .padding(.top, 20)
         }
-        .sheet(isPresented: $showDatePicker) {
+        .onChange(of: userName){
+            validateFields()
+        }
+        .sheet(isPresented: $showDatePicker, onDismiss: {
+            validateFields()
+        }) {
             DatePickerPopup(
                 selectedDate: $selectedDate,
                 dateOfBirth: $dateOfBirth,
@@ -591,8 +595,8 @@ struct ProfileSetupView: View {
             isNameOrPhoneValid = userName.trimmingCharacters(in: .whitespacesAndNewlines).count >= 2
         }
 
-        // Validate profile picture is uploaded
-        let isProfilePictureUploaded = selectedImage != nil
+//        // Validate profile picture is uploaded
+//        let isProfilePictureUploaded = selectedImage != nil
 
         // Validate email (if provided, it should be valid format)
         var isEmailValid = true
@@ -613,7 +617,7 @@ struct ProfileSetupView: View {
         let isCityValid = selectedCity >= 0 && selectedCity < cities.count
 
         // Enable button only if required fields are filled and email is either empty or valid
-        isSetupComplete = isNameOrPhoneValid && isProfilePictureUploaded && isDOBValid && isCityValid && (emailAddress.isEmpty || isEmailValid)
+        isSetupComplete = isNameOrPhoneValid && isDOBValid && isCityValid && (emailAddress.isEmpty || isEmailValid)
     }
 }
 

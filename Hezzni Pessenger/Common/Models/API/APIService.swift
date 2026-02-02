@@ -56,6 +56,38 @@ class APIService {
         )
         return response.data.data.map(PassengerService.init(dto:))
     }
+
+    /// Calculate ride price and get available ride options
+    func calculateRidePrice(
+        pickupLatitude: Double,
+        pickupLongitude: Double,
+        pickupAddress: String,
+        dropoffLatitude: Double,
+        dropoffLongitude: Double,
+        dropoffAddress: String,
+        passengerServiceId: Int
+    ) async throws -> CalculateRidePriceResponse {
+        let token = TokenManager.shared.token
+        let parameters: [String: Any] = [
+            "pickup": [
+                "latitude": pickupLatitude,
+                "longitude": pickupLongitude,
+                "address": pickupAddress
+            ],
+            "dropoff": [
+                "latitude": dropoffLatitude,
+                "longitude": dropoffLongitude,
+                "address": dropoffAddress
+            ],
+            "passengerServiceId": passengerServiceId
+        ]
+        return try await requestWithBearerAuth(
+            endpoint: "/api/passenger/calculate-ride-price",
+            method: "POST",
+            parameters: parameters,
+            authToken: token
+        )
+    }
     
     // MARK: - Driver Preferences + Presence
 
@@ -1448,4 +1480,41 @@ struct MotorcycleVehicleDetailsPayload {
             "cityId": cityId
         ]
     }
+}
+
+// MARK: - Ride Price Calculation Models
+
+struct CalculateRidePriceResponse: Decodable {
+    struct RideOption: Decodable {
+        let id: Int
+        let ridePreference: String
+        let ridePreferenceKey: String
+        let description: String
+        let price: Double
+    }
+    
+    struct LocationData: Decodable {
+        let latitude: Double
+        let longitude: Double
+        let address: String
+    }
+    
+    struct PriceData: Decodable {
+        let passengerService: PassengerServiceInfo
+        let distance: Double
+        let estimatedDuration: Int
+        let pickup: LocationData
+        let dropoff: LocationData
+        let options: [RideOption]
+    }
+    
+    struct PassengerServiceInfo: Decodable {
+        let id: Int
+        let name: String
+    }
+    
+    let status: String
+    let message: String
+    let data: PriceData
+    let timestamp: String
 }
