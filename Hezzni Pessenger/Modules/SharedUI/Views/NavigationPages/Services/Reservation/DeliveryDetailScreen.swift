@@ -18,17 +18,20 @@ struct DeliveryDetailScreen : View {
     @State private var selectedOption: String? = "standard"
     @State var couponField: String = ""
     @State private var showCouponError: Bool = false
+    @State private var couponErrorMessage: String = "Invalid coupon code"
     @State private var appliedCoupon: AppliedCoupon? = nil
+    @State private var isValidatingCoupon: Bool = false
     @State private var reciverName: String = ""
     @State private var parcelDescription: String = ""
     @State private var isPhoneFieldInvalid: Bool = false
     @State private var isReceiverNameValid: Bool = false
     @State private var isPhoneNumberValid: Bool = false
     @Binding var selectedCountry: Country
-    var selectedService: String = "Car"
+    
     @State private var phoneNumber: String = ""
     @FocusState private var isPhoneFieldFocused: Bool
     
+    var selectedService: String = "Car"
     let deliveryService = VehicleSubOptionsView.RideOption(
         id: 1,
         text_id: "standard",
@@ -40,9 +43,6 @@ struct DeliveryDetailScreen : View {
         price: 25
     );
     //    @Namespace private var animations
-    // Valid coupon
-    private let validCoupon = "ABC123"
-    
     
     // Computed properties for coupon logic
     private var isCouponFieldEmpty: Bool {
@@ -50,26 +50,61 @@ struct DeliveryDetailScreen : View {
     }
     
     private var shouldShowError: Bool {
-        !isCouponFieldEmpty && couponField != validCoupon && showCouponError
+        !isCouponFieldEmpty && showCouponError
     }
     
     private var isApplyButtonEnabled: Bool {
-        !isCouponFieldEmpty && !shouldShowError
+        !isCouponFieldEmpty && !isValidatingCoupon
     }
     
    
-    // Apply coupon action
+    // Apply coupon action - validates via API
     private func applyCoupon() {
-        if couponField == validCoupon {
-            appliedCoupon = AppliedCoupon(
-                code: couponField,
-                discount: "5% off",
-                validity: "Valid for 7 days"
-            )
-            couponField = ""
-            showCouponError = false
-        } else {
-            showCouponError = true
+        let couponCode = couponField.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !couponCode.isEmpty else { return }
+        
+        // Get the current price from deliveryService
+        let currentPrice = deliveryService.price
+        
+        isValidatingCoupon = true
+        showCouponError = false
+        
+        Task {
+            do {
+                let response = try await APIService.shared.validateCoupon(code: couponCode, price: currentPrice)
+                
+                await MainActor.run {
+                    isValidatingCoupon = false
+                    
+                    if response.data.isValid {
+                        // Coupon is valid
+                        let discountPercentage = currentPrice > 0 
+                            ? Int((response.data.discountAmount / currentPrice) * 100) 
+                            : 0
+                        
+                        appliedCoupon = AppliedCoupon(
+                            code: couponCode,
+                            discount: "\(discountPercentage)% off",
+                            validity: "Applied successfully",
+                            couponId: response.data.couponId,
+                            discountAmount: response.data.discountAmount,
+                            newPrice: response.data.newPrice
+                        )
+                        couponField = ""
+                        showCouponError = false
+                    } else {
+                        // Coupon is not valid
+                        couponErrorMessage = "Invalid coupon code"
+                        showCouponError = true
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    isValidatingCoupon = false
+                    couponErrorMessage = error.localizedDescription
+                    showCouponError = true
+                }
+            }
         }
     }
     
@@ -205,10 +240,11 @@ struct DeliveryDetailScreen : View {
                                 couponField: $couponField,
                                 showCouponError: $showCouponError,
                                 appliedCoupon: $appliedCoupon,
-                                validCoupon: validCoupon,
+                                errorMessage: couponErrorMessage,
                                 isCouponFieldEmpty: isCouponFieldEmpty,
                                 shouldShowError: shouldShowError,
                                 isApplyButtonEnabled: isApplyButtonEnabled,
+                                isLoading: isValidatingCoupon,
                                 applyCoupon: applyCoupon,
                                 removeCoupon: removeCoupon
                             )

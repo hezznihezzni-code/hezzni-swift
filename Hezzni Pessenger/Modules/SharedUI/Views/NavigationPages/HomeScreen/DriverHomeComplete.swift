@@ -12,11 +12,13 @@ import OSLog
 
 // MARK: - Ride Request Model
 struct RideRequest: Identifiable {
-    let id = UUID()
+    let id: UUID
+    let rideRequestId: Int
     let passengerName: String
     let passengerRating: Double
     let passengerTrips: Int
     let passengerImage: String
+    let passengerPhone: String?
     let isVerified: Bool
     let pickupLocation: String
     let destinationLocation: String
@@ -25,6 +27,63 @@ struct RideRequest: Identifiable {
     let fare: String
     let paymentMethod: String
     let rideType: String
+    let distanceToPickup: String
+    let estimatedArrivalMinutes: Int
+    
+    // Initialize from DriverRideRequest socket model
+    init(from socketRequest: DriverRideRequest) {
+        self.id = UUID()
+        self.rideRequestId = socketRequest.rideRequestId
+        self.passengerName = socketRequest.passenger.name
+        self.passengerRating = socketRequest.passenger.rating ?? 5.0
+        self.passengerTrips = 0 // Not provided in socket
+        self.passengerImage = socketRequest.passenger.imageUrl ?? "profile_placeholder"
+        self.passengerPhone = socketRequest.passenger.phone
+        self.isVerified = true
+        self.pickupLocation = socketRequest.pickup.address
+        self.destinationLocation = socketRequest.dropoff.address
+        self.distance = socketRequest.formattedRideDistance
+        self.duration = socketRequest.formattedRideDuration
+        self.fare = socketRequest.formattedPrice
+        self.paymentMethod = "Cash"
+        self.rideType = socketRequest.serviceTypeName ?? "Hezzni Standard"
+        self.distanceToPickup = socketRequest.formattedDistanceToPickup
+        self.estimatedArrivalMinutes = socketRequest.estimatedArrivalMinutes ?? 5
+    }
+    
+    // Legacy initializer for backward compatibility
+    init(
+        passengerName: String,
+        passengerRating: Double,
+        passengerTrips: Int,
+        passengerImage: String,
+        isVerified: Bool,
+        pickupLocation: String,
+        destinationLocation: String,
+        distance: String,
+        duration: String,
+        fare: String,
+        paymentMethod: String,
+        rideType: String
+    ) {
+        self.id = UUID()
+        self.rideRequestId = 0
+        self.passengerName = passengerName
+        self.passengerRating = passengerRating
+        self.passengerTrips = passengerTrips
+        self.passengerImage = passengerImage
+        self.passengerPhone = nil
+        self.isVerified = isVerified
+        self.pickupLocation = pickupLocation
+        self.destinationLocation = destinationLocation
+        self.distance = distance
+        self.duration = duration
+        self.fare = fare
+        self.paymentMethod = paymentMethod
+        self.rideType = rideType
+        self.distanceToPickup = "N/A"
+        self.estimatedArrivalMinutes = 5
+    }
 }
 
 // MARK: - Driver Ride State
@@ -43,6 +102,7 @@ struct DriverHomeComplete: View {
     @State private var mapView = GMSMapView()
     @State private var cameraPosition: GMSCameraPosition
     @StateObject private var locationManager = LocationManager()
+    @StateObject private var driverSocketManager = DriverRideSocketManager.shared
     @State private var isOnline = false
     @State private var showOptionsSheet = false
     @State private var todaysEarnings: Double = 0.00
@@ -187,7 +247,77 @@ struct DriverHomeComplete: View {
         }
         
         .onAppear {
-            simulateRideRequest()
+            setupSocketCallbacks()
+        }
+    }
+    
+    // MARK: - Socket Setup
+    
+    private func setupSocketCallbacks() {
+        // Handle new ride requests from socket
+        driverSocketManager.onNewRideRequest = { driverRideRequest in
+            log.info("Received new ride request from socket: rideRequestId=\(driverRideRequest.rideRequestId)")
+            
+            let rideRequest = RideRequest(from: driverRideRequest)
+            
+            DispatchQueue.main.async {
+                if rideState == .waitingForRequests {
+                    currentRideRequest = rideRequest
+                    withAnimation {
+                        rideState = .rideRequestReceived
+                    }
+                }
+            }
+        }
+        
+        // Handle ride offer timeout
+        driverSocketManager.onRideRequestTimeout = {
+            log.info("Ride offer timed out")
+            DispatchQueue.main.async {
+                if rideState == .rideRequestReceived {
+                    withAnimation {
+                        rideState = .waitingForRequests
+                        currentRideRequest = nil
+                    }
+                }
+            }
+        }
+        
+        // Handle ride accepted confirmation
+        driverSocketManager.onRideAccepted = { rideDetails in
+            log.info("Ride accepted confirmation received")
+            DispatchQueue.main.async {
+                withAnimation {
+                    rideState = .rideAccepted
+                }
+            }
+        }
+        
+        // Handle ride accept failed
+        driverSocketManager.onRideAcceptFailed = { errorMessage in
+            log.error("Failed to accept ride: \(errorMessage)")
+            DispatchQueue.main.async {
+                withAnimation {
+                    rideState = .waitingForRequests
+                    currentRideRequest = nil
+                }
+            }
+        }
+        
+        // Handle ride cancelled
+        driverSocketManager.onRideCancelled = { reason in
+            log.info("Ride was cancelled: \(reason ?? "No reason")")
+            DispatchQueue.main.async {
+                withAnimation {
+                    rideState = .waitingForRequests
+                    currentRideRequest = nil
+                }
+            }
+        }
+        
+        // Handle errors
+        driverSocketManager.onError = { errorMsg in
+            log.error("Socket error received: \(errorMsg)")
         }
     }
     
@@ -534,7 +664,9 @@ struct DriverHomeComplete: View {
                         rideState = response.data.isOnline ? .waitingForRequests : .offline
                     }
                     if response.data.isOnline {
-                        simulateRideRequest()
+                        // Connect to socket and start listening for ride requests
+                        driverSocketManager.goOnline()
+                        log.info("Driver socket connected and listening for ride requests")
                     }
                 }
             } catch {
@@ -557,6 +689,9 @@ struct DriverHomeComplete: View {
                         isOnline = response.data.isOnline
                         rideState = response.data.isOnline ? .waitingForRequests : .offline
                     }
+                    // Disconnect from socket when going offline
+                    driverSocketManager.goOffline()
+                    log.info("Driver socket disconnected")
                 }
             } catch {
                 let msg = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
@@ -566,12 +701,34 @@ struct DriverHomeComplete: View {
     }
     
     private func acceptRide() {
+        guard let rideRequest = currentRideRequest else {
+            log.warning("No current ride request to accept")
+            return
+        }
+        
+        // Emit socket event to accept the ride
+        driverSocketManager.acceptRide(rideRequestId: rideRequest.rideRequestId)
+        log.info("Accepting ride request: \(rideRequest.rideRequestId)")
+        
         withAnimation {
             rideState = .rideAccepted
         }
     }
     
     private func skipRide() {
+        guard let rideRequest = currentRideRequest else {
+            log.warning("No current ride request to skip")
+            withAnimation {
+                rideState = .waitingForRequests
+                currentRideRequest = nil
+            }
+            return
+        }
+        
+        // Emit socket event to decline/skip the ride
+        driverSocketManager.declineRide(rideRequestId: rideRequest.rideRequestId)
+        log.info("Skipping ride request: \(rideRequest.rideRequestId)")
+        
         withAnimation {
             rideState = .waitingForRequests
             currentRideRequest = nil
@@ -602,31 +759,8 @@ struct DriverHomeComplete: View {
             rideState = .waitingForRequests
             currentRideRequest = nil
         }
-        simulateRideRequest()
-    }
-    
-    private func simulateRideRequest() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            if rideState == .waitingForRequests {
-                currentRideRequest = RideRequest(
-                    passengerName: "Ahmed Hassan",
-                    passengerRating: 4.8,
-                    passengerTrips: 2847,
-                    passengerImage: "profile_placeholder",
-                    isVerified: true,
-                    pickupLocation: "Current Location, Marrakech",
-                    destinationLocation: "Menara Mall, Gueliz District",
-                    distance: "2.8 km",
-                    duration: "8 min",
-                    fare: "26.66 MAD",
-                    paymentMethod: "Cash",
-                    rideType: "Hezzni Standard"
-                )
-                withAnimation {
-                    rideState = .rideRequestReceived
-                }
-            }
-        }
+        // Socket will automatically receive new ride requests when available
+        log.info("Reset to waiting state, listening for new ride requests")
     }
     
     private func updateCameraPosition(location: CLLocation?) {

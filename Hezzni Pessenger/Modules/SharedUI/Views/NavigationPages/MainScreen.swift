@@ -12,7 +12,7 @@ struct MainScreen: View {
     @EnvironmentObject private var navigationState: NavigationStateManager
     
     //---------- Components For Home Screen ----------------///
-    @State var selectedService: String = "Car"
+    @State var selectedService: SelectedService = .defaultService
     @State var isNowSelected: Bool = true
     @State var pickupLocation: String = "From?"
     @State var destinationLocation: String = "Where To?"

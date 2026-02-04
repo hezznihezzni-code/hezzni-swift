@@ -13,10 +13,11 @@ import SwiftUI
         couponField: .constant(""),
         showCouponError: .constant(false),
         appliedCoupon: .constant(nil),
-        validCoupon: "ABC123",
+        errorMessage: "Invalid coupon code",
         isCouponFieldEmpty: true,
         shouldShowError: false,
         isApplyButtonEnabled: true,
+        isLoading: false,
         applyCoupon: {},
         removeCoupon: {}
     )
@@ -92,10 +93,11 @@ struct CouponView: View {
     @Binding var couponField: String
     @Binding var showCouponError: Bool
     @Binding var appliedCoupon: AppliedCoupon?
-    let validCoupon: String
+    var errorMessage: String = "Invalid coupon code"
     let isCouponFieldEmpty: Bool
     let shouldShowError: Bool
     let isApplyButtonEnabled: Bool
+    var isLoading: Bool = false
     let applyCoupon: () -> Void
     let removeCoupon: () -> Void
     var body: some View {
@@ -169,15 +171,24 @@ struct CouponView: View {
                                 }
                             }
                         Button(action: applyCoupon) {
-                            Text("Apply")
-                                .font(Font.custom("Poppins", size: 18).weight(.medium))
-                                .foregroundColor(isApplyButtonEnabled ? .white : Color(.systemGray3))
-                                .frame(maxWidth: 100, maxHeight: 40)
-                                .frame(minWidth: 80)
-                                .background(isApplyButtonEnabled ? Color.black : Color(.systemGray5))
-                                .cornerRadius(8)
+                            if isLoading {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    .frame(maxWidth: 100, maxHeight: 40)
+                                    .frame(minWidth: 80)
+                                    .background(Color.black)
+                                    .cornerRadius(8)
+                            } else {
+                                Text("Apply")
+                                    .font(Font.custom("Poppins", size: 18).weight(.medium))
+                                    .foregroundColor(isApplyButtonEnabled ? .white : Color(.systemGray3))
+                                    .frame(maxWidth: 100, maxHeight: 40)
+                                    .frame(minWidth: 80)
+                                    .background(isApplyButtonEnabled ? Color.black : Color(.systemGray5))
+                                    .cornerRadius(8)
+                            }
                         }
-                        .disabled(!isApplyButtonEnabled)
+                        .disabled(!isApplyButtonEnabled || isLoading)
                         .padding(.trailing, 8)
                     }
                     .background(Color.white)
@@ -189,7 +200,7 @@ struct CouponView: View {
                     )
                     .cornerRadius(10)
                     if shouldShowError {
-                        Text("Invalid Code")
+                        Text(errorMessage)
                             .font(Font.custom("Poppins", size: 12))
                             .foregroundColor(.red)
                     }

@@ -11,6 +11,8 @@
 		524AF9572EE3791D0083519A /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 524AF9562EE3791D0083519A /* GoogleMaps */; };
 		524AF9592EE379210083519A /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 524AF9582EE379210083519A /* Inject */; };
 		524AF95B2EE379240083519A /* FlagsKit in Frameworks */ = {isa = PBXBuildFile; productRef = 524AF95A2EE379240083519A /* FlagsKit */; };
+		52578DD82F323310001A2607 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 52578DD72F323310001A2607 /* SocketIO */; };
+		52578DE22F32E3B4001A2607 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 52578DE12F32E3B4001A2607 /* SocketIO */; };
 		525A02942E79C6E300D6136E /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 525A02932E79C6E300D6136E /* GoogleMaps */; };
 		525A02962E79CE4D00D6136E /* .swift in Sources */ = {isa = PBXBuildFile; fileRef = 525A02952E79CE3600D6136E /* .swift */; };
 		5265F5C32E8661CB0040CCEF /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 5265F5C22E8661CB0040CCEF /* Inject */; };
@@ -83,8 +85,10 @@
 				Common/Models/API/APIService.swift,
 				Common/Models/API/cities.json,
 				Common/Models/API/coutries.json,
+				Common/Models/API/DriverRideSocketManager.swift,
 				Common/Models/API/EnvironmentLoader.swift,
 				Common/Models/API/LocationDataService.swift,
+				Common/Models/API/RideSocketManager.swift,
 				Common/Models/API/URLEnvironment.swift,
 				Common/Models/Country.swift,
 				Common/Models/Driver/DriverPreferenceModels.swift,
@@ -96,6 +100,7 @@
 				Common/Models/NavigationStateManager.swift,
 				Common/Models/PassengerService.swift,
 				Common/Models/Person.swift,
+				Common/Models/SelectedService.swift,
 				Common/ViewModels/CitiesViewModel.swift,
 				Common/ViewModels/DriverPreferencesViewModel.swift,
 				Common/ViewModels/PassengerServicesViewModel.swift,
@@ -113,8 +118,10 @@
 				Modules/SharedUI/Components/Reusables/RangeSliderRepresentable.swift,
 				Modules/SharedUI/Components/Reusables/RatingScreen.swift,
 				Modules/SharedUI/Components/Reusables/ReusableViews.swift,
+				Modules/SharedUI/Components/Reusables/RideDetailComponents.swift,
 				Modules/SharedUI/Components/Reusables/Screens/ServiceWelcomeScreen.swift,
 				Modules/SharedUI/Components/Reusables/SearchableDropDown.swift,
+				Modules/SharedUI/Components/Reusables/ShimmerView.swift,
 				Modules/SharedUI/Components/Reusables/TermsCaption.swift,
 				Modules/SharedUI/Components/Reusables/TripStatsView.swift,
 				Modules/SharedUI/ViewModels/DriverDocumentsStatusViewModel.swift,
@@ -162,12 +169,14 @@
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/HomeScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/PathSelectionScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/AddNewVehicleScreen.swift,
+				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/CarRentalScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/MyVehiclesScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/RejectedVehiclesScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/RentalHome.swift,
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/RentalMainScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/UnderReviewVehiclesScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/VehicleFiltersSheet.swift,
+				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/VehicleInformation/VehicleInformationScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/MainScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/Services/AirportRideWelcomeScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/Services/BikeRide/BikeRideWelcomeScreen.swift,
@@ -176,10 +185,10 @@
 				Modules/SharedUI/Views/NavigationPages/Services/GroupRideWelcomeScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/Services/RentalRideWelcomeScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/Services/Reservation/DeliveryDetailScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/Reservation/FindingReservationScreen.swift,
+				Modules/SharedUI/Views/NavigationPages/Services/Reservation/FindingRideScreen.swift,
+				Modules/SharedUI/Views/NavigationPages/Services/Reservation/GenericRideDetailScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/Services/Reservation/NowRide.swift,
 				Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReservationConfirmedScreen.swift,
-				Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReservationDetailScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReusableScreens/NoDriverFoundScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReusableScreens/PaymentConfirmationScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/Services/Reservation/ReusableScreens/RidePaymentScreen.swift,
@@ -255,6 +264,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				525A02942E79C6E300D6136E /* GoogleMaps in Frameworks */,
+				52578DD82F323310001A2607 /* SocketIO in Frameworks */,
 				520D44992E9F85A6003B2E73 /* FlagsKit in Frameworks */,
 				5265F5C32E8661CB0040CCEF /* Inject in Frameworks */,
 			);
@@ -279,6 +289,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				524AF9572EE3791D0083519A /* GoogleMaps in Frameworks */,
+				52578DE22F32E3B4001A2607 /* SocketIO in Frameworks */,
 				524AF95B2EE379240083519A /* FlagsKit in Frameworks */,
 				524AF9592EE379210083519A /* Inject in Frameworks */,
 			);
@@ -363,6 +374,7 @@
 				525A02932E79C6E300D6136E /* GoogleMaps */,
 				5265F5C22E8661CB0040CCEF /* Inject */,
 				520D44982E9F85A6003B2E73 /* FlagsKit */,
+				52578DD72F323310001A2607 /* SocketIO */,
 			);
 			productName = "Hezzni Pessenger";
 			productReference = 521B781D2E6FE3C3004C5A3C /* Hezzni Pessenger.app */;
@@ -435,6 +447,7 @@
 				524AF9562EE3791D0083519A /* GoogleMaps */,
 				524AF9582EE379210083519A /* Inject */,
 				524AF95A2EE379240083519A /* FlagsKit */,
+				52578DE12F32E3B4001A2607 /* SocketIO */,
 			);
 			productName = "Hezzni Driver";
 			productReference = 52CD68D12EDF346600D898E4 /* Hezzni Driver.app */;
@@ -533,6 +546,7 @@
 				525A02922E79C6E200D6136E /* XCRemoteSwiftPackageReference "ios-maps-sdk" */,
 				52BBE4AF2E865F83000DC61A /* XCRemoteSwiftPackageReference "Inject" */,
 				520D44972E9F85A6003B2E73 /* XCRemoteSwiftPackageReference "FlagsKit" */,
+				52578DD62F323310001A2607 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 521B781E2E6FE3C3004C5A3C /* Products */;
@@ -1160,6 +1174,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		52578DD62F323310001A2607 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/socketio/socket.io-client-swift.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		525A02922E79C6E200D6136E /* XCRemoteSwiftPackageReference "ios-maps-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/googlemaps/ios-maps-sdk";
@@ -1198,6 +1220,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 520D44972E9F85A6003B2E73 /* XCRemoteSwiftPackageReference "FlagsKit" */;
 			productName = FlagsKit;
+		};
+		52578DD72F323310001A2607 /* SocketIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 52578DD62F323310001A2607 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */;
+			productName = SocketIO;
+		};
+		52578DE12F32E3B4001A2607 /* SocketIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 52578DD62F323310001A2607 /* XCRemoteSwiftPackageReference "socket.io-client-swift" */;
+			productName = SocketIO;
 		};
 		525A02932E79C6E300D6136E /* GoogleMaps */ = {
 			isa = XCSwiftPackageProductDependency;

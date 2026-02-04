@@ -170,60 +170,90 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             return
         }
         
+        // Minimum 3 characters for meaningful search
+        guard query.count >= 2 else {
+            completion([])
+            return
+        }
+        
         let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
         
+        let apiKey = "AIzaSyAGlfVLO31MsYNRfiJooK3-e38vAVkkij0"
+        
         // Build URL with optional location bias for better results
-        var urlString = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=\(encodedQuery)&key=AIzaSyAGlfVLO31MsYNRfiJooK3-e38vAVkkij0"
+        var urlString = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=\(encodedQuery)&key=\(apiKey)"
         
         // Add location bias if available (improves relevance of results)
         if let location = location ?? currentLocation?.coordinate {
             urlString += "&location=\(location.latitude),\(location.longitude)&radius=50000"
         }
         
+        print("📍 Places API request: \(urlString.prefix(100))...") // Debug log
+        
         guard let url = URL(string: urlString) else {
+            print("❌ Invalid URL for Places API")
             completion([])
             return
         }
         
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
-                print("Places API error: \(error.localizedDescription)")
+                print("❌ Places API error: \(error.localizedDescription)")
                 completion([])
                 return
             }
             
             guard let data = data else {
+                print("❌ No data from Places API")
                 completion([])
                 return
             }
             
             do {
-                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                   let predictions = json["predictions"] as? [[String: Any]] {
+                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    // Check API status
+                    let status = json["status"] as? String ?? "UNKNOWN"
+                    print("📍 Places API status: \(status)")
                     
-                    let suggestions = predictions.compactMap { prediction -> PlaceSuggestion? in
-                        guard let placeId = prediction["place_id"] as? String,
-                              let description = prediction["description"] as? String else {
-                            return nil
+                    if status != "OK" && status != "ZERO_RESULTS" {
+                        if let errorMessage = json["error_message"] as? String {
+                            print("❌ Places API error message: \(errorMessage)")
                         }
-                        
-                        let mainText = (prediction["structured_formatting"] as? [String: Any])?["main_text"] as? String ?? description
-                        let secondaryText = (prediction["structured_formatting"] as? [String: Any])?["secondary_text"] as? String ?? ""
-                        
-                        return PlaceSuggestion(
-                            placeId: placeId,
-                            description: description,
-                            mainText: mainText,
-                            secondaryText: secondaryText
-                        )
+                        completion([])
+                        return
                     }
                     
-                    completion(suggestions)
+                    if let predictions = json["predictions"] as? [[String: Any]] {
+                        print("📍 Found \(predictions.count) predictions")
+                        
+                        let suggestions = predictions.compactMap { prediction -> PlaceSuggestion? in
+                            guard let placeId = prediction["place_id"] as? String,
+                                  let description = prediction["description"] as? String else {
+                                return nil
+                            }
+                            
+                            let mainText = (prediction["structured_formatting"] as? [String: Any])?["main_text"] as? String ?? description
+                            let secondaryText = (prediction["structured_formatting"] as? [String: Any])?["secondary_text"] as? String ?? ""
+                            
+                            return PlaceSuggestion(
+                                placeId: placeId,
+                                description: description,
+                                mainText: mainText,
+                                secondaryText: secondaryText
+                            )
+                        }
+                        
+                        completion(suggestions)
+                    } else {
+                        print("❌ No predictions in Places API response")
+                        completion([])
+                    }
                 } else {
+                    print("❌ Failed to parse Places API JSON")
                     completion([])
                 }
             } catch {
-                print("JSON parsing error: \(error.localizedDescription)")
+                print("❌ JSON parsing error: \(error.localizedDescription)")
                 completion([])
             }
         }.resume()
@@ -239,8 +269,9 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 //            completion(nil, nil)
 //            return
 //        }
+        var apiKey: String = "AIzaSyAGlfVLO31MsYNRfiJooK3-e38vAVkkij0"
         
-        let urlString = "https://maps.googleapis.com/maps/api/place/details/json?place_id=\(placeId)&fields=geometry,formatted_address&key=AIzaSyAGlfVLO31MsYNRfiJooK3-e38vAVkkij0"
+        let urlString = "https://maps.googleapis.com/maps/api/place/details/json?place_id=\(placeId)&fields=geometry,formatted_address&key=\(apiKey)"
         
         guard let url = URL(string: urlString) else {
             completion(nil, nil)

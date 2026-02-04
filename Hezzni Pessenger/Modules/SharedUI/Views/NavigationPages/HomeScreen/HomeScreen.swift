@@ -28,13 +28,15 @@ enum BottomSheetState {
 struct HomeScreen: View {
     
     //-----------Inital Screen Variables -----------------------//
-    @Binding var selectedService: String
+    @Binding var selectedService: SelectedService
     @Binding var isNowSelected: Bool
     @Binding var pickupLocation: String
     @Binding var destinationLocation: String
     
     @Binding private var bottomSheetState: BottomSheetState
     
+    // MARK: - Services ViewModel
+    @StateObject private var servicesViewModel = PassengerServicesViewModel()
    
     @State private var isEditingPickup = false
     @State private var isEditingDestination = false
@@ -63,6 +65,7 @@ struct HomeScreen: View {
     //MARK: For Reservation Screen
     @State private var showSchedulePicker = false
     @State private var selectedDate: Date = Date()
+    @State private var appliedCoupon: AppliedCoupon? = nil
     
     //MARK: Variables for second screen
     @State private var showServices = true
@@ -82,29 +85,16 @@ struct HomeScreen: View {
     // Country picker presentation (full-screen overlay)
     @State private var showCountryPicker: Bool = false
     @State private var selectedCountryForDelivery: Country = .morocco
-
-    // List of services
-    private let services = [
-        Service(id: "car", icon: "car-service-icon", title: "Car"),
-        Service(id: "airport", icon: "airport-service-icon", title: "Ride to Airport"),
-        Service(id: "motorcycle", icon: "motorcycle-service-icon", title: "Motorcycle"),
-        Service(id: "city", icon: "city-service-icon", title: "City to City"),
-        Service(id: "taxi", icon: "taxi-service-icon", title: "Taxi"),
-        Service(id: "delivery", icon: "delivery-service-icon", title: "Delivery"),
-        Service(id: "group", icon: "shared-service-icon", title: "Group Ride")
-    ]
     
-    // Sample suggestion data
-    let suggestions = [
-        "Owen Elementary",
-        "E Oak Hill Dr",
-        "Woodcrest",
-        "Park Land D",
-        "Park Row Pl",
-        "New Reservation",
-        "Menara Airport",
-        "Jamaâ El Fna Square"
-    ]
+    @State var selectedRideInformation: VehicleSubOptionsView.RideOption
+
+    // Filtered services (excluding Rental Car and Reservation)
+    private var filteredServices: [PassengerService] {
+        servicesViewModel.services.filter { service in
+            let name = service.name.lowercased()
+            return name != "rental car" && name != "reservation"
+        }
+    }
     
     // Google Places autocomplete suggestions
     @State private var placeSuggestions: [PlaceSuggestion] = []
@@ -115,7 +105,7 @@ struct HomeScreen: View {
     @State private var hasSetInitialPickupLocation = false
     
     init(
-        selectedService: Binding<String>,
+        selectedService: Binding<SelectedService>,
         isNowSelected: Binding<Bool>,
         pickupLocation: Binding<String>,
         destinationLocation: Binding<String>,
@@ -127,9 +117,18 @@ struct HomeScreen: View {
         self._destinationLocation = destinationLocation
         self._bottomSheetState = bottomSheetState
     
-        // Default camera position for New York 40.629255690273595, -73.98749804295893
         let marrakech = CLLocationCoordinate2D(latitude: 40.629255690273595, longitude: -73.98749804295893)
         _cameraPosition = State(initialValue: GMSCameraPosition.camera(withTarget: marrakech, zoom: 14))
+        _selectedRideInformation = State(initialValue: VehicleSubOptionsView.RideOption(
+            id: 0,
+            text_id: "standard",
+            icon: "",
+            title: "Standard",
+            subtitle: "",
+            seats: 4,
+            timeEstimate: "10 min",
+            price: 100
+        ))
     }
     
     var body: some View {
@@ -397,10 +396,11 @@ struct HomeScreen: View {
         }
     }
     
+    // Note: filteredSuggestions is kept for backward compatibility but
+    // placeSuggestions from Google API should be used instead
     private var filteredSuggestions: [String] {
-        suggestions.filter {
-            searchText.isEmpty ? true : $0.localizedCaseInsensitiveContains(searchText)
-        }
+        // Return empty array - we use Google Places API suggestions now
+        return []
     }
     
     private func suggestionRow(suggestion: String) -> some View {
@@ -432,7 +432,7 @@ struct HomeScreen: View {
             // ----------- Titles ------------
             if bottomSheetState == .journey {
                 CustomAppBar(
-                    title: selectedService,
+                    title: selectedService.displayName,
                     weight: .medium,
                     backButtonAction: {
                         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
@@ -449,14 +449,14 @@ struct HomeScreen: View {
 //                                        selectedService = "Car"
 //                                    }
 //                                        bottomSheetState = .reservation
-//                                    
+//
 //                                } else{
 //                                    if selectedService == "Delivery" {
 //                                        bottomSheetState = .deliveryService
 //                                    }else {
 //                                        bottomSheetState = .nowRide
 //                                    }
-//                                    
+//
 //                                }
 //                                sheetHeight = maxSheetHeight
 //                            }
@@ -510,7 +510,7 @@ struct HomeScreen: View {
             }
             if bottomSheetState == .rideSummary {
                 CustomAppBar(
-                    title: selectedService,
+                    title: selectedService.displayName,
                     weight: .medium,
                     backButtonAction: {
                         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
@@ -574,39 +574,72 @@ struct HomeScreen: View {
             
             // Location selection content or Reservation screen
             if bottomSheetState == .reservation {
-                ReservationDetailScreen(
+                GenericRideDetailScreen(
+                    isReservation: !isNowSelected,
                     pickup: pickupLocation,
                     destination: destinationLocation,
                     bottomSheetState: $bottomSheetState,
                     rideInformation: rideOptions,
+                    selectedRideInformation: $selectedRideInformation,
                     namespace: animations,
+                    appliedCoupon: $appliedCoupon,
                     selectedService: $selectedService,
                     showSchedulePicker: $showSchedulePicker,
-                    selectedDate: $selectedDate
+                    selectedDate: $selectedDate,
+                    showCountryPicker: $showCountryPicker
                 )
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
             else if bottomSheetState == .nowRide {
-                NowRideDetailScreen(
+                GenericRideDetailScreen(
+                    isReservation: !isNowSelected,
                     pickup: pickupLocation,
                     destination: destinationLocation,
                     bottomSheetState: $bottomSheetState,
                     rideInformation: rideOptions,
+                    
+                    selectedRideInformation: $selectedRideInformation,
                     namespace: animations,
-                    selectedService: selectedService,
+                    appliedCoupon: $appliedCoupon,
+                    selectedService: $selectedService,
+                    showSchedulePicker: $showSchedulePicker,
+                    selectedDate: $selectedDate,
+                    showCountryPicker: $showCountryPicker
                 )
+//                NowRideDetailScreen(
+//                    pickup: pickupLocation,
+//                    destination: destinationLocation,
+//                    bottomSheetState: $bottomSheetState,
+//                    rideInformation: rideOptions,
+//                    namespace: animations,
+//                    selectedService: selectedService.displayName
+//                )
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
             else if bottomSheetState == .deliveryService {
-                DeliveryDetailScreen(
+                GenericRideDetailScreen(
+                    isReservation: !isNowSelected,
                     pickup: pickupLocation,
                     destination: destinationLocation,
                     bottomSheetState: $bottomSheetState,
-                    showCountryPicker: $showCountryPicker,
+                    rideInformation: rideOptions,
+                    selectedRideInformation: $selectedRideInformation,
                     namespace: animations,
-                    selectedCountry: $selectedCountryForDelivery,
-                    selectedService: selectedService
+                    appliedCoupon: $appliedCoupon,
+                    selectedService: $selectedService,
+                    showSchedulePicker: $showSchedulePicker,
+                    selectedDate: $selectedDate,
+                    showCountryPicker: $showCountryPicker
                 )
+//                DeliveryDetailScreen(
+//                    pickup: pickupLocation,
+//                    destination: destinationLocation,
+//                    bottomSheetState: $bottomSheetState,
+//                    showCountryPicker: $showCountryPicker,
+//                    namespace: animations,
+//                    selectedCountry: $selectedCountryForDelivery,
+//                    selectedService: selectedService.displayName
+//                )
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
             else if bottomSheetState == .rideSummary {
@@ -614,13 +647,10 @@ struct HomeScreen: View {
                 rideSummaryView
                     .transition(.move(edge: .trailing).combined(with: .opacity))
             }
-//            else if bottomSheetState == .rideOptions {
-//                // Ride Options Screen - Shows available ride options with prices
-//                rideOptionsView
-//                    .transition(.move(edge: .trailing).combined(with: .opacity))
-//            }
             else if bottomSheetState == .payment{
                 RidePaymentScreen(
+                    rideInfo: selectedRideInformation,
+                    selectedService: $selectedService,
                     bottomSheetState: $bottomSheetState,
                     namespace: animations
                 )
@@ -640,18 +670,50 @@ struct HomeScreen: View {
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
             else if bottomSheetState == .findingRide {
-                FindingReservationScreen(
+                FindingRideScreen(
                     bottomSheetState: $bottomSheetState,
                     namespace: animations,
                     sheetHeight: $sheetHeight,
+                    isReservation: !isNowSelected,
+                    vehicle: selectedRideOption.map {
+                        VehicleSubOptionsView.RideOption(
+                            id: $0.id,
+                            text_id: $0.ridePreference.lowercased().replacingOccurrences(of: " ", with: "-"),
+                            icon: getIconForPreference($0.ridePreference),
+                            title: $0.ridePreference,
+                            subtitle: "Comfortable vehicles",
+                            seats: 4,
+                            timeEstimate: "\(estimatedDuration) min",
+                            price: $0.price
+                        )
+                    } ?? VehicleSubOptionsView.RideOption(
+                        id: 1,
+                        text_id: "standard",
+                        icon: "car-service-icon",
+                        title: "Hezzni Standard",
+                        subtitle: "Comfortable vehicles",
+                        seats: 4,
+                        timeEstimate: "3-8 min",
+                        price: 25
+                    ),
+                    pickupLocation: pickupLocation,
+                    destinationLocation: destinationLocation,
+                    pickupDate: selectedDate,
                     onCancel: {
                         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                             bottomSheetState = .orderSummary
-                            
                         }
-                    }
+                    },
+                    pickupLatitude: pickupLatitude,
+                    pickupLongitude: pickupLongitude,
+                    dropoffLatitude: destinationLatitude,
+                    dropoffLongitude: destinationLongitude,
+                    serviceTypeId: selectedService.id,
+                    selectedRideOptionId: selectedRideOption?.id ?? 1,
+                    estimatedPrice: selectedRideOption?.price ?? 0,
+                    couponId: appliedCoupon?.couponId
                 )
-                    .transition(.move(edge: .trailing).combined(with: .opacity))
+                .transition(.move(edge: .trailing).combined(with: .opacity))
             }
             else if bottomSheetState == .reservationConfirmation {
                 ReservationConfirmedScreen(
@@ -695,17 +757,85 @@ struct HomeScreen: View {
     }
     
     private var servicesScrollView: some View {
-        HorizontalServicesScrollView(
-            items: services,
-            padding: EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16),
-            backgroundColor: .white
-        ) { service in
-            ServiceCardBuilder.createCard(
-                icon: service.icon,
-                title: service.title,
-                isSelected: selectedService == service.title,
-                action: { selectedService = service.title }
-            )
+        Group {
+            if servicesViewModel.isLoading {
+                // Show shimmer effect while loading
+                ServicesShimmerView(itemCount: 5)
+            } else if let errorMessage = servicesViewModel.errorMessage {
+                // Show error state
+                VStack(spacing: 8) {
+                    Text("Failed to load services")
+                        .font(.poppins(.medium, size: 14))
+                        .foregroundColor(.gray)
+                    Text(errorMessage)
+                        .font(.poppins(.regular, size: 12))
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                    Button("Retry") {
+                        Task {
+                            await servicesViewModel.loadServices(force: true)
+                        }
+                    }
+                    .font(.poppins(.medium, size: 14))
+                    .foregroundColor(.hezzniGreen)
+                }
+                .padding()
+            } else {
+                // Show services from API
+                HorizontalServicesScrollView(
+                    items: filteredServices,
+                    padding: EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16),
+                    backgroundColor: .white
+                ) { service in
+                    ServiceCardBuilder.createCard(
+                        icon: service.iconAssetName,
+                        title: getDisplayName(for: service.name),
+                        isSelected: selectedService.id == service.id,
+                        action: {
+                            selectedService = SelectedService(from: service)
+                        }
+                    )
+                }
+            }
+        }
+        .onAppear {
+            Task {
+                await servicesViewModel.loadServices()
+            }
+        }
+    }
+    
+    /// Get display name for service (shorter version for UI)
+    private func getDisplayName(for name: String) -> String {
+        switch name.lowercased() {
+        case "car rides":
+            return "Car"
+        case "airport ride":
+            return "Ride to Airport"
+        case "city to city":
+            return "City to City"
+        case "group ride":
+            return "Group Ride"
+        default:
+            return name
+        }
+    }
+    
+    /// Get icon for ride preference
+    private func getIconForPreference(_ preference: String) -> String {
+        switch preference.lowercased() {
+        case "hezzni standard":
+            return "car-service-icon"
+        case "hezzni comfort":
+            return "car-service-comfort-icon"
+        case "hezzni xl":
+            return "car-service-xl-icon"
+        case "taxi":
+            return "taxi-service-icon"
+        case "motorcycle", "bike":
+            return "motorcycle-service-icon"
+        default:
+            return "car-service-icon"
         }
     }
     
@@ -1153,14 +1283,18 @@ struct HomeScreen: View {
     // MARK: - Helper Methods
     
     private func fetchPlacesSuggestions() {
+        print("🔍 fetchPlacesSuggestions called with searchText: '\(searchText)'")
+        
         guard !searchText.isEmpty else {
             placeSuggestions = []
+            print("🔍 Search text is empty, clearing suggestions")
             return
         }
         
         isLoadingSuggestions = true
         locationManager.fetchPlacesSuggestions(query: searchText) { suggestions in
             DispatchQueue.main.async {
+                print("🔍 Received \(suggestions.count) suggestions")
                 self.placeSuggestions = suggestions
                 self.isLoadingSuggestions = false
             }
@@ -1413,8 +1547,6 @@ struct HomeScreen: View {
             } else {
                 if sheetHeight > (midSheetHeight + minSheetHeight) / 2 {
                     sheetHeight = midSheetHeight
-                } else {
-                    sheetHeight = minSheetHeight
                 }
             }
             
@@ -1513,7 +1645,7 @@ struct HomeScreen: View {
                     dropoffLatitude: destinationLatitude,
                     dropoffLongitude: destinationLongitude,
                     dropoffAddress: destinationLocation,
-                    passengerServiceId: 1  // Adjust based on selected service
+                    passengerServiceId: selectedService.id  // Use selected service ID
                 )
                 
                 DispatchQueue.main.async {
@@ -1748,25 +1880,25 @@ struct ServiceCardHorizontal: View {
     }
 }
 
-// Swift
-#Preview {
-    struct HomeScreenPreviewWrapper: View {
-        @State private var selectedService = "Car"
-        @State private var isNowSelected = true
-        @State private var pickupLocation = "From?"
-        @State private var destinationLocation = "Where To?"
-        @State private var bottomSheetState = BottomSheetState.initial
-
-        var body: some View {
-            HomeScreen(
-                selectedService: $selectedService,
-                isNowSelected: $isNowSelected,
-                pickupLocation: $pickupLocation,
-                destinationLocation: $destinationLocation,
-                bottomSheetState: $bottomSheetState
-            )
-            .environmentObject(NavigationStateManager())
-        }
-    }
-    return HomeScreenPreviewWrapper()
-}
+//// Swift
+//#Preview {
+//    struct HomeScreenPreviewWrapper: View {
+//        @State private var selectedService = SelectedService.defaultService
+//        @State private var isNowSelected = true
+//        @State private var pickupLocation = "From?"
+//        @State private var destinationLocation = "Where To?"
+//        @State private var bottomSheetState = BottomSheetState.initial
+//
+//        var body: some View {
+//            HomeScreen(
+//                selectedService: $selectedService,
+//                isNowSelected: $isNowSelected,
+//                pickupLocation: $pickupLocation,
+//                destinationLocation: $destinationLocation,
+//                bottomSheetState: $bottomSheetState
+//            )
+//            .environmentObject(NavigationStateManager())
+//        }
+//    }
+//    return HomeScreenPreviewWrapper()
+//}

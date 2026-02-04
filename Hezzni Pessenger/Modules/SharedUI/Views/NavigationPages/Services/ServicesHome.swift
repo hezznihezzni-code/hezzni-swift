@@ -9,12 +9,13 @@ import SwiftUI
 
 struct ServicesHome: View {
     @State private var navigateToService: String? = nil
+    @State private var showRentalScreen: Bool = false
     @EnvironmentObject private var navigationState: NavigationStateManager
 
     @StateObject private var servicesVM = PassengerServicesViewModel()
     
     @Binding var selectedTab: BottomNavigationBar.Tab
-    @Binding var selectedService: String
+    @Binding var selectedService: SelectedService
     @Binding var isNowSelected: Bool
     @Binding var pickupLocation: String
     @Binding var destinationLocation: String
@@ -24,71 +25,92 @@ struct ServicesHome: View {
     var body: some View {
         NavigationView {
             ZStack {
-                VStack {
-                    CustomAppBar(title: "Choose a Service", backButtonVisible: false, backButtonAction: {}, trailingView: {
-                        HStack {
-                            NotificationButton()
-                        }
-                    })
-
-                    if servicesVM.isLoading {
-                        ServicesGridShimmer()
-                            .padding(.top, 16)
-                    } else if let error = servicesVM.errorMessage {
-                        VStack(spacing: 12) {
-                            Text(error)
-                                .font(.poppins(.regular, size: 14))
-                                .foregroundColor(.red)
-                                .multilineTextAlignment(.center)
-
-                            Button("Retry") {
-                                Task { await servicesVM.loadServices(force: true) }
-                            }
-                            .font(.poppins(.medium, size: 14))
-                        }
-                        .padding(.top, 24)
-                    } else {
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 16) {
-                            ForEach(servicesVM.services) { service in
-                                ServiceCard(
-                                    icon: service.iconAssetName,
-                                    title: service.name,
-                                    isSelected: selectedService == service.name,
-                                    action: {
-                                        selectedService = service.name
-                                        selectedTab = .home
-                                        navigationState.hideBottomBar()
-                                        if service.name == "Reservation" {
-                                            isNowSelected = false
-                                        }
-                                        bottomSheetState = .journey
-//                                            navigateToService = service.name
-                                    }
-                                )
-//                                NavigationLink(
-//                                    destination: serviceWelcomeView(for: service.name),
-//                                    tag: service.name,
-//                                    selection: $navigateToService
-//                                ) {
-//                                    ServiceCard(
-//                                        icon: service.iconAssetName,
-//                                        title: service.name,
-//                                        isSelected: selectedService == service.name,
-//                                        action: {
-//                                            selectedService = service.name
-//                                            selectedTab = .home
-//                                            bottomSheetState = .nowRide
-////                                            navigateToService = service.name
-//                                        }
-//                                    )
-//                                }
-                            }
+                if showRentalScreen { CarRentalScreen(
+                    onBack: {
+                        navigationState.showBottomBar()
+                        
+                        withAnimation(.easeInOut){
+                            showRentalScreen = false
                         }
                     }
-
-                    Spacer()
+                )
+                .transition(.move(edge: .trailing))
+                } else {
+                    VStack {
+                        CustomAppBar(title: "Choose a Service", backButtonVisible: false, backButtonAction: {}, trailingView: {
+                            HStack {
+                                NotificationButton()
+                            }
+                        })
+                        
+                        if servicesVM.isLoading {
+                            ServicesGridShimmer()
+                                .padding(.top, 16)
+                        } else if let error = servicesVM.errorMessage {
+                            VStack(spacing: 12) {
+                                Text(error)
+                                    .font(.poppins(.regular, size: 14))
+                                    .foregroundColor(.red)
+                                    .multilineTextAlignment(.center)
+                                
+                                Button("Retry") {
+                                    Task { await servicesVM.loadServices(force: true) }
+                                }
+                                .font(.poppins(.medium, size: 14))
+                            }
+                            .padding(.top, 24)
+                        } else {
+                            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3), spacing: 16) {
+                                ForEach(servicesVM.services) { service in
+                                    ServiceCard(
+                                        icon: service.iconAssetName,
+                                        title: service.name,
+                                        isSelected: selectedService.id == service.id,
+                                        action: {
+                                            selectedService = SelectedService(from: service)
+                                            if service.name == "Rental Car" {
+                                                withAnimation(.easeInOut){
+                                                    showRentalScreen = true
+                                                }
+                                                navigationState.hideBottomBar()
+                                            }
+                                            else{
+                                                selectedTab = .home
+                                                navigationState.hideBottomBar()
+                                                if service.name == "Reservation" {
+                                                    isNowSelected = false
+                                                }
+                                                bottomSheetState = .journey
+                                            }
+                                            
+                                            //                                            navigateToService = service.name
+                                        }
+                                    )
+                                    //                                NavigationLink(
+                                    //                                    destination: serviceWelcomeView(for: service.name),
+                                    //                                    tag: service.name,
+                                    //                                    selection: $navigateToService
+                                    //                                ) {
+                                    //                                    ServiceCard(
+                                    //                                        icon: service.iconAssetName,
+                                    //                                        title: service.name,
+                                    //                                        isSelected: selectedService == service.name,
+                                    //                                        action: {
+                                    //                                            selectedService = service.name
+                                    //                                            selectedTab = .home
+                                    //                                            bottomSheetState = .nowRide
+                                    ////                                            navigateToService = service.name
+                                    //                                        }
+                                    //                                    )
+                                    //                                }
+                                }
+                            }
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
                 }
-                .padding(.horizontal, 16)
             }
             .navigationBarHidden(true)
             .onAppear {
@@ -98,8 +120,8 @@ struct ServicesHome: View {
                 await servicesVM.loadServices()
 
                 // Keep default selection consistent with API data.
-                if selectedService == "Car", let first = servicesVM.services.first {
-                    selectedService = first.name
+                if selectedService.name == "Car Rides" || selectedService.id == 1, let first = servicesVM.services.first {
+                    selectedService = SelectedService(from: first)
                 }
             }
         }
@@ -206,27 +228,27 @@ struct ServiceCard: View {
 }
 
 
-// Swift
-#Preview {
-    struct ServicesHomePreview: View {
-        @State private var selectedService = "Car"
-        @State private var isNowSelected = true
-        @State private var pickupLocation = "From?"
-        @State private var destinationLocation = "Where To?"
-        @State private var bottomSheetState = BottomSheetState.initial
-        @State private var selectedTab: BottomNavigationBar.Tab = .services
-
-        var body: some View {
-            ServicesHome(
-                selectedTab: $selectedTab,
-                selectedService: $selectedService,
-                isNowSelected: $isNowSelected,
-                pickupLocation: $pickupLocation,
-                destinationLocation: $destinationLocation,
-                bottomSheetState: $bottomSheetState
-            )
-            .environmentObject(NavigationStateManager())
-        }
-    }
-    return ServicesHomePreview()
-}
+//// Swift
+//#Preview {
+//    struct ServicesHomePreview: View {
+//        @State private var selectedService = "Car"
+//        @State private var isNowSelected = true
+//        @State private var pickupLocation = "From?"
+//        @State private var destinationLocation = "Where To?"
+//        @State private var bottomSheetState = BottomSheetState.initial
+//        @State private var selectedTab: BottomNavigationBar.Tab = .services
+//
+//        var body: some View {
+//            ServicesHome(
+//                selectedTab: $selectedTab,
+//                selectedService: $selectedService,
+//                isNowSelected: $isNowSelected,
+//                pickupLocation: $pickupLocation,
+//                destinationLocation: $destinationLocation,
+//                bottomSheetState: $bottomSheetState
+//            )
+//            .environmentObject(NavigationStateManager())
+//        }
+//    }
+//    return ServicesHomePreview()
+//}

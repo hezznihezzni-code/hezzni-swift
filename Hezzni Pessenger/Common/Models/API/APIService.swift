@@ -89,6 +89,36 @@ class APIService {
         )
     }
     
+    // MARK: - Coupon Validation
+    
+    /// Response model for coupon validation
+    struct CouponValidationResponse: Decodable {
+        let status: String
+        let message: String
+        let data: CouponValidationData
+        let timestamp: String
+        
+        struct CouponValidationData: Decodable {
+            let isValid: Bool
+            let discountAmount: Double
+            let newPrice: Double
+            let message: String
+            let couponId: Int
+        }
+    }
+    
+    /// Validate a coupon code and get the discounted price
+    func validateCoupon(code: String, price: Double) async throws -> CouponValidationResponse {
+        let token = TokenManager.shared.token
+        let encodedCode = code.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? code
+        return try await requestWithBearerAuth(
+            endpoint: "/api/coupons/validate/\(encodedCode)?price=\(price)",
+            method: "GET",
+            parameters: nil,
+            authToken: token
+        )
+    }
+    
     // MARK: - Driver Preferences + Presence
 
     /// Fetch driver ride preferences.

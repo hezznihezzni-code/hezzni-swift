@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-private struct ShimmerModifier: ViewModifier {
+private struct ShimmerModifier1: ViewModifier {
     var isActive: Bool
     var speed: Double
 
@@ -56,6 +56,6 @@ private struct ShimmerModifier: ViewModifier {
 extension View {
     /// Adds a lightweight shimmer effect. Best used on placeholder/skeleton views.
     func shimmer(isActive: Bool = true, speed: Double = 1.2) -> some View {
-        modifier(ShimmerModifier(isActive: isActive, speed: speed))
+        modifier(ShimmerModifier1(isActive: isActive, speed: speed))
     }
 }

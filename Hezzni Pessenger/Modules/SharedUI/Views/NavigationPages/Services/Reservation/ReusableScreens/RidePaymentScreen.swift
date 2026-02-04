@@ -150,6 +150,8 @@ struct PaymentMethodList: View {
 
 // MARK: - PaymentMethodScreen
 struct RidePaymentScreen: View {
+    var rideInfo: VehicleSubOptionsView.RideOption
+    @Binding var selectedService: SelectedService
     @Binding var bottomSheetState: BottomSheetState
     var namespace: Namespace.ID?
     @State private var selectedMethodIndex: Int = 0
@@ -170,12 +172,12 @@ struct RidePaymentScreen: View {
                         
                         VStack(alignment: .leading, spacing: 24) {
                             RideOptionCard(
-                                icon: "car-service-icon",
-                                title: "Hezzni Standard",
-                                subtitle: "Comfortable vehicles",
-                                seats: 4,
-                                timeEstimate: "3-8 min",
-                                price: 50,
+                                icon: rideInfo.icon,
+                                title: rideInfo.title,
+                                subtitle: rideInfo.subtitle,
+                                seats: rideInfo.seats,
+                                timeEstimate: rideInfo.timeEstimate,
+                                price: rideInfo.price,
                                 isSelected: .constant(true)
                             )
                             .matchedGeometryEffect(id: "selected_vehicle", in: namespace!)
@@ -195,7 +197,6 @@ struct RidePaymentScreen: View {
                             .padding(.bottom, 24)
                     }
                     .padding(EdgeInsets(top: 15, leading: 0, bottom: 35, trailing: 0))
-                    .frame(width: 402)
                     .background(.white)
                 }
             }
@@ -204,7 +205,7 @@ struct RidePaymentScreen: View {
         
     }
 }
-
-#Preview {
-    RidePaymentScreen(bottomSheetState: .constant(.payment))
-}
+//
+//#Preview {
+//    RidePaymentScreen(bottomSheetState: .constant(.payment))
+//}

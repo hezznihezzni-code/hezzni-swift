@@ -35,7 +35,7 @@ struct VehicleFiltersSheet: View {
     @State private var engineTypes: Set<String> = []
     @State private var priceRange: ClosedRange<Double> = 400...5700
     @State private var appliedFilters: [String] = []
-    @State private var filterState: FilterExpandedState = FilterExpandedState.year
+    @State private var filterState: FilterExpandedState = FilterExpandedState.none
     @State private var startYear: Int = 2000
     @State private var endYear: Int = 2025
     
