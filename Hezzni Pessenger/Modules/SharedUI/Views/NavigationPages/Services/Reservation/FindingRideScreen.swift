@@ -39,7 +39,7 @@ struct FindingRideScreen: View {
     var couponId: Int? = nil  // Optional coupon ID from applied coupon
     
     // Socket manager
-    @StateObject private var socketManager = RideSocketManager.shared
+    @ObservedObject private var socketManager = RideSocketManager.shared
 
     @State private var showReservationScreen = false
     @State private var showNoDriverFound = false
@@ -202,24 +202,20 @@ struct FindingRideScreen: View {
     private func startRideSearch() {
         currentSearchTime = 0
         
-        // Connect and emit ride request
-        socketManager.connect()
-        
-        // Wait for connection before emitting
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            socketManager.requestRide(
-                pickupLatitude: pickupLatitude,
-                pickupLongitude: pickupLongitude,
-                pickupAddress: pickupLocation,
-                dropoffLatitude: dropoffLatitude,
-                dropoffLongitude: dropoffLongitude,
-                dropoffAddress: destinationLocation,
-                serviceTypeId: serviceTypeId,
-                selectedRideOptionId: selectedRideOptionId,
-                estimatedPrice: estimatedPrice,
-                couponId: couponId
-            )
-        }
+        // Request ride - the socketManager will handle connection automatically
+        // It will connect first if not already connected
+        socketManager.requestRide(
+            pickupLatitude: pickupLatitude,
+            pickupLongitude: pickupLongitude,
+            pickupAddress: pickupLocation,
+            dropoffLatitude: dropoffLatitude,
+            dropoffLongitude: dropoffLongitude,
+            dropoffAddress: destinationLocation,
+            serviceTypeId: serviceTypeId,
+            selectedRideOptionId: selectedRideOptionId,
+            estimatedPrice: estimatedPrice,
+            couponId: couponId
+        )
         
         // Start search timer
         searchTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in

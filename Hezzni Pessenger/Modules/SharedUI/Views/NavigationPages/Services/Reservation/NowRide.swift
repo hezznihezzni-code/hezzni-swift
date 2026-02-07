@@ -309,6 +309,9 @@ struct TripSummaryView: View {
     let vehicle: String
     let estimatedTime: String
     let price: String
+    var discountedPrice: String? = nil  // Optional discounted price when coupon applied
+    var discountText: String? = nil      // Optional discount label (e.g., "10% off")
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             Text("Trip Summary")
@@ -347,14 +350,37 @@ struct TripSummaryView: View {
                 .foregroundColor(.clear)
                 .frame(width: 322, height: 1)
                 .background(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.08))
+            
+            // Price section - shows discounted price if coupon applied
             HStack(alignment: .top) {
-                Text("Estimate price")
-                    .font(Font.custom("Poppins", size: 16).weight(.medium))
-                    .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Estimate price")
+                        .font(Font.custom("Poppins", size: 16).weight(.medium))
+                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                    if let discountText = discountText {
+                        Text(discountText)
+                            .font(Font.custom("Poppins", size: 12))
+                            .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+                    }
+                }
                 Spacer()
-                Text(price +  " MAD")
-                    .font(Font.custom("Poppins", size: 18).weight(.semibold))
-                    .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+                VStack(alignment: .trailing, spacing: 2) {
+                    if let discountedPrice = discountedPrice {
+                        // Show original price with strikethrough
+                        Text(price + " MAD")
+                            .font(Font.custom("Poppins", size: 14))
+                            .strikethrough()
+                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.5))
+                        // Show discounted price
+                        Text(discountedPrice + " MAD")
+                            .font(Font.custom("Poppins", size: 18).weight(.semibold))
+                            .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+                    } else {
+                        Text(price + " MAD")
+                            .font(Font.custom("Poppins", size: 18).weight(.semibold))
+                            .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+                    }
+                }
             }
         }
         .padding(14)

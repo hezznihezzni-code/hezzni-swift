@@ -144,19 +144,42 @@ final class RideSocketManager: ObservableObject {
     
     private init() {}
     
+    // Track retry attempts to prevent infinite loops
+    private var connectionRetryCount = 0
+    private let maxConnectionRetries = 3
+    
     // MARK: - Connection Management
     
     func connect() {
+        // Prevent multiple connection attempts
+        if connectionState == .connecting || connectionState == .connected {
+            print("✅ Passenger socket already \(connectionState == .connected ? "connected" : "connecting"), skipping...")
+            return
+        }
+        
         guard let token = TokenManager.shared.token else {
             connectionState = .error("No authentication token found")
+            return
+        }
+        
+        // ✅ FIX: Extract userId from JWT token
+        guard let userId = JWTHelper.extractUserId(from: token) else {
+            connectionState = .error("Failed to extract userId from token")
+            print("❌ Could not decode userId from JWT token")
             return
         }
         
         let socketURL = URLEnvironment.socketURL
         
         connectionState = .connecting
+        connectionRetryCount = 0
+        print("🔌 Passenger socket connecting to \(socketURL.absoluteString)/ride")
         
-        // Configure socket with authentication
+        // Clean up any existing connection
+        socket?.disconnect()
+        manager?.disconnect()
+        
+        // Configure socket manager
         manager = SocketManager(
             socketURL: socketURL,
             config: [
@@ -173,8 +196,26 @@ final class RideSocketManager: ObservableObject {
         // Connect to /ride namespace
         socket = manager?.socket(forNamespace: "/ride")
         
+        // ✅ FIX: Auth payload to be sent with connect()
+        // This maps to socket.handshake.auth on the server
+        let authPayload: [String: Any] = [
+            "userId": userId,
+            "userType": "passenger"
+        ]
+        
+        print("")
+        print("╔══════════════════════════════════════════════════════════════╗")
+        print("║  🔌 PASSENGER SOCKET CONNECTION                              ║")
+        print("╠══════════════════════════════════════════════════════════════╣")
+        print("║  URL: \(socketURL.absoluteString)/ride")
+        print("║  Auth Payload: \(authPayload)")
+        print("╚══════════════════════════════════════════════════════════════╝")
+        print("")
+        
         setupEventHandlers()
-        socket?.connect()
+        
+        // ✅ Connect with auth payload - this sends auth data to server's socket.handshake.auth
+        socket?.connect(withPayload: authPayload)
     }
     
     func disconnect() {
@@ -191,32 +232,90 @@ final class RideSocketManager: ObservableObject {
     // MARK: - Event Handlers Setup
     
     private func setupEventHandlers() {
-        guard let socket = socket else { return }
+        guard let socket = socket else {
+            print("❌ setupEventHandlers: socket is nil!")
+            return
+        }
+        
+        print("")
+        print("📡 PASSENGER: Setting up event handlers...")
+        print("   Socket ID: \(socket.sid)")
+        print("   Socket Status: \(socket.status)")
+        print("")
         
         // Connection events
-        socket.on(clientEvent: .connect) { [weak self] _, _ in
+        socket.on(clientEvent: .connect) { [weak self] data, _ in
+            print("")
+            print("╔══════════════════════════════════════════════════════════════╗")
+            print("║  ✅ PASSENGER SOCKET CONNECTED                               ║")
+            print("╠══════════════════════════════════════════════════════════════╣")
+            print("║  Connect Data: \(data)")
+            print("║  Socket SID: \(socket.sid)")
+            print("║  Socket Status: \(socket.status)")
+            print("╚══════════════════════════════════════════════════════════════╝")
+            print("")
+            
             Task { @MainActor in
                 self?.connectionState = .connected
-                print("✅ Passenger socket connected to /ride namespace")
+                self?.connectionRetryCount = 0  // Reset retry count on successful connection
+                print("🚶 Passenger: connectionState set to .connected")
             }
         }
         
-        socket.on(clientEvent: .disconnect) { [weak self] _, _ in
+        socket.on(clientEvent: .disconnect) { [weak self] data, _ in
+            print("")
+            print("╔══════════════════════════════════════════════════════════════╗")
+            print("║  ❌ PASSENGER SOCKET DISCONNECTED                            ║")
+            print("╠══════════════════════════════════════════════════════════════╣")
+            print("║  Disconnect Reason: \(data)")
+            print("║  Socket Status: \(socket.status)")
+            print("╚══════════════════════════════════════════════════════════════╝")
+            print("")
+            
             Task { @MainActor in
                 self?.connectionState = .disconnected
                 self?.isSearchingForDriver = false
-                print("❌ Passenger socket disconnected from /ride namespace")
             }
         }
         
         socket.on(clientEvent: .error) { [weak self] data, _ in
+            print("")
+            print("╔══════════════════════════════════════════════════════════════╗")
+            print("║  ⚠️ PASSENGER SOCKET ERROR                                   ║")
+            print("╠══════════════════════════════════════════════════════════════╣")
+            print("║  Error Data: \(data)")
+            print("║  Socket Status: \(socket.status)")
+            print("╚══════════════════════════════════════════════════════════════╝")
+            print("")
+            
             Task { @MainActor in
                 let errorMsg = (data.first as? String) ?? "Unknown socket error"
                 self?.connectionState = .error(errorMsg)
                 self?.errorMessage = errorMsg
                 self?.onError?(errorMsg)
-                print("⚠️ Passenger socket error: \(errorMsg)")
             }
+        }
+        
+        // Listen for server-sent errors (different from client errors)
+        socket.on("error") { [weak self] data, _ in
+            print("")
+            print("⚠️ PASSENGER: Server sent 'error' event:")
+            print("   Data: \(data)")
+            print("")
+            
+            Task { @MainActor in
+                let errorMsg = (data.first as? [String: Any])?["message"] as? String ?? "An error occurred"
+                self?.errorMessage = errorMsg
+                self?.onError?(errorMsg)
+            }
+        }
+        
+        // Listen for 'connect_error' which often contains auth failure reasons
+        socket.on("connect_error") { data, _ in
+            print("")
+            print("❌ PASSENGER: connect_error event:")
+            print("   Data: \(data)")
+            print("")
         }
         
         // Listen for ALL events to debug
@@ -224,7 +323,51 @@ final class RideSocketManager: ObservableObject {
             print("🔔 PASSENGER SOCKET EVENT: \(event.event) with items: \(event.items ?? [])")
         }
         
-        // Ride request response
+        // NEW: Listen for ride:requestReceived (acknowledgment from server)
+        socket.on("ride:requestReceived") { [weak self] data, _ in
+            print("")
+            print("╔══════════════════════════════════════════════════════════════╗")
+            print("║  📨 PASSENGER: ride:requestReceived                           ║")
+            print("╠══════════════════════════════════════════════════════════════╣")
+            if let responseData = data.first as? [String: Any] {
+                if let jsonData = try? JSONSerialization.data(withJSONObject: responseData, options: .prettyPrinted),
+                   let jsonString = String(data: jsonData, encoding: .utf8) {
+                    print(jsonString)
+                }
+            } else {
+                print("   Data: \(data)")
+            }
+            print("╚══════════════════════════════════════════════════════════════╝")
+            print("")
+            
+            Task { @MainActor in
+                self?.handleRideRequestResponse(data)
+            }
+        }
+        
+        // NEW: Listen for ride:accepted (driver accepted the ride)
+        socket.on("ride:accepted") { [weak self] data, _ in
+            print("")
+            print("╔══════════════════════════════════════════════════════════════╗")
+            print("║  🎉 PASSENGER: ride:accepted - DRIVER FOUND!                ║")
+            print("╠══════════════════════════════════════════════════════════════╣")
+            if let responseData = data.first as? [String: Any] {
+                if let jsonData = try? JSONSerialization.data(withJSONObject: responseData, options: .prettyPrinted),
+                   let jsonString = String(data: jsonData, encoding: .utf8) {
+                    print(jsonString)
+                }
+            } else {
+                print("   Data: \(data)")
+            }
+            print("╚══════════════════════════════════════════════════════════════╝")
+            print("")
+            
+            Task { @MainActor in
+                self?.handleDriverFound(data)
+            }
+        }
+        
+        // Ride request response (original listener)
         socket.on(RideSocketEvent.rideRequestResponse.rawValue) { [weak self] data, _ in
             print("📨 RECEIVED ride:requestResponse with data: \(data)")
             Task { @MainActor in
@@ -284,9 +427,21 @@ final class RideSocketManager: ObservableObject {
     ) {
         guard connectionState == .connected else {
             // Auto-connect if not connected
+            connectionRetryCount += 1
+            
+            if connectionRetryCount > maxConnectionRetries {
+                print("❌ Max connection retries reached, giving up")
+                isSearchingForDriver = false
+                errorMessage = "Failed to connect to server"
+                onError?("Failed to connect to server")
+                return
+            }
+            
+            print("🔄 Socket not connected, connecting... (attempt \(connectionRetryCount)/\(maxConnectionRetries))")
             connect()
-            // Retry after a short delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            
+            // Retry after connection delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
                 self?.requestRide(
                     pickupLatitude: pickupLatitude,
                     pickupLongitude: pickupLongitude,
@@ -303,6 +458,8 @@ final class RideSocketManager: ObservableObject {
             return
         }
         
+        // Reset retry count on successful connection
+        connectionRetryCount = 0
         isSearchingForDriver = true
         errorMessage = nil
         
@@ -321,9 +478,24 @@ final class RideSocketManager: ObservableObject {
         )
         
         let socketData = payload.toSocketData()
-        print("🚀 EMITTING passenger:requestRide with data:")
-        print("   Event: \(RideSocketEvent.requestRide.rawValue)")
-        print("   Payload: \(socketData)")
+        
+        print("")
+        print("╔══════════════════════════════════════════════════════════════╗")
+        print("║  🚀 EMITTING: passenger:requestRide                          ║")
+        print("╠══════════════════════════════════════════════════════════════╣")
+        print("║  Event: \(RideSocketEvent.requestRide.rawValue)")
+        print("║  Connection State: \(connectionState)")
+        print("║  Socket Status: \(socket?.status.description ?? "nil")")
+        print("╠══════════════════════════════════════════════════════════════╣")
+        print("║  PAYLOAD (JSON):")
+        if let jsonData = try? JSONSerialization.data(withJSONObject: socketData, options: .prettyPrinted),
+           let jsonString = String(data: jsonData, encoding: .utf8) {
+            print(jsonString)
+        } else {
+            print("   Raw: \(socketData)")
+        }
+        print("╚══════════════════════════════════════════════════════════════╝")
+        print("")
         
         socket?.emit(RideSocketEvent.requestRide.rawValue, socketData)
         currentRideStatus = .searching

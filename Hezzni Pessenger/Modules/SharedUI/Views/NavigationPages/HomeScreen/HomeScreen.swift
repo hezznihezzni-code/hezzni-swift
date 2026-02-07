@@ -103,6 +103,7 @@ struct HomeScreen: View {
     // Track which location is being selected from map (pickup or destination)
     @State private var isSelectingPickupFromMap = true
     @State private var hasSetInitialPickupLocation = false
+    @State private var hasSetInitialCameraPosition = false
     
     init(
         selectedService: Binding<SelectedService>,
@@ -117,8 +118,9 @@ struct HomeScreen: View {
         self._destinationLocation = destinationLocation
         self._bottomSheetState = bottomSheetState
     
-        let marrakech = CLLocationCoordinate2D(latitude: 40.629255690273595, longitude: -73.98749804295893)
-        _cameraPosition = State(initialValue: GMSCameraPosition.camera(withTarget: marrakech, zoom: 14))
+        // Default to Marrakech, Morocco
+        let defaultLocation = CLLocationCoordinate2D(latitude: 31.6295, longitude: -7.9811)
+        _cameraPosition = State(initialValue: GMSCameraPosition.camera(withTarget: defaultLocation, zoom: 14))
         _selectedRideInformation = State(initialValue: VehicleSubOptionsView.RideOption(
             id: 0,
             text_id: "standard",
@@ -142,6 +144,23 @@ struct HomeScreen: View {
                             configureMap()
                         }
 
+                    // GPS button above the sheet (show in initial, journey, chooseOnMap, rideSummary states)
+                    if bottomSheetState == .initial || bottomSheetState == .journey || bottomSheetState == .chooseOnMap || bottomSheetState == .rideSummary || bottomSheetState == .rideOptions {
+                        VStack {
+                            Spacer()
+                            HStack {
+                                Spacer()
+                                Button(action: {
+                                    centerOnCurrentLocation()
+                                }) {
+                                    circularButton(icon: "gps_location_icon")
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, sheetHeight + 16)
+                        }
+                    }
+                    
                     // Custom draggable sheet
                     draggableSheet
                 }
@@ -150,7 +169,11 @@ struct HomeScreen: View {
                     locationManager.startUpdatingLocation()
                 }
                 .onChange(of: locationManager.currentLocation) { location in
-                    updateCameraPosition(location: location)
+                    // Only auto-center map on initial load, NOT when user is choosing from map
+                    if !hasSetInitialCameraPosition && bottomSheetState != .chooseOnMap {
+                        hasSetInitialCameraPosition = true
+                        updateCameraPosition(location: location)
+                    }
                     
                     // Auto-set pickup location from user's current location (only once)
                     if !hasSetInitialPickupLocation, let location = location {
@@ -606,14 +629,6 @@ struct HomeScreen: View {
                     selectedDate: $selectedDate,
                     showCountryPicker: $showCountryPicker
                 )
-//                NowRideDetailScreen(
-//                    pickup: pickupLocation,
-//                    destination: destinationLocation,
-//                    bottomSheetState: $bottomSheetState,
-//                    rideInformation: rideOptions,
-//                    namespace: animations,
-//                    selectedService: selectedService.displayName
-//                )
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
             else if bottomSheetState == .deliveryService {
@@ -1216,6 +1231,13 @@ struct HomeScreen: View {
                 })
                 .font(.system(size: 16))
                 .foregroundColor(.primary)
+                .onChange(of: pickupLocation) { newValue in
+                    // Sync searchText when pickup location changes while editing
+                    if isEditingPickup {
+                        searchText = newValue
+                        print("🔍 Pickup location changed: '\(newValue)' - triggering search")
+                    }
+                }
             }
             
             Spacer()
@@ -1238,6 +1260,13 @@ struct HomeScreen: View {
                 })
                 .font(.system(size: 16))
                 .foregroundColor(.primary)
+                .onChange(of: destinationLocation) { newValue in
+                    // Sync searchText when destination location changes while editing
+                    if isEditingDestination {
+                        searchText = newValue
+                        print("🔍 Destination location changed: '\(newValue)' - triggering search")
+                    }
+                }
             }
             
             Spacer()
@@ -1548,6 +1577,9 @@ struct HomeScreen: View {
                 if sheetHeight > (midSheetHeight + minSheetHeight) / 2 {
                     sheetHeight = midSheetHeight
                 }
+                else {
+                    sheetHeight = midSheetHeight
+                }
             }
             
         }
@@ -1558,6 +1590,23 @@ struct HomeScreen: View {
             let camera = GMSCameraPosition.camera(withTarget: location.coordinate, zoom: 14)
             cameraPosition = camera
             mapView.animate(to: camera)
+        }
+    }
+    
+    /// Center the map on the user's current location and update pickup
+    private func centerOnCurrentLocation() {
+        if let location = locationManager.currentLocation {
+            print("📍 Centering map on current location: \(location.coordinate.latitude), \(location.coordinate.longitude)")
+            let camera = GMSCameraPosition.camera(withTarget: location.coordinate, zoom: 16)
+            cameraPosition = camera
+            mapView.animate(to: camera)
+            
+            // Also update pickup location
+            setPickupFromCurrentLocation(location: location)
+        } else {
+            // Request location update if not available
+            print("📍 Current location not available, requesting update...")
+            locationManager.startUpdatingLocation()
         }
     }
     

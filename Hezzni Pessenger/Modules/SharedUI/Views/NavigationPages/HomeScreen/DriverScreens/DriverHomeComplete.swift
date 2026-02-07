@@ -21,7 +21,11 @@ struct RideRequest: Identifiable {
     let passengerPhone: String?
     let isVerified: Bool
     let pickupLocation: String
+    let pickupLatitude: Double
+    let pickupLongitude: Double
     let destinationLocation: String
+    let destinationLatitude: Double
+    let destinationLongitude: Double
     let distance: String
     let duration: String
     let fare: String
@@ -41,7 +45,11 @@ struct RideRequest: Identifiable {
         self.passengerPhone = socketRequest.passenger.phone
         self.isVerified = true
         self.pickupLocation = socketRequest.pickup.address
+        self.pickupLatitude = socketRequest.pickup.latitude
+        self.pickupLongitude = socketRequest.pickup.longitude
         self.destinationLocation = socketRequest.dropoff.address
+        self.destinationLatitude = socketRequest.dropoff.latitude
+        self.destinationLongitude = socketRequest.dropoff.longitude
         self.distance = socketRequest.formattedRideDistance
         self.duration = socketRequest.formattedRideDuration
         self.fare = socketRequest.formattedPrice
@@ -59,7 +67,11 @@ struct RideRequest: Identifiable {
         passengerImage: String,
         isVerified: Bool,
         pickupLocation: String,
+        pickupLatitude: Double,
+        pickupLongitude: Double,
         destinationLocation: String,
+        destinationLatitude: Double,
+        destinationLongitude: Double,
         distance: String,
         duration: String,
         fare: String,
@@ -75,7 +87,11 @@ struct RideRequest: Identifiable {
         self.passengerPhone = nil
         self.isVerified = isVerified
         self.pickupLocation = pickupLocation
+        self.pickupLatitude = pickupLatitude
+        self.pickupLongitude = pickupLongitude
         self.destinationLocation = destinationLocation
+        self.destinationLatitude = destinationLatitude
+        self.destinationLongitude = destinationLongitude
         self.distance = distance
         self.duration = duration
         self.fare = fare
@@ -102,7 +118,7 @@ struct DriverHomeComplete: View {
     @State private var mapView = GMSMapView()
     @State private var cameraPosition: GMSCameraPosition
     @StateObject private var locationManager = LocationManager()
-    @StateObject private var driverSocketManager = DriverRideSocketManager.shared
+    @ObservedObject private var driverSocketManager = DriverRideSocketManager.shared
     @State private var isOnline = false
     @State private var showOptionsSheet = false
     @State private var todaysEarnings: Double = 0.00
@@ -120,6 +136,7 @@ struct DriverHomeComplete: View {
     @State private var showCallOptions = false
     @State private var showTripComplete = false
     @State private var showRatingSheet = false
+    @State private var locationUpdateTimer: Timer?
     
     @StateObject var preferencesVM = DriverPreferencesViewModel()
     private let log = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.hezzni.app", category: "DriverHome")
@@ -449,14 +466,26 @@ struct DriverHomeComplete: View {
 //            }
             
             Button(action: {
-                if let location = locationManager.currentLocation {
-                    updateCameraPosition(location: location)
-                }
+                centerOnCurrentLocation()
             }) {
                 circularButton(icon: "gps_location_icon")
             }
         }
         .padding(.horizontal, 15)
+    }
+    
+    /// Center the map on the user's current location
+    private func centerOnCurrentLocation() {
+        if let location = locationManager.currentLocation {
+            log.info("Centering map on current location: \(location.coordinate.latitude), \(location.coordinate.longitude)")
+            let camera = GMSCameraPosition.camera(withTarget: location.coordinate, zoom: 16)
+            cameraPosition = camera
+            mapView.animate(to: camera)
+        } else {
+            // Request location update if not available
+            log.info("Current location not available, requesting update...")
+            locationManager.startUpdatingLocation()
+        }
     }
     
     @ViewBuilder
@@ -664,9 +693,30 @@ struct DriverHomeComplete: View {
                         rideState = response.data.isOnline ? .waitingForRequests : .offline
                     }
                     if response.data.isOnline {
+                        // Pass current location and preferences to socket manager before going online
+                        if let location = locationManager.currentLocation {
+                            driverSocketManager.setLocation(
+                                latitude: location.coordinate.latitude,
+                                longitude: location.coordinate.longitude,
+                                preferences: ids
+                            )
+                            log.info("Setting driver location: \(location.coordinate.latitude), \(location.coordinate.longitude) with preferences: \(ids)")
+                        } else {
+                            // Even without location, set preferences
+                            driverSocketManager.setLocation(
+                                latitude: 0,
+                                longitude: 0,
+                                preferences: ids
+                            )
+                            log.info("Setting driver preferences without location: \(ids)")
+                        }
+                        
                         // Connect to socket and start listening for ride requests
                         driverSocketManager.goOnline()
                         log.info("Driver socket connected and listening for ride requests")
+                        
+                        // Start periodic location updates (every 10 seconds)
+                        startLocationUpdates()
                     }
                 }
             } catch {
@@ -689,6 +739,9 @@ struct DriverHomeComplete: View {
                         isOnline = response.data.isOnline
                         rideState = response.data.isOnline ? .waitingForRequests : .offline
                     }
+                    // Stop location updates
+                    stopLocationUpdates()
+                    
                     // Disconnect from socket when going offline
                     driverSocketManager.goOffline()
                     log.info("Driver socket disconnected")
@@ -698,6 +751,29 @@ struct DriverHomeComplete: View {
                 log.error("Go Offline API failed. error=\(msg, privacy: .public)")
             }
         }
+    }
+    
+    /// Start sending periodic location updates to the server
+    private func startLocationUpdates() {
+        stopLocationUpdates() // Stop any existing timer
+        
+        locationUpdateTimer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { [self] _ in
+            if let location = locationManager.currentLocation {
+                driverSocketManager.updateLocation(
+                    latitude: location.coordinate.latitude,
+                    longitude: location.coordinate.longitude
+                )
+                log.info("Sent location update: \(location.coordinate.latitude), \(location.coordinate.longitude)")
+            }
+        }
+        log.info("Started periodic location updates")
+    }
+    
+    /// Stop sending periodic location updates
+    private func stopLocationUpdates() {
+        locationUpdateTimer?.invalidate()
+        locationUpdateTimer = nil
+        log.info("Stopped periodic location updates")
     }
     
     private func acceptRide() {
@@ -778,76 +854,6 @@ struct DriverHomeComplete: View {
     }
 }
 
-// MARK: - Ride Request Bottom Sheet
-struct RideRequestBottomSheet: View {
-    let request: RideRequest
-    let onAccept: () -> Void
-    let onSkip: () -> Void
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(request.fare)
-                        .font(Font.custom("Poppins", size: 28).weight(.semibold))
-                        .foregroundColor(.black)
-                    Text("\(request.duration) • \(request.distance)")
-                        .font(Font.custom("Poppins", size: 14))
-                        .foregroundColor(Color.black.opacity(0.6))
-                }
-                
-                Spacer()
-                
-               
-            }
-            
-            VStack{
-                
-                HStack(spacing: 8) {
-                    PaymentMethodBadge(icon: "star.fill", isSystemIcon: true, text: String(request.passengerRating))
-                    PaymentMethodBadge(icon: "cash_on_deliver_icon", text: request.paymentMethod)
-                    Spacer()
-                    RideTypeBadge(text: request.rideType)
-                }
-            }
-            
-            Divider()
-                .padding(.horizontal, -16)
-            
-//            VStack(spacing: 12) {
-//                LocationRow(icon: "pickup_ellipse", location: request.pickupLocation, isPickup: true)
-//                LocationRow(icon: "dropoff_ellipse", location: request.destinationLocation, isPickup: false)
-//            }
-//
-            PickupDestinationPathView(pickupLocation: "Current Location, Marrakech", destinationLocation: "Menara Mall, Gueliz District", offsetX: 25)
-            HStack(spacing: 12) {
-                Button(action: onSkip) {
-                    Text("Skip")
-                        .font(Font.custom("Poppins", size: 14).weight(.medium))
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .frame(width: 130, height: 50)
-                        .background(Color(red: 0.93, green: 0.93, blue: 0.93))
-                        .cornerRadius(10)
-                }
-                
-                Button(action: onAccept) {
-                    Text("Accept")
-                        .font(Font.custom("Poppins", size: 14).weight(.medium))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(Color(red: 0.22, green: 0.65, blue: 0.33))
-                        .cornerRadius(10)
-                }
-            }
-        }
-        .padding(EdgeInsets(top: 15, leading: 20, bottom: 35, trailing: 20))
-        .background(.white)
-        .cornerRadius(24)
-        .shadow(color: Color.black.opacity(0.10), radius: 10)
-    }
-}
 
 // MARK: - Active Ride Bottom Sheet
 enum ActiveRideSheetState {

@@ -9,7 +9,7 @@ import SwiftUI
 import CoreLocation
 
 struct DriverHomeScreen: View {
-    @StateObject private var socketManager = DriverRideSocketManager.shared
+    @ObservedObject private var socketManager = DriverRideSocketManager.shared
     @StateObject private var locationManager = LocationManager()
     
     @State private var showIncomingRide = false

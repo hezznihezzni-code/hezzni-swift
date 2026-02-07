@@ -690,6 +690,8 @@ struct DriverAccountScreen: View {
                                     )
                                     
                                 }
+                                Spacer()
+                                    .frame(height: 80)
                             }
                             .padding(0)
                             .frame(width: .infinity, alignment: .center)

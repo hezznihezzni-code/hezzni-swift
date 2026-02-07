@@ -254,7 +254,9 @@ struct DeliveryDetailScreen : View {
                                     serviceType: selectedService,
                                     vehicle: options.first(where: { $0.text_id == selectedOption })?.title ?? "-",
                                     estimatedTime: options.first(where: { $0.text_id == selectedOption })?.timeEstimate ?? "-",
-                                    price: options.first(where: { $0.text_id == selectedOption }).flatMap { String(format: "%.0f", $0.price) } ?? "-" + " MAD"
+                                    price: options.first(where: { $0.text_id == selectedOption }).flatMap { String(format: "%.0f", $0.price) } ?? "-",
+                                    discountedPrice: appliedCoupon.flatMap { String(format: "%.0f", $0.newPrice) },
+                                    discountText: appliedCoupon?.discount
                                 )
                                 PrimaryButton(text: "Confirm Trip", action: {
                                     withAnimation{

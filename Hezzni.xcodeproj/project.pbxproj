@@ -87,6 +87,7 @@
 				Common/Models/API/coutries.json,
 				Common/Models/API/DriverRideSocketManager.swift,
 				Common/Models/API/EnvironmentLoader.swift,
+				Common/Models/API/JWTHelper.swift,
 				Common/Models/API/LocationDataService.swift,
 				Common/Models/API/RideSocketManager.swift,
 				Common/Models/API/URLEnvironment.swift,
@@ -165,7 +166,8 @@
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/Wallet/WalletModels.swift,
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/WalletHistory.swift,
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/Drawer/WithdrawFunds.swift,
-				Modules/SharedUI/Views/NavigationPages/HomeScreen/DriverHomeComplete.swift,
+				Modules/SharedUI/Views/NavigationPages/HomeScreen/DriverScreens/BottomSheets/RideRequestBottomSheet.swift,
+				Modules/SharedUI/Views/NavigationPages/HomeScreen/DriverScreens/DriverHomeComplete.swift,
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/HomeScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/PathSelectionScreen.swift,
 				Modules/SharedUI/Views/NavigationPages/HomeScreen/RentalSection/AddNewVehicleScreen.swift,
@@ -818,6 +820,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Hezzni-Pessenger-Info.plist";
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to take photos of your ID documents for verification.";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Always permissions";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "When in use permissions";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need photo library access so you can select document photos if camera isn’t available.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -850,13 +854,15 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Hezzni-Pessenger-Info.plist";
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to take photos of your ID documents for verification.";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Always permissions";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "When in use permissions";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need photo library access so you can select document photos if camera isn’t available.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UIUserInterfaceStyle = "";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -950,6 +956,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Hezzni-Driver-Info.plist";
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to take photos of your ID documents for verification.";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Always permissions";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "When in use permissions";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need photo library access so you can select document photos if camera isn’t available.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -989,6 +997,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Hezzni-Driver-Info.plist";
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to take photos of your ID documents for verification.";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Always permissions";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "When in use permissions";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need photo library access so you can select document photos if camera isn’t available.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

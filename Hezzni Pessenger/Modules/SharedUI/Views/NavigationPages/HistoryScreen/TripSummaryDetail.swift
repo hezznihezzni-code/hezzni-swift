@@ -184,4 +184,6 @@ struct TagView: View {
     }
 }
 
-// TripStatsView moved to Components/Reusables/TripStatsView.swift
+#Preview{
+    TripSummaryDetail(trip: Trip(userName: "Ahmed Hassan", date: "3 Jun, 2025 at 12:00 PM", rating: 5.0, status: .completed, fare: "24 MAD", pickup: "Current Location, Marrakech", destination: "Current Location, Marrakech"))
+}

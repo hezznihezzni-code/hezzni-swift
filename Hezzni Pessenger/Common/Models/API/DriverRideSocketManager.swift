@@ -13,6 +13,7 @@ internal import _LocationEssentials
 // MARK: - Ride Request Models for Driver
 
 /// Represents a ride request received by the driver
+/// Updated to match server's flat field format
 struct DriverRideRequest: Codable, Identifiable {
     let rideRequestId: Int
     let rideOfferId: Int?
@@ -22,11 +23,33 @@ struct DriverRideRequest: Codable, Identifiable {
     let serviceTypeName: String?
     let distanceKm: Double?
     let estimatedDurationMinutes: Int?
-    let pickup: Location
-    let dropoff: Location
+    
+    // Flat pickup fields from server
+    let pickupLatitude: Double
+    let pickupLongitude: Double
+    let pickupAddress: String
+    
+    // Flat dropoff fields from server
+    let dropoffLatitude: Double
+    let dropoffLongitude: Double
+    let dropoffAddress: String
+    
+    // Selected preferences
+    let selectedPreferences: [Int]?
+    let expiresAt: String?
+    
     let passenger: PassengerInfo
     
     var id: Int { rideRequestId }
+    
+    // Computed location objects for convenience
+    var pickup: Location {
+        Location(latitude: pickupLatitude, longitude: pickupLongitude, address: pickupAddress)
+    }
+    
+    var dropoff: Location {
+        Location(latitude: dropoffLatitude, longitude: dropoffLongitude, address: dropoffAddress)
+    }
     
     // Computed properties for UI display
     var formattedDistanceToPickup: String {
@@ -153,21 +176,49 @@ final class DriverRideSocketManager: ObservableObject {
     
     private init() {}
     
+    // Track retry attempts to prevent infinite loops
+    private var connectionRetryCount = 0
+    private let maxConnectionRetries = 3
+    
     // MARK: - Connection Management
     
     /// Connect to socket when driver goes online
     func goOnline() {
+        // Prevent multiple connection attempts
+        if connectionState == .connecting || connectionState == .connected {
+            print("🚗 Driver socket already \(connectionState == .connected ? "connected" : "connecting"), skipping...")
+            return
+        }
+        
         guard let token = TokenManager.shared.token else {
             connectionState = .error("No authentication token found")
             onlineStatus = .offline
             return
         }
         
+        // ✅ FIX: Extract userId from JWT token
+        guard let userId = JWTHelper.extractUserId(from: token) else {
+            connectionState = .error("Failed to extract userId from token")
+            onlineStatus = .offline
+            print("❌ Could not decode userId from JWT token")
+            return
+        }
+        
         let socketURL = URLEnvironment.socketURL
         
         connectionState = .connecting
+        connectionRetryCount = 0
+        print("🔌 Driver socket connecting to \(socketURL.absoluteString)/ride")
         
-        // Configure socket with authentication
+        // Get location for initial connection
+        let latitude = pendingLocation?.latitude ?? 0
+        let longitude = pendingLocation?.longitude ?? 0
+        
+        // Clean up any existing connection
+        socket?.disconnect()
+        manager?.disconnect()
+        
+        // Configure socket manager
         manager = SocketManager(
             socketURL: socketURL,
             config: [
@@ -184,8 +235,28 @@ final class DriverRideSocketManager: ObservableObject {
         // Connect to /ride namespace
         socket = manager?.socket(forNamespace: "/ride")
         
+        // ✅ FIX: Auth payload to be sent with connect()
+        // This maps to socket.handshake.auth on the server
+        let authPayload: [String: Any] = [
+            "userId": userId,
+            "userType": "driver"
+        ]
+        
+        print("")
+        print("╔══════════════════════════════════════════════════════════════╗")
+        print("║  🔌 DRIVER SOCKET CONNECTION                                 ║")
+        print("╠══════════════════════════════════════════════════════════════╣")
+        print("║  URL: \(socketURL.absoluteString)/ride")
+        print("║  Auth Payload: \(authPayload)")
+        print("║  Location: \(latitude), \(longitude)")
+        print("║  Preferences: \(pendingPreferences)")
+        print("╚══════════════════════════════════════════════════════════════╝")
+        print("")
+        
         setupEventHandlers()
-        socket?.connect()
+        
+        // ✅ Connect with auth payload - this sends auth data to server's socket.handshake.auth
+        socket?.connect(withPayload: authPayload)
         
         onlineStatus = .online
     }
@@ -195,7 +266,7 @@ final class DriverRideSocketManager: ObservableObject {
         // Notify server before disconnecting
         if let socket = socket, connectionState == .connected {
             socket.emit(DriverSocketEvent.goOffline.rawValue)
-            print("Emitted driver:goOffline event")
+            print("📴 Emitted driver:goOffline event")
         }
         
         socket?.disconnect()
@@ -209,23 +280,59 @@ final class DriverRideSocketManager: ObservableObject {
         print("Driver socket disconnected - went offline")
     }
     
+    /// Store the current location and preferences for emitting when connected
+    private var pendingLocation: (latitude: Double, longitude: Double)?
+    private var pendingPreferences: [Int] = []
+    
+    /// Set location and preferences to be sent when going online
+    func setLocation(latitude: Double, longitude: Double, preferences: [Int] = []) {
+        pendingLocation = (latitude, longitude)
+        pendingPreferences = preferences
+    }
+    
     /// Emit driver:goOnline event to notify server
     private func emitGoOnline() {
-        guard let socket = socket, connectionState == .connected else { return }
+        guard let socket = socket else {
+            print("❌ emitGoOnline: socket is nil")
+            return
+        }
         
-        // Get current location if available
-        let locationManager = LocationManager()
-        let latitude = locationManager.currentLocation?.coordinate.latitude ?? 0
-        let longitude = locationManager.currentLocation?.coordinate.longitude ?? 0
+        // Check actual socket status, not our state
+        guard socket.status == .connected else {
+            print("❌ emitGoOnline: socket.status is \(socket.status), not connected - skipping emit")
+            return
+        }
+        
+        // Use pending location if available, otherwise default to 0,0
+        let latitude = pendingLocation?.latitude ?? 0
+        let longitude = pendingLocation?.longitude ?? 0
         
         let payload: [String: Any] = [
             "latitude": latitude,
             "longitude": longitude,
-            "role": "driver"
+            "role": "driver",
+            "selectedPreferences": pendingPreferences
         ]
         
+        print("")
+        print("╔══════════════════════════════════════════════════════════════╗")
+        print("║  🚗 EMITTING: driver:goOnline                                ║")
+        print("╠══════════════════════════════════════════════════════════════╣")
+        print("║  Event: \(DriverSocketEvent.goOnline.rawValue)")
+        print("║  Socket Status: \(socket.status)")
+        print("╠══════════════════════════════════════════════════════════════╣")
+        print("║  PAYLOAD (JSON):")
+        if let jsonData = try? JSONSerialization.data(withJSONObject: payload, options: .prettyPrinted),
+           let jsonString = String(data: jsonData, encoding: .utf8) {
+            print(jsonString)
+        } else {
+            print("   Raw: \(payload)")
+        }
+        print("╚══════════════════════════════════════════════════════════════╝")
+        print("")
+        
         socket.emit(DriverSocketEvent.goOnline.rawValue, payload)
-        print("Emitted driver:goOnline event with location: \(latitude), \(longitude)")
+        print("✅ driver:goOnline emitted successfully")
     }
     
     /// Check if driver is currently online
@@ -239,13 +346,30 @@ final class DriverRideSocketManager: ObservableObject {
         guard let socket = socket else { return }
         
         // Connection events
-        socket.on(clientEvent: .connect) { [weak self] _, _ in
+        socket.on(clientEvent: .connect) { [weak self] data, _ in
+            print("")
+            print("╔══════════════════════════════════════════════════════════════╗")
+            print("║  ✅ DRIVER SOCKET CONNECTED                                   ║")
+            print("╠══════════════════════════════════════════════════════════════╣")
+            print("║  Data: \(data)")
+            print("║  Socket Status: \(socket.status)")
+            print("╚══════════════════════════════════════════════════════════════╝")
+            print("")
+            
             Task { @MainActor in
                 self?.connectionState = .connected
-                print("Driver socket connected to /ride namespace")
+                print("🚗 Driver: connectionState set to .connected")
                 
-                // Notify server that driver is online and available
-                self?.emitGoOnline()
+                // Small delay to ensure socket is fully ready before emitting
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+                
+                // Check if still connected before emitting
+                if socket.status == .connected {
+                    print("🚗 Driver: socket still connected, emitting goOnline...")
+                    self?.emitGoOnline()
+                } else {
+                    print("❌ Driver: socket no longer connected (status: \(socket.status)), skipping emit")
+                }
             }
         }
         
@@ -458,13 +582,20 @@ final class DriverRideSocketManager: ObservableObject {
     
     /// Update driver's current location
     func updateLocation(latitude: Double, longitude: Double) {
-        guard let socket = socket, connectionState == .connected else { return }
+        guard let socket = socket, connectionState == .connected else {
+            print("⚠️ Cannot update location - socket not connected (state: \(connectionState))")
+            return
+        }
         
+        // ✅ FIX: Include isAvailable flag (REQUIRED by backend)
+        // Without this, driver will be filtered out during ride matching!
         let payload: [String: Any] = [
             "latitude": latitude,
-            "longitude": longitude
+            "longitude": longitude,
+            "isAvailable": true  // ✅ CRITICAL: Required for ride matching
         ]
         
+        print("📍 EMITTING driver:updateLocation - lat: \(latitude), lng: \(longitude), available: true")
         socket.emit(DriverSocketEvent.updateLocation.rawValue, payload)
     }
     
