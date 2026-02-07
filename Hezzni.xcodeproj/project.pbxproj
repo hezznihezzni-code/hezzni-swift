@@ -93,6 +93,7 @@
 				Common/Models/API/URLEnvironment.swift,
 				Common/Models/Country.swift,
 				Common/Models/Driver/DriverPreferenceModels.swift,
+				Common/Models/GoogleMaps/DriverMapView.swift,
 				Common/Models/GoogleMaps/GoogleMapView.swift,
 				Common/Models/GoogleMaps/LocationManager.swift,
 				"Common/Models/GoogleMaps/map-style.json",

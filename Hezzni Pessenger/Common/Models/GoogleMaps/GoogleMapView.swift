@@ -17,7 +17,7 @@ struct GoogleMapView: UIViewRepresentable {
     func makeUIView(context: Context) -> GMSMapView {
         mapView = GMSMapView.map(withFrame: CGRect.zero, camera: cameraPosition)
         mapView.isMyLocationEnabled = true
-        mapView.settings.myLocationButton = true
+        mapView.settings.myLocationButton = false
         
         // Apply custom style
         MapStyleHelper.applyCustomStyle(to: mapView)

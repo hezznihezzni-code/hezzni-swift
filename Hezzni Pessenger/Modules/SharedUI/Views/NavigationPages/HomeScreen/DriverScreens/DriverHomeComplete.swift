@@ -153,7 +153,9 @@ struct DriverHomeComplete: View {
                 mapContentView
                     .onAppear { configureMap() }
                     .onChange(of: locationManager.currentLocation) { location in
-                        updateCameraPosition(location: location)
+                        if rideState != .rideRequestReceived{
+                            updateCameraPosition(location: location)
+                        }
                     }
                 
                 VStack {
@@ -341,8 +343,22 @@ struct DriverHomeComplete: View {
     // MARK: - Subviews
     
     private var mapContentView: some View {
-        GoogleMapView(mapView: $mapView, cameraPosition: $cameraPosition)
-            .edgesIgnoringSafeArea(.all)
+        DriverMapView(
+            mapView: $mapView,
+            cameraPosition: $cameraPosition,
+            driverLocation: locationManager.currentLocation?.coordinate,
+            pickupLocation: currentRideRequest != nil ? CLLocationCoordinate2D(
+                latitude: currentRideRequest!.pickupLatitude,
+                longitude: currentRideRequest!.pickupLongitude
+            ) : nil,
+            destinationLocation: currentRideRequest != nil ? CLLocationCoordinate2D(
+                latitude: currentRideRequest!.destinationLatitude,
+                longitude: currentRideRequest!.destinationLongitude
+            ) : nil,
+            showRoute: rideState == .rideRequestReceived,
+            isWaitingForRequests: rideState == .waitingForRequests
+        )
+        .edgesIgnoringSafeArea(.all)
     }
     
     private var topNavigationBar: some View {

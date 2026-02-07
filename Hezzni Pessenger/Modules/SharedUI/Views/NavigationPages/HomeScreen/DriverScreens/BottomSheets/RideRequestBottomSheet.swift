@@ -12,15 +12,13 @@ struct RideRequestBottomSheet: View {
     let onAccept: () -> Void
     let onSkip: () -> Void
     
+    // Countdown timer
+    let countdownSeconds: Int = 15
+    @State private var remainingSeconds: Int = 15
+    @State private var countdownTimer: Timer?
+    
     var body: some View {
         VStack(spacing: 16) {
-//            pickupLocation: "Current Location, Marrakech",
-//            destinationLocation: "Menara Mall, Gueliz District",
-//            distance: "2.5 KM",
-//            duration: "8 min",
-//            fare: "25.00 MAD",
-//            paymentMethod: "Cash",
-//            rideType: "Standard"
             // Driver info
             RiderCardInformationSection(
                 profileImage: "profile_placeholder",
@@ -57,7 +55,10 @@ struct RideRequestBottomSheet: View {
 
             PickupDestinationPathView(pickupLocation: request.pickupLocation, destinationLocation: request.destinationLocation, offsetX: 25)
             HStack(spacing: 12) {
-                Button(action: onSkip) {
+                Button(action: {
+                    stopCountdown()
+                    onSkip()
+                }) {
                     Text("Skip")
                         .font(Font.custom("Poppins", size: 14).weight(.medium))
                         .foregroundColor(.black)
@@ -67,14 +68,15 @@ struct RideRequestBottomSheet: View {
                         .cornerRadius(10)
                 }
                 
-                Button(action: onAccept) {
-                    Text("Accept")
-                        .font(Font.custom("Poppins", size: 14).weight(.medium))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(Color(red: 0.22, green: 0.65, blue: 0.33))
-                        .cornerRadius(10)
+                // Accept button with countdown progress
+                Button(action: {
+                    stopCountdown()
+                    onAccept()
+                }) {
+                    AcceptButtonWithCountdown(
+                        remainingSeconds: remainingSeconds,
+                        totalSeconds: countdownSeconds
+                    )
                 }
             }
         }
@@ -82,30 +84,90 @@ struct RideRequestBottomSheet: View {
         .background(.white)
         .cornerRadius(24)
         .shadow(color: Color.black.opacity(0.10), radius: 10)
+        .onAppear {
+            startCountdown()
+        }
+        .onDisappear {
+            stopCountdown()
+        }
+    }
+    
+    private func startCountdown() {
+        remainingSeconds = countdownSeconds
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            if remainingSeconds > 0 {
+                remainingSeconds -= 1
+            } else {
+                stopCountdown()
+                onSkip() // Auto-skip when timer expires
+            }
+        }
+    }
+    
+    private func stopCountdown() {
+        countdownTimer?.invalidate()
+        countdownTimer = nil
     }
 }
 
-// Swift
-#Preview {
-    RideRequestBottomSheet(
-        request: RideRequest(
-            passengerName: "Test Passenger",
-            passengerRating: 4.5,
-            passengerTrips: 10,
-            passengerImage: "profile_placeholder",
-            isVerified: true,
-            pickupLocation: "Current Location, Marrakech",
-            destinationLocation: "Menara Mall, Gueliz District",
-            distance: "2.5 KM",
-            duration: "8 min",
-            fare: "25.00 MAD",
-            paymentMethod: "Cash",
-            rideType: "Standard"
-        ),
-        onAccept: {},
-        onSkip: {}
-    )
+// MARK: - Accept Button with Countdown Progress
+struct AcceptButtonWithCountdown: View {
+    let remainingSeconds: Int
+    let totalSeconds: Int
+    
+    private var progress: CGFloat {
+        CGFloat(remainingSeconds) / CGFloat(totalSeconds)
+    }
+    
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                // Light green background (revealed as timer counts down)
+                Rectangle()
+                    .fill(Color(red: 0.22, green: 0.65, blue: 0.33).opacity(0.4))
+                
+                // Dark green progress (shrinks from right to left)
+                Rectangle()
+                    .fill(Color(red: 0.22, green: 0.65, blue: 0.33))
+                    .frame(width: geometry.size.width * progress)
+                    .animation(.linear(duration: 1.0), value: progress)
+                
+                // Text overlay
+                HStack {
+                    Spacer()
+                    Text("Accept (\(remainingSeconds)s)")
+                        .font(Font.custom("Poppins", size: 14).weight(.medium))
+                        .foregroundColor(.white)
+                    Spacer()
+                }
+            }
+        }
+        .frame(height: 50)
+        .cornerRadius(10)
+    }
 }
+
+//// Swift
+//#Preview {
+//    RideRequestBottomSheet(
+//        request: RideRequest(
+//            passengerName: "Test Passenger",
+//            passengerRating: 4.5,
+//            passengerTrips: 10,
+//            passengerImage: "profile_placeholder",
+//            isVerified: true,
+//            pickupLocation: "Current Location, Marrakech",
+//            destinationLocation: "Menara Mall, Gueliz District",
+//            distance: "2.5 KM",
+//            duration: "8 min",
+//            fare: "25.00 MAD",
+//            paymentMethod: "Cash",
+//            rideType: "Standard"
+//        ),
+//        onAccept: {},
+//        onSkip: {}
+//    )
+//}
 
 
 
