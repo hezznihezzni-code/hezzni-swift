@@ -88,8 +88,8 @@ struct GenericRideDetailScreen : View {
     var pickup: String
     var destination: String
     @Binding var bottomSheetState: BottomSheetState
-    var rideInformation: [CalculateRidePriceResponse.RideOption] = []
-    @Binding var selectedRideInformation: VehicleSubOptionsView.RideOption
+    var rideOptions: [CalculateRidePriceResponse.RideOption] = []
+    @Binding var selectedRideOption: CalculateRidePriceResponse.RideOption
     var namespace: Namespace.ID?
     @State private var selectedOption: String? = "standard"
     @State var couponField: String = ""
@@ -166,7 +166,7 @@ struct GenericRideDetailScreen : View {
         guard !couponCode.isEmpty else { return }
         
         // Get the current price from selectedRideInformation
-        let currentPrice = selectedRideInformation.price
+        let currentPrice = selectedRideOption.price
         
         isValidatingCoupon = true
         showCouponError = false
@@ -180,8 +180,8 @@ struct GenericRideDetailScreen : View {
                     
                     if response.data.isValid {
                         // Coupon is valid
-                        let discountPercentage = currentPrice > 0 
-                            ? Int((response.data.discountAmount / currentPrice) * 100) 
+                        let discountPercentage = currentPrice > 0
+                            ? Int((response.data.discountAmount / currentPrice) * 100)
                             : 0
                         
                         appliedCoupon = AppliedCoupon(
@@ -217,8 +217,8 @@ struct GenericRideDetailScreen : View {
         showCouponError = false
     }
     
-    private var options: [VehicleSubOptionsView.RideOption] {
-        let baseOptions: [VehicleSubOptionsView.RideOption]
+    private var options: [CalculateRidePriceResponse.RideOption] {
+        let baseOptions: [CalculateRidePriceResponse.RideOption]
         switch selectedService.displayName.lowercased() {
         case "car", "car rides":
             baseOptions = carRideOptions
@@ -231,8 +231,8 @@ struct GenericRideDetailScreen : View {
         }
         // Map and update price from rideInformation
         return baseOptions.map { option in
-            if let info = rideInformation.first(where: { $0.id == option.id }) {
-                return VehicleSubOptionsView.RideOption(
+            if let info = rideOptions.first(where: { $0.id == option.id }) {
+                return CalculateRidePriceResponse.RideOption(
                     id: option.id,
                     text_id: option.text_id,
                     icon: option.icon,
@@ -240,6 +240,9 @@ struct GenericRideDetailScreen : View {
                     subtitle: option.subtitle,
                     seats: option.seats,
                     timeEstimate: option.timeEstimate,
+                    ridePreference: option.ridePreference,
+                    ridePreferenceKey: option.ridePreferenceKey,
+                    description: option.description,
                     price: info.price // Use price from rideInformation
                 )
             } else {
@@ -253,13 +256,15 @@ struct GenericRideDetailScreen : View {
                 ScrollView {
                     ZStack {
                         VStack(spacing: 16){
-                            Text("Trip Routes")
-                                .font(
-                                    Font.custom("Poppins", size: 16)
-                                        .weight(.medium)
-                                )
-                                .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                                .frame(maxWidth: .infinity, alignment: .topLeading)
+                            HStack{
+                                Text("Trip Routes")
+                                    .font(
+                                        Font.custom("Poppins", size: 16)
+                                            .weight(.medium)
+                                    )
+                                    .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                                    Spacer()
+                            }
                             LocationCardView(
                                 imageName: "pickup_ellipse",
                                 heading: "Pickup Location",
@@ -300,13 +305,15 @@ struct GenericRideDetailScreen : View {
                             }
                             if selectedService.name != "Delivery" || isReservation{
                                 // MARK: - Vehicle Option
-                                Text("Vehicle Options")
-                                    .font(
-                                        Font.custom("Poppins", size: 16)
-                                            .weight(.medium)
-                                    )
-                                    .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                                HStack{
+                                    Text("Vehicle Options")
+                                        .font(
+                                            Font.custom("Poppins", size: 16)
+                                                .weight(.medium)
+                                        )
+                                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                                        Spacer()
+                                }
                             }
                             if isReservation {
                                 // Services selector with shimmer loading
@@ -327,13 +334,15 @@ struct GenericRideDetailScreen : View {
                             }
                             if selectedService.name == "Delivery" {
                                 
-                                Text("Delivery Details")
-                                    .font(
-                                        Font.custom("Poppins", size: 16)
-                                            .weight(.medium)
-                                    )
-                                    .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                                HStack{
+                                    Text("Delivery Details")
+                                        .font(
+                                            Font.custom("Poppins", size: 16)
+                                                .weight(.medium)
+                                        )
+                                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                                        Spacer()
+                                }
                                 // Full Name Field
                                 FormField(
                                     title: "Receiver’s Name",
@@ -376,7 +385,7 @@ struct GenericRideDetailScreen : View {
                                 }
                             }
                             
-                            VehicleSubOptionsView(selectedOption: $selectedOption, rideInfo: $selectedRideInformation, options: options)
+                            VehicleSubOptionsView(selectedOption: $selectedOption, rideInfo: $selectedRideOption, options: options)
 //                                .matchedGeometryEffect(id: "selected_vehicle", in: namespace!)
                             if selectedService.name == "Group Ride" {
                                 groupRidePassengersSection
@@ -674,7 +683,20 @@ struct GenericRideDetailScreen : View {
         pickup: "pickupLocation",
         destination: "destinationLocation",
         bottomSheetState: .constant(.reservation),
-        selectedRideInformation: .constant(VehicleSubOptionsView.RideOption(id: 0, text_id: "standard", icon: "", title: "Standard", subtitle: "", seats: 4, timeEstimate: "10 min", price: 100)),
+        selectedRideOption: .constant(CalculateRidePriceResponse.RideOption(
+            id: 0,
+            text_id: "standard",
+            icon: "",
+            title: "Standard",
+            subtitle: "",
+            seats: 4,
+            timeEstimate: "10 min",
+            ridePreference: "Standard",           // <-- Added
+            ridePreferenceKey: "STANDARD",        // <-- Added
+            description: "Standard ride option",   // <-- Added
+            price: 100,
+            
+        )),
         appliedCoupon: .constant(nil),
         selectedService: .constant(SelectedService(id: 1, name: "Group Ride")),
         showSchedulePicker: .constant(false),
@@ -703,7 +725,6 @@ struct BottomSheetContent: View {
                     }
                 )
         }
-        .frame(maxWidth: .infinity)
         .frame(height: contentHeight > 0 ? contentHeight + 48 : nil) // 48 for close button spacing
         .background(Color.white)
         .cornerRadius(20)

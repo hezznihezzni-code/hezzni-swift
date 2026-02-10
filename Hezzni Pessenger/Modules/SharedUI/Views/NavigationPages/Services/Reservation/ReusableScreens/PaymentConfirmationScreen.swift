@@ -8,7 +8,13 @@
 import SwiftUI
 
 struct PaymentConfirmationScreen: View {
+    var rideInfo: CalculateRidePriceResponse.RideOption
+    var pickupLocation: String
+    var destinationLocation: String
+    var isReservation: Bool
     @Binding var bottomSheetState: BottomSheetState
+    var paymentMethod: Card
+    
     var namespace: Namespace.ID?
     var onContinue : () -> Void = {}
     var body: some View {
@@ -34,7 +40,7 @@ struct PaymentConfirmationScreen: View {
                             Spacer()
                         }
                         HStack(spacing: 4) {
-                            Text("CAR RIDE")
+                            Text(rideInfo.ridePreference)
                                 .font(Font.custom("Poppins", size: 11).weight(.medium))
                                 .foregroundColor(.white)
                         }
@@ -45,64 +51,33 @@ struct PaymentConfirmationScreen: View {
                     .padding(.leading, 3)
                     // Trip Details
                     VStack(alignment: .leading, spacing: 10) {
-//                        VStack(spacing: 0){
-//                                LocationCardView(
-//                                    imageName: "pickup_ellipse",
-//                                    
-//                                    content: "Current Location, Marrakech",
-//                                    cornerRadius: 10,
-//                                    roundedEdges: .top,
-//                                    borderColor: Color(red: 0.89, green: 0.89, blue: 0.89),
-//                                    expandToFill: true
-//                                )
-//                            LocationCardView(
-//                                imageName: "dropoff_ellipse",
-//                                content: "Menara Mall, Gueliz District",
-//                                cornerRadius: 10,
-//                                roundedEdges: .bottom,
-//                                borderColor: Color(red: 0.89, green: 0.89, blue: 0.89),
-//                                expandToFill: true
-//                            )
-//                            
-//                        }
-//                        .overlay(
-//                            Line()
-//                            .stroke(
-//                                Color(red: 0.22, green: 0.65, blue: 0.33).opacity(0.25),
-//                                style: StrokeStyle(
-//                                    lineWidth: 2,
-//                                    dash: [5,5]
-//                                )
-//                            )
-//                            
-//                            .frame(height: 50)
-//                            .offset(x: 22)
-//                            ,alignment: .leading
-//                        )
-                        PickupDestinationPathView(pickupLocation: "Current Location, Marrakech", destinationLocation: "Menara Mall, Gueliz District")
-                        // Date/Time
-                        HStack(spacing: 12) {
-                            Image("reservation_icon")
-                                .foregroundStyle(.hezzniGreen)
-                            HStack(spacing: 50) {
-                                Text("16 July, 2025 at 9:00 am")
-                                    .font(Font.custom("Poppins", size: 12))
-                                    .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                                    .padding(.vertical, 4)
-                                Spacer()
+                        
+                        PickupDestinationPathView(pickupLocation: pickupLocation, destinationLocation: destinationLocation)
+                        if isReservation {
+                            // Date/Time
+                            HStack(spacing: 12) {
+                                Image("reservation_icon")
+                                    .foregroundStyle(.hezzniGreen)
+                                HStack(spacing: 50) {
+                                    Text("16 July, 2025 at 9:00 am")
+                                        .font(Font.custom("Poppins", size: 12))
+                                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                                        .padding(.vertical, 4)
+                                    Spacer()
+                                }
+                                .padding(.vertical, 8)
                             }
-                            .padding(.vertical, 8)
+                            .padding(.horizontal, 13)
+                            .cornerRadius(10)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color(red: 0.89, green: 0.89, blue: 0.89), lineWidth: 0.5)
+                            )
                         }
-                        .padding(.horizontal, 13)
-                        .cornerRadius(10)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color(red: 0.89, green: 0.89, blue: 0.89), lineWidth: 0.5)
-                        )
                     }
                     // Estimated Time
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Estimated time: 15-20 min")
+                        Text("Estimated time: \(rideInfo.timeEstimate) min")
                             .font(Font.custom("Poppins", size: 10))
                             .foregroundColor(Color(red: 0.5, green: 0.5, blue: 0.5))
                     }
@@ -138,7 +113,7 @@ struct PaymentConfirmationScreen: View {
                                 .font(Font.custom("Poppins", size: 14))
                                 .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.60))
                             Spacer()
-                            Text("25.00 MAD")
+                            Text("\(rideInfo.price) MAD")
                                 .font(Font.custom("Poppins", size: 14).weight(.medium))
                                 .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
                         }
@@ -178,7 +153,7 @@ struct PaymentConfirmationScreen: View {
                             .font(Font.custom("Poppins", size: 14))
                             .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.60))
                         Spacer()
-                        Text("0.00 MAD")
+                        Text("\(rideInfo.price) MAD")
                             .font(Font.custom("Poppins", size: 16).weight(.medium))
                             .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
                     }
@@ -193,11 +168,11 @@ struct PaymentConfirmationScreen: View {
                 .shadow(color: Color.black.opacity(0.08), radius: 10)
                 // Payment Method Card
                 PaymentMethodRow(
-                    iconName: "cash_on_deliver_icon",
-                    title: "Cash Payment",
-                    subtitle: "pay the driver directly",
-                    badge: nil,
-                    cardNumber: nil,
+                    iconName: paymentMethod.iconName,
+                    title: paymentMethod.title,
+                    subtitle: paymentMethod.subtitle,
+                    badge: paymentMethod.badge,
+                    cardNumber: paymentMethod.cardNumber,
                     isSelected: true,
                     isAddCard: false,
                     showCheckMark: false,

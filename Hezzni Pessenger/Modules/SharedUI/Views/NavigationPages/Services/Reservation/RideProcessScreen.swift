@@ -8,14 +8,9 @@
 import SwiftUI
 import GoogleMaps
 
-enum RideProcessSheetState {
-    case summary
-    case expanded
-    case minimized
-}
 
 struct RideProcessScreen: View {
-    @State private var sheetState: RideProcessSheetState = .summary
+    
     @State private var sheetHeight: CGFloat = 480
     private let minSheetHeight: CGFloat = 120
     private let midSheetHeight: CGFloat = 480
@@ -24,6 +19,9 @@ struct RideProcessScreen: View {
     @State private var mapView = GMSMapView()
     @State private var cameraPosition: GMSCameraPosition
     @State private var showChatScreen = false // Add this state
+    @State private var showCancelConfirmation = false  // Confirmation dialog state
+    @ObservedObject private var socketManager = RideSocketManager.shared
+    @Environment(\.dismiss) private var dismiss
 
     init() {
         let marrakech = CLLocationCoordinate2D(latitude: 40.629255690273595, longitude: -73.98749804295893)
@@ -101,7 +99,7 @@ struct RideProcessScreen: View {
                             
                             // Cancel button
                             Button(action: {
-                                // Cancel ride logic
+                                showCancelConfirmation = true  // Show confirmation dialog
                             }) {
                                 Text("Cancel Ride")
                                     .font(Font.custom("Poppins", size: 16).weight(.medium))
@@ -122,7 +120,7 @@ struct RideProcessScreen: View {
                 }
                 .background(.hezzniGreen)
                 .cornerRadius(24)
-                .offset(y: -5)
+                .offset(y: -22)
             }
             .frame(height: sheetHeight)
             .background(.white)
@@ -139,6 +137,16 @@ struct RideProcessScreen: View {
                 EmptyView()
             }
         )
+        .alert("Cancel Ride", isPresented: $showCancelConfirmation) {
+            Button("No, Keep Ride", role: .cancel) { }
+            Button("Yes, Cancel", role: .destructive) {
+                // Emit passenger:cancelRide with rideRequestId
+                socketManager.cancelRide(reason: "Passenger cancelled")
+                dismiss()
+            }
+        } message: {
+            Text("Are you sure you want to cancel this ride?")
+        }
         .onAppear {
             mapView.isMyLocationEnabled = true
             mapView.settings.myLocationButton = true

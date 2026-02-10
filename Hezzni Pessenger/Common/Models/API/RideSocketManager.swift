@@ -51,19 +51,89 @@ struct RideRequestResponse: Codable {
     let status: String?
 }
 
-struct DriverFoundResponse: Codable {
-    let driverId: String
-    let driverName: String
-    let driverPhone: String?
-    let vehicleInfo: VehicleInfo?
-    let estimatedArrival: Int? // in minutes
-    let rating: Double?
+/// Response model for ride:accepted event from server
+/// Matches the actual API response structure
+struct DriverFoundResponse: Codable, Equatable {
+    let rideRequestId: Int
+    let distanceToPickup: String
+    let estimatedArrivalMinutes: Int
+    let pickupAddress: String
+    let pickupLatitude: String
+    let pickupLongitude: String
+    let dropoffAddress: String
+    let dropoffLatitude: String
+    let dropoffLongitude: String
+    let estimatedPrice: String
+    let driver: DriverInfo
     
-    struct VehicleInfo: Codable {
-        let make: String?
-        let model: String?
-        let color: String?
-        let plateNumber: String?
+    struct DriverInfo: Codable, Equatable {
+        let id: Int
+        let name: String
+        let phone: String
+        let imageUrl: String?
+        let averageRating: String
+        let totalTrips: Int
+        let currentLatitude: Double
+        let currentLongitude: Double
+        let vehicle: VehicleInfo
+    }
+    
+    struct VehicleInfo: Codable, Equatable {
+        let plateNumber: String
+        let make: String
+        let model: String
+    }
+    
+    // Computed properties for backwards compatibility
+    var driverId: String { String(driver.id) }
+    var driverName: String { driver.name }
+    var driverPhone: String? { driver.phone }
+    var estimatedArrival: Int? { estimatedArrivalMinutes }
+    var rating: Double? { Double(driver.averageRating) }
+    var vehicleInfo: VehicleInfo? { driver.vehicle }
+}
+
+/// Model for driver location updates
+struct DriverLocationUpdate: Codable, Equatable {
+    let latitude: Double
+    let longitude: Double
+    let timestamp: String
+    
+    // Equatable conformance
+    static func == (lhs: DriverLocationUpdate, rhs: DriverLocationUpdate) -> Bool {
+        return lhs.latitude == rhs.latitude &&
+               lhs.longitude == rhs.longitude &&
+               lhs.timestamp == rhs.timestamp
+    }
+    
+    // Helper to parse string coordinates if needed
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        // Try decoding as Double first, then as String
+        if let lat = try? container.decode(Double.self, forKey: .latitude) {
+            latitude = lat
+        } else if let latString = try? container.decode(String.self, forKey: .latitude),
+                  let lat = Double(latString) {
+            latitude = lat
+        } else {
+            throw DecodingError.typeMismatch(Double.self, DecodingError.Context(codingPath: [CodingKeys.latitude], debugDescription: "Expected Double or String"))
+        }
+        
+        if let lng = try? container.decode(Double.self, forKey: .longitude) {
+            longitude = lng
+        } else if let lngString = try? container.decode(String.self, forKey: .longitude),
+                  let lng = Double(lngString) {
+            longitude = lng
+        } else {
+            throw DecodingError.typeMismatch(Double.self, DecodingError.Context(codingPath: [CodingKeys.longitude], debugDescription: "Expected Double or String"))
+        }
+        
+        timestamp = try container.decode(String.self, forKey: .timestamp)
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case latitude, longitude, timestamp
     }
 }
 
@@ -93,6 +163,8 @@ enum RideSocketEvent: String {
     // Listen events
     case rideRequestResponse = "ride:requestResponse"
     case driverFound = "ride:driverFound"
+    case rideAccepted = "ride:accepted"  // Main event when driver accepts
+    case driverLocationUpdate = "ride:driverLocationUpdate"  // Real-time driver location
     case statusUpdate = "ride:statusUpdate"
     case noDriverFound = "ride:noDriverFound"
     case error = "error"
@@ -127,9 +199,12 @@ final class RideSocketManager: ObservableObject {
     @Published var connectionState: SocketConnectionState = .disconnected
     @Published var currentRideStatus: RideStatusUpdate.RideStatus?
     @Published var driverInfo: DriverFoundResponse?
+    @Published var driverLocation: DriverLocationUpdate?  // Real-time driver location
     @Published var errorMessage: String?
     @Published var isSearchingForDriver: Bool = false
     @Published var currentRideId: String?
+    @Published var isRideStarted: Bool = false  // Track if ride has started
+    @Published var hasDriverArrived: Bool = false  // Track if driver has arrived at pickup
     
     private var manager: SocketManager?
     private var socket: SocketIOClient?
@@ -137,10 +212,18 @@ final class RideSocketManager: ObservableObject {
     
     // Callbacks for specific events
     var onDriverFound: ((DriverFoundResponse) -> Void)?
+    var onDriverLocationUpdate: ((DriverLocationUpdate) -> Void)?  // Real-time driver location callback
+    var onDriverArrived: (() -> Void)?  // Callback when driver arrives at pickup
+    var onRideStarted: (() -> Void)?  // Callback when ride starts
+    var onRideCompleted: (() -> Void)?  // Callback when ride completes
+    var onRideCancelled: (() -> Void)?  // Callback when ride is cancelled
     var onNoDriverFound: (() -> Void)?
     var onRideStatusUpdate: ((RideStatusUpdate) -> Void)?
     var onError: ((String) -> Void)?
     var onRideRequestSuccess: ((String) -> Void)?
+    
+    // Store rideRequestId for cancellation
+    @Published var currentRideRequestId: Int?
     
     private init() {}
     
@@ -367,6 +450,14 @@ final class RideSocketManager: ObservableObject {
             }
         }
         
+        // Listen for real-time driver location updates
+        socket.on(RideSocketEvent.driverLocationUpdate.rawValue) { [weak self] data, _ in
+            print("📍 RECEIVED ride:driverLocationUpdate with data: \(data)")
+            Task { @MainActor in
+                self?.handleDriverLocationUpdate(data)
+            }
+        }
+        
         // Ride request response (original listener)
         socket.on(RideSocketEvent.rideRequestResponse.rawValue) { [weak self] data, _ in
             print("📨 RECEIVED ride:requestResponse with data: \(data)")
@@ -388,6 +479,46 @@ final class RideSocketManager: ObservableObject {
             print("📊 RECEIVED ride:statusUpdate with data: \(data)")
             Task { @MainActor in
                 self?.handleStatusUpdate(data)
+            }
+        }
+        
+        // Driver arrived at pickup
+        socket.on("ride:driverArrived") { [weak self] data, _ in
+            print("📍 RECEIVED ride:driverArrived")
+            Task { @MainActor in
+                self?.hasDriverArrived = true
+                self?.currentRideStatus = .driverArrived
+                self?.onDriverArrived?()
+            }
+        }
+        
+        // Ride started
+        socket.on("ride:started") { [weak self] data, _ in
+            print("🚗 RECEIVED ride:started")
+            Task { @MainActor in
+                self?.isRideStarted = true
+                self?.currentRideStatus = .rideStarted
+                self?.onRideStarted?()
+            }
+        }
+        
+        // Ride completed
+        socket.on("ride:completed") { [weak self] data, _ in
+            print("✅ RECEIVED ride:completed")
+            Task { @MainActor in
+                self?.currentRideStatus = .rideCompleted
+                self?.onRideCompleted?()
+            }
+        }
+        
+        // Ride cancelled (by driver or system)
+        socket.on("ride:cancelled") { [weak self] data, _ in
+            print("❌ RECEIVED ride:cancelled")
+            if let responseData = data.first as? [String: Any] {
+                print("   Data: \(responseData)")
+            }
+            Task { @MainActor in
+                self?.resetRideState()
             }
         }
         
@@ -502,18 +633,52 @@ final class RideSocketManager: ObservableObject {
     
     }
     
-    /// Cancel the current ride search
-    func cancelRideSearch() {
-        guard let rideId = currentRideId else {
-            isSearchingForDriver = false
-            currentRideStatus = nil
+    /// Cancel the current ride with optional reason
+    /// Emits: passenger:cancelRide with { rideRequestId, reason }
+    func cancelRide(reason: String? = nil) {
+        guard let rideRequestId = currentRideRequestId ?? (driverInfo?.rideRequestId) else {
+            print("⚠️ No rideRequestId available for cancellation")
+            resetRideState()
             return
         }
         
-        socket?.emit(RideSocketEvent.cancelRide.rawValue, ["rideId": rideId])
+        var payload: [String: Any] = [
+            "rideRequestId": rideRequestId
+        ]
+        
+        if let reason = reason {
+            payload["reason"] = reason
+        }
+        
+        print("")
+        print("╔══════════════════════════════════════════════════════════════╗")
+        print("║  ❌ EMITTING: passenger:cancelRide                           ║")
+        print("╠══════════════════════════════════════════════════════════════╣")
+        print("║  rideRequestId: \(rideRequestId)")
+        print("║  reason: \(reason ?? "No reason provided")")
+        print("╚══════════════════════════════════════════════════════════════╝")
+        print("")
+        
+        socket?.emit(RideSocketEvent.cancelRide.rawValue, payload)
+        resetRideState()
+    }
+    
+    /// Legacy method name for backwards compatibility
+    func cancelRideSearch() {
+        cancelRide()
+    }
+    
+    /// Reset all ride-related state
+    private func resetRideState() {
         isSearchingForDriver = false
         currentRideStatus = .rideCancelled
         currentRideId = nil
+        currentRideRequestId = nil
+        driverInfo = nil
+        driverLocation = nil
+        isRideStarted = false
+        hasDriverArrived = false
+        onRideCancelled?()
     }
     
     // MARK: - Response Handlers
@@ -550,6 +715,7 @@ final class RideSocketManager: ObservableObject {
             isSearchingForDriver = false
             currentRideStatus = .driverFound
             driverInfo = driver
+            currentRideRequestId = driver.rideRequestId  // Store rideRequestId for cancellation
             onDriverFound?(driver)
             
             print("Driver found: \(driver.driverName)")
@@ -577,6 +743,22 @@ final class RideSocketManager: ObservableObject {
             print("Ride status update: \(update.status.rawValue)")
         } catch {
             print("Failed to decode status update: \(error)")
+        }
+    }
+    
+    private func handleDriverLocationUpdate(_ data: [Any]) {
+        guard let locationData = data.first as? [String: Any] else { return }
+        
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: locationData)
+            let location = try JSONDecoder().decode(DriverLocationUpdate.self, from: jsonData)
+            
+            driverLocation = location
+            onDriverLocationUpdate?(location)
+            
+            print("📍 Driver location updated: (\(location.latitude), \(location.longitude)) at \(location.timestamp)")
+        } catch {
+            print("Failed to decode driver location: \(error)")
         }
     }
     

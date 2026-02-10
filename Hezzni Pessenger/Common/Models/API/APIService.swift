@@ -153,6 +153,50 @@ class APIService {
             authToken: token
         )
     }
+    
+    // MARK: - Reviews
+    
+    /// Response model for review submission
+    struct ReviewSubmitResponse: Decodable {
+        let status: String
+        let message: String
+    }
+    
+    /// Submit a review for the driver (called by passenger after ride completion)
+    func submitDriverReview(rideRequestId: Int, rating: Int, comment: String?, tags: [String]?) async throws -> ReviewSubmitResponse {
+        let token = TokenManager.shared.token
+        var parameters: [String: Any] = [
+            "rideRequestId": rideRequestId,
+            "rating": rating
+        ]
+        if let comment = comment, !comment.isEmpty { parameters["comment"] = comment }
+        if let tags = tags, !tags.isEmpty { parameters["tags"] = tags }
+        
+        return try await requestWithBearerAuth(
+            endpoint: "/api/reviews/driver",
+            method: "POST",
+            parameters: parameters,
+            authToken: token
+        )
+    }
+    
+    /// Submit a review for the passenger (called by driver after ride completion)
+    func submitPassengerReview(rideRequestId: Int, rating: Int, comment: String?, tags: [String]?) async throws -> ReviewSubmitResponse {
+        let token = TokenManager.shared.token
+        var parameters: [String: Any] = [
+            "rideRequestId": rideRequestId,
+            "rating": rating
+        ]
+        if let comment = comment, !comment.isEmpty { parameters["comment"] = comment }
+        if let tags = tags, !tags.isEmpty { parameters["tags"] = tags }
+        
+        return try await requestWithBearerAuth(
+            endpoint: "/api/reviews/passenger",
+            method: "POST",
+            parameters: parameters,
+            authToken: token
+        )
+    }
 // MARK: - Driver Profile Response Models
     struct DriverProfileResponse: Decodable {
         struct DriverProfileData: Decodable {
@@ -1517,10 +1561,84 @@ struct MotorcycleVehicleDetailsPayload {
 struct CalculateRidePriceResponse: Decodable {
     struct RideOption: Decodable {
         let id: Int
+        let text_id: String
+        let icon: String
+        let title: String
+        let subtitle: String
+        let seats: Int
+        let timeEstimate: String
         let ridePreference: String
         let ridePreferenceKey: String
         let description: String
         let price: Double
+        init(
+               id: Int,
+               text_id: String,
+               icon: String,
+               title: String,
+               subtitle: String,
+               seats: Int,
+               timeEstimate: String,
+               ridePreference: String,
+               ridePreferenceKey: String,
+               description: String,
+               price: Double
+           ) {
+               self.id = id
+               self.text_id = text_id
+               self.icon = icon
+               self.title = title
+               self.subtitle = subtitle
+               self.seats = seats
+               self.timeEstimate = timeEstimate
+               self.ridePreference = ridePreference
+               self.ridePreferenceKey = ridePreferenceKey
+               self.description = description
+               self.price = price
+           }
+        private enum CodingKeys: String, CodingKey {
+            case id
+            case text_id
+            case icon
+            case title
+            case subtitle
+            case seats
+            case timeEstimate
+            case ridePreference
+            case ridePreferenceKey
+            case description
+            case price
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+
+            id = try container.decode(Int.self, forKey: .id)
+
+            let decodedRidePreference = try container.decodeIfPresent(String.self, forKey: .ridePreference)
+            let decodedRidePreferenceKey = try container.decodeIfPresent(String.self, forKey: .ridePreferenceKey)
+            let decodedDescription = try container.decodeIfPresent(String.self, forKey: .description)
+
+            let decodedTextId = try container.decodeIfPresent(String.self, forKey: .text_id)
+            let decodedTitle = try container.decodeIfPresent(String.self, forKey: .title)
+            let decodedSubtitle = try container.decodeIfPresent(String.self, forKey: .subtitle)
+            let decodedIcon = try container.decodeIfPresent(String.self, forKey: .icon)
+            let decodedSeats = try container.decodeIfPresent(Int.self, forKey: .seats)
+            let decodedTimeEstimate = try container.decodeIfPresent(String.self, forKey: .timeEstimate)
+
+            ridePreference = decodedRidePreference ?? decodedTitle ?? ""
+            ridePreferenceKey = decodedRidePreferenceKey ?? decodedTextId ?? ""
+            description = decodedDescription ?? decodedSubtitle ?? ""
+
+            text_id = decodedTextId ?? decodedRidePreferenceKey?.lowercased() ?? ""
+            title = decodedTitle ?? decodedRidePreference ?? ""
+            subtitle = decodedSubtitle ?? decodedDescription ?? ""
+            icon = decodedIcon ?? ""
+            seats = decodedSeats ?? 0
+            timeEstimate = decodedTimeEstimate ?? ""
+
+            price = try container.decode(Double.self, forKey: .price)
+        }
     }
     
     struct LocationData: Decodable {

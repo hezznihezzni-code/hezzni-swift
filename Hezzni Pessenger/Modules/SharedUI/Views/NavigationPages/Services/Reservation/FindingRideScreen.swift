@@ -13,7 +13,7 @@ struct FindingRideScreen: View {
     @Binding var sheetHeight: CGFloat
     var isReservation: Bool = false
     // Props for trip info
-    var vehicle: VehicleSubOptionsView.RideOption = .init(
+    var vehicle: CalculateRidePriceResponse.RideOption = .init(
         id: 1,
         text_id: "standard",
         icon: "car-service-icon",
@@ -21,6 +21,9 @@ struct FindingRideScreen: View {
         subtitle: "Comfortable vehicles",
         seats: 4,
         timeEstimate: "3-8 min",
+        ridePreference: "None",
+        ridePreferenceKey: "Hezzni Standards",
+        description: "Affordable everyday rides",
         price: 25
     )
     var pickupLocation: String = "Current Location, Marrakech"
@@ -165,7 +168,11 @@ struct FindingRideScreen: View {
         }
         .onDisappear {
             cleanupTimers()
-            socketManager.disconnect()
+            // DON'T disconnect socket here - it will clear driverInfo
+            // Only cancel search if still searching (not if driver was found)
+            if socketManager.isSearchingForDriver {
+                socketManager.cancelRideSearch()
+            }
         }
         .onChange(of: socketManager.currentRideStatus) { newStatus in
             handleStatusChange(newStatus)
@@ -178,7 +185,8 @@ struct FindingRideScreen: View {
         socketManager.onDriverFound = { driver in
             cleanupTimers()
             withAnimation {
-                bottomSheetState = .reservationConfirmation
+                // Transition to driver en route screen to show driver coming to pickup
+                bottomSheetState = .driverEnRoute
             }
         }
         
@@ -265,7 +273,13 @@ struct FindingRideScreen: View {
         case .driverFound:
             cleanupTimers()
             withAnimation {
-                bottomSheetState = .reservationConfirmation
+                // Transition to driver en route screen
+                bottomSheetState = .driverEnRoute
+            }
+        case .driverEnRoute:
+            cleanupTimers()
+            withAnimation {
+                bottomSheetState = .driverEnRoute
             }
         case .noDriverFound:
             cleanupTimers()

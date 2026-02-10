@@ -138,6 +138,15 @@ struct DriverHomeComplete: View {
     @State private var showRatingSheet = false
     @State private var locationUpdateTimer: Timer?
     
+    // Distance tracking for button enabling
+    @State private var distanceToPickup: Double = Double.infinity
+    @State private var distanceToDestination: Double = Double.infinity
+    
+    // Threshold constants (in meters)
+    // Note: GPS accuracy is typically 5-20m, so thresholds need to account for this
+    private let pickupProximityThreshold: Double = 100.0  // 100 meters for "I'm here" (accounts for GPS accuracy)
+    private let destinationProximityThreshold: Double = 50.0  // 50 meters for "Complete Ride"
+    
     @StateObject var preferencesVM = DriverPreferencesViewModel()
     private let log = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.hezzni.app", category: "DriverHome")
 
@@ -153,9 +162,21 @@ struct DriverHomeComplete: View {
                 mapContentView
                     .onAppear { configureMap() }
                     .onChange(of: locationManager.currentLocation) { location in
-                        if rideState != .rideRequestReceived{
+                        // Only auto-update camera when not showing a route
+                        // (i.e., when offline, waiting, or ride completed)
+                        let shouldAutoUpdateCamera = rideState == .offline || 
+                                                     rideState == .waitingForRequests || 
+                                                     rideState == .rideCompleted
+                        if shouldAutoUpdateCamera {
                             updateCameraPosition(location: location)
                         }
+                    }
+                    .onChange(of: distanceToPickup) { newDistance in
+                        print("🚗 DriverHomeComplete: distanceToPickup updated to \(newDistance)m (threshold: \(pickupProximityThreshold)m)")
+                        print("🔘 Button should be enabled: \(newDistance <= pickupProximityThreshold)")
+                    }
+                    .onChange(of: distanceToDestination) { newDistance in
+                        print("🏁 DriverHomeComplete: distanceToDestination updated to \(newDistance)m")
                     }
                 
                 VStack {
@@ -205,31 +226,40 @@ struct DriverHomeComplete: View {
                 ChatDetailedScreen()
             }
             .fullScreenCover(isPresented: $showTripComplete) {
-                TripCompleteScreen(
-                    onRate: {
+                DriverTripCompleteScreen(
+                    fare: currentRideRequest?.fare ?? "0.00 MAD",
+                    distance: currentRideRequest?.distance ?? "0 KM",
+                    time: currentRideRequest?.duration ?? "0 min",
+                    passengerName: currentRideRequest?.passengerName ?? "Passenger",
+                    passengerRating: currentRideRequest?.passengerRating ?? 5.0,
+                    passengerImage: currentRideRequest?.passengerImage ?? "profile_placeholder",
+                    pickupLocation: currentRideRequest?.pickupLocation ?? "",
+                    destinationLocation: currentRideRequest?.destinationLocation ?? "",
+                    onRateRider: {
                         showTripComplete = false
                         showRatingSheet = true
                     },
-                    onBookAnother: {
+                    onFindNextRide: {
                         showTripComplete = false
                         resetToWaitingState()
                     }
                 )
-//                DriverTripCompleteScreen(
-//                    onRateRider: {
-//                        showTripComplete = false
-//                        showRatingSheet = true
-//                    },
-//                    onFindNextRide: {
-//                        showTripComplete = false
-//                        resetToWaitingState()
-//                    }
-//                )
             }
             .sheet(isPresented: $showRatingSheet) {
                 DriverRatingScreen(
                     passengerName: currentRideRequest?.passengerName ?? "Passenger",
                     onSubmit: {
+                        // Submit passenger review via API
+                        if let rideRequest = currentRideRequest {
+                            Task {
+                                try? await APIService.shared.submitPassengerReview(
+                                    rideRequestId: rideRequest.rideRequestId,
+                                    rating: 5, // TODO: Pass actual rating from DriverRatingScreen
+                                    comment: nil,
+                                    tags: nil
+                                )
+                            }
+                        }
                         showRatingSheet = false
                         resetToWaitingState()
                     }
@@ -342,6 +372,23 @@ struct DriverHomeComplete: View {
     
     // MARK: - Subviews
     
+    // Determine the route display mode based on ride state
+    private var currentRouteDisplayMode: DriverRouteDisplayMode {
+        switch rideState {
+        case .rideRequestReceived:
+            // Show both routes when viewing a ride request
+            return .driverToPickupAndDestination
+        case .rideAccepted, .arrivedAtPickup:
+            // Show route to pickup when going to pick up passenger
+            return .driverToPickup
+        case .rideInProgress:
+            // Show route to destination during ride
+            return .driverToDestination
+        default:
+            return .none
+        }
+    }
+    
     private var mapContentView: some View {
         DriverMapView(
             mapView: $mapView,
@@ -355,8 +402,11 @@ struct DriverHomeComplete: View {
                 latitude: currentRideRequest!.destinationLatitude,
                 longitude: currentRideRequest!.destinationLongitude
             ) : nil,
-            showRoute: rideState == .rideRequestReceived,
-            isWaitingForRequests: rideState == .waitingForRequests
+            routeDisplayMode: currentRouteDisplayMode,
+            showRoute: rideState == .rideRequestReceived, // Keep for legacy support
+            isWaitingForRequests: rideState == .waitingForRequests,
+            distanceToPickup: $distanceToPickup,
+            distanceToDestination: $distanceToDestination
         )
         .edgesIgnoringSafeArea(.all)
     }
@@ -526,7 +576,11 @@ struct DriverHomeComplete: View {
                 onNavigate: {},
                 onArrived: { arrivedAtPickup() },
                 onChat: { showChatScreen = true },
-                onCall: { showCallOptions = true }
+                onCall: { showCallOptions = true },
+                distanceToPickup: distanceToPickup,
+                distanceToDestination: distanceToDestination,
+                pickupProximityThreshold: pickupProximityThreshold,
+                destinationProximityThreshold: destinationProximityThreshold
             )
         case .arrivedAtPickup:
             ActiveRideBottomSheet(
@@ -535,7 +589,11 @@ struct DriverHomeComplete: View {
                 onNavigate: {},
                 onStartRide: { startRide() },
                 onChat: { showChatScreen = true },
-                onCall: { showCallOptions = true }
+                onCall: { showCallOptions = true },
+                distanceToPickup: distanceToPickup,
+                distanceToDestination: distanceToDestination,
+                pickupProximityThreshold: pickupProximityThreshold,
+                destinationProximityThreshold: destinationProximityThreshold
             )
         case .rideInProgress:
             ActiveRideBottomSheet(
@@ -544,7 +602,11 @@ struct DriverHomeComplete: View {
                 onNavigate: {},
                 onCompleteRide: { completeRide() },
                 onChat: { showChatScreen = true },
-                onCall: { showCallOptions = true }
+                onCall: { showCallOptions = true },
+                distanceToPickup: distanceToPickup,
+                distanceToDestination: distanceToDestination,
+                pickupProximityThreshold: pickupProximityThreshold,
+                destinationProximityThreshold: destinationProximityThreshold
             )
         case .rideCompleted:
             EmptyView()
@@ -831,15 +893,36 @@ struct DriverHomeComplete: View {
         withAnimation {
             rideState = .arrivedAtPickup
         }
+        
+        // Notify server (and passenger) that driver has arrived at pickup
+        if let rideRequest = currentRideRequest {
+            driverSocketManager.arrivedAtPickup(rideId: rideRequest.rideRequestId)
+            log.info("Emitted driver:arrivedAtPickup for rideRequestId: \(rideRequest.rideRequestId)")
+        }
     }
     
     private func startRide() {
         withAnimation {
             rideState = .rideInProgress
         }
+        
+        // Notify server (and passenger) that ride has started
+        if let rideRequest = currentRideRequest {
+            driverSocketManager.startRide(rideId: rideRequest.rideRequestId)
+            log.info("Emitted driver:startRide for rideRequestId: \(rideRequest.rideRequestId)")
+        }
     }
     
     private func completeRide() {
+        // Notify server (and passenger) that ride is complete
+        if let rideRequest = currentRideRequest {
+            driverSocketManager.completeRide(rideId: rideRequest.rideRequestId)
+            log.info("Emitted driver:completeRide for rideRequestId: \(rideRequest.rideRequestId)")
+        }
+        
+        // Clear map routes and markers
+        mapView.clear()
+        
         withAnimation {
             rideState = .rideCompleted
             showTripComplete = true
@@ -888,6 +971,21 @@ struct ActiveRideBottomSheet: View {
     var onChat: () -> Void = {}
     var onCall: () -> Void = {}
     
+    // Distance properties for button enabling
+    var distanceToPickup: Double = Double.infinity
+    var distanceToDestination: Double = Double.infinity
+    var pickupProximityThreshold: Double = 10.0  // meters
+    var destinationProximityThreshold: Double = 5.0  // meters
+    
+    // Computed properties for button states
+    private var canMarkArrived: Bool {
+        distanceToPickup <= pickupProximityThreshold
+    }
+    
+    private var canCompleteRide: Bool {
+        distanceToDestination <= destinationProximityThreshold
+    }
+    
     var body: some View {
         ZStack{
 //            if state == .arrivedAtPickup {
@@ -907,7 +1005,14 @@ struct ActiveRideBottomSheet: View {
                     onCall: onCall
                 )
                 
-                PickupDestinationPathView(pickupLocation: "Current Location, Marrakech", destinationLocation: "Menara Mall, Gueliz District", offsetX: 25)
+                PickupDestinationPathView(pickupLocation: request.pickupLocation, destinationLocation: request.destinationLocation, offsetX: 25)
+                
+                // Show distance info when not yet within range
+                if state == .accepted && !canMarkArrived {
+                    distanceInfoView(distance: distanceToPickup, threshold: pickupProximityThreshold, label: "pickup")
+                } else if state == .inProgress && !canCompleteRide {
+                    distanceInfoView(distance: distanceToDestination, threshold: destinationProximityThreshold, label: "destination")
+                }
                 
                 actionButton
             }
@@ -918,19 +1023,52 @@ struct ActiveRideBottomSheet: View {
         }
     }
     
+    private func distanceInfoView(distance: Double, threshold: Double, label: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "location.fill")
+                .font(.system(size: 12))
+                .foregroundColor(.orange)
+            
+            Text("Get within \(Int(threshold))m of \(label) to continue")
+                .font(Font.custom("Poppins", size: 12))
+                .foregroundColor(.orange)
+            
+            Spacer()
+            
+            Text("\(distance)m away")
+                .font(Font.custom("Poppins", size: 12).weight(.medium))
+                .foregroundColor(.black.opacity(0.6))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color.orange.opacity(0.1))
+        .cornerRadius(8)
+    }
+    
     @ViewBuilder
     private var actionButton: some View {
         switch state {
         case .accepted:
-            Button(action: onArrived) {
-                Text("I'm here")
-                    .font(Font.custom("Poppins", size: 14).weight(.medium))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(Color(red: 0.22, green: 0.65, blue: 0.33))
-                    .cornerRadius(10)
+            Button(action: {
+                if canMarkArrived {
+                    onArrived()
+                }
+            }) {
+                HStack(spacing: 8) {
+                    if !canMarkArrived {
+                        Image(systemName: "location.slash.fill")
+                            .font(.system(size: 14))
+                    }
+                    Text("I'm here")
+                        .font(Font.custom("Poppins", size: 14).weight(.medium))
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(canMarkArrived ? Color(red: 0.22, green: 0.65, blue: 0.33) : Color.gray)
+                .cornerRadius(10)
             }
+            .disabled(!canMarkArrived)
         case .arrivedAtPickup:
             Button(action: onStartRide) {
                 Text("Start Ride")
@@ -942,19 +1080,57 @@ struct ActiveRideBottomSheet: View {
                     .cornerRadius(10)
             }
         case .inProgress:
-            Button(action: onCompleteRide) {
-                Text("Complete Ride")
-                    .font(Font.custom("Poppins", size: 14).weight(.medium))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(Color(red: 0.22, green: 0.65, blue: 0.33))
-                    .cornerRadius(10)
+            Button(action: {
+                if canCompleteRide {
+                    onCompleteRide()
+                }
+            }) {
+                HStack(spacing: 8) {
+                    if !canCompleteRide {
+                        Image(systemName: "location.slash.fill")
+                            .font(.system(size: 14))
+                    }
+                    Text("Complete Ride")
+                        .font(Font.custom("Poppins", size: 14).weight(.medium))
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(canCompleteRide ? Color(red: 0.22, green: 0.65, blue: 0.33) : Color.gray)
+                .cornerRadius(10)
             }
+            .disabled(!canCompleteRide)
         }
     }
 }
 
+#Preview {
+    ActiveRideBottomSheet(
+        request: RideRequest(
+            passengerName: "Ahmed Hassan",
+            passengerRating: 4.8,
+            passengerTrips: 120,
+            passengerImage: "profile_placeholder",
+            isVerified: true,
+            pickupLocation: "Current Location, Marrakech",
+            pickupLatitude: 31.6295,
+            pickupLongitude: -7.9811,
+            destinationLocation: "Menara Mall, Gueliz District",
+            destinationLatitude: 31.6245,
+            destinationLongitude: -7.9931,
+            distance: "2.5 KM",
+            duration: "8 min",
+            fare: "25.00 MAD",
+            paymentMethod: "Cash",
+            rideType: "Hezzni Standard"
+        ),
+        state: .accepted,
+        distanceToPickup: 50,
+        distanceToDestination: 200,
+        pickupProximityThreshold: 100,
+        destinationProximityThreshold: 50
+    )
+}
 // MARK: - Passenger Info Row
 struct PassengerInfoRow: View {
     let name: String

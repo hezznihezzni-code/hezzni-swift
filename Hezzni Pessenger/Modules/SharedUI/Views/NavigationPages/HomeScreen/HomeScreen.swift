@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 import GoogleMaps
 import FlagsKit
 import CoreLocation
@@ -19,6 +20,8 @@ enum BottomSheetState {
     case payment
     case orderSummary
     case findingRide
+    case driverEnRoute    // New state: Driver accepted, showing driver on map heading to pickup
+    case rideProcess
     case reservationConfirmation
     case reservation
     case nowRide
@@ -37,6 +40,8 @@ struct HomeScreen: View {
     
     // MARK: - Services ViewModel
     @StateObject private var servicesViewModel = PassengerServicesViewModel()
+    
+    
    
     @State private var isEditingPickup = false
     @State private var isEditingDestination = false
@@ -58,6 +63,11 @@ struct HomeScreen: View {
     @State private var estimatedDistance: Double = 0
     @State private var estimatedDuration: Int = 0
     @State private var routePolyline: GMSPolyline?
+    
+    // MARK: - Driver Tracking (for driverEnRoute state)
+    @StateObject private var socketManager = RideSocketManager.shared
+    @State private var driverMarker: GMSMarker?
+    @State private var driverRoutePolyline: GMSPolyline?
     
     //MARK: Animation Variables
     @Namespace private var animations
@@ -81,12 +91,16 @@ struct HomeScreen: View {
 
     // Notifications presentation (avoid navigationDestination)
     @State private var isShowingNotifications = false
+    
+    @State private var showRideNotFound: Bool = false
+    @State private var showTripComplete: Bool = false
+    @State private var showPassengerRating: Bool = false
 
     // Country picker presentation (full-screen overlay)
     @State private var showCountryPicker: Bool = false
     @State private var selectedCountryForDelivery: Country = .morocco
     
-    @State var selectedRideInformation: VehicleSubOptionsView.RideOption
+    @State var selectedRideInformation: CalculateRidePriceResponse.RideOption //
 
     // Filtered services (excluding Rental Car and Reservation)
     private var filteredServices: [PassengerService] {
@@ -102,8 +116,18 @@ struct HomeScreen: View {
     
     // Track which location is being selected from map (pickup or destination)
     @State private var isSelectingPickupFromMap = true
+    @State private var selectedMapAddress: String = ""
     @State private var hasSetInitialPickupLocation = false
     @State private var hasSetInitialCameraPosition = false
+    
+    @State private var selectedPaymentMethod = 0
+    private let paymentMethods: [Card] = [
+        .init(iconName: "cash_on_deliver_icon", title: "Cash Payment", subtitle: "pay the driver directly", badge: nil, cardNumber: nil, isAddCard: false, cardHolder: nil, expiry: nil),
+        .init(iconName: "hezzni_wallet_icon", title: "Hezzni Wallet", subtitle: "Pay with Hezzni balance", badge: "55.66 MAD", cardNumber: nil, isAddCard: false, cardHolder: nil, expiry: nil),
+        .init(iconName: "visa", title: "Visa Card", subtitle: "", badge: nil, cardNumber: "**** **** **** 2345", isAddCard: false, cardHolder: nil, expiry: nil),
+        .init(iconName: "mastercard", title: "Mastercard", subtitle: "", badge: nil, cardNumber: "**** **** **** 2345", isAddCard: false, cardHolder: nil, expiry: nil),
+        .init(iconName: nil, title: "Add Credit / Debit Card", subtitle: "Add Visa or Mastercard for trips", badge: nil, cardNumber: nil, isAddCard: true, cardHolder: nil, expiry: nil)
+    ]
     
     init(
         selectedService: Binding<SelectedService>,
@@ -121,7 +145,8 @@ struct HomeScreen: View {
         // Default to Marrakech, Morocco
         let defaultLocation = CLLocationCoordinate2D(latitude: 31.6295, longitude: -7.9811)
         _cameraPosition = State(initialValue: GMSCameraPosition.camera(withTarget: defaultLocation, zoom: 14))
-        _selectedRideInformation = State(initialValue: VehicleSubOptionsView.RideOption(
+        // Line 136, inside HomeScreen.init
+        _selectedRideInformation = State(initialValue: CalculateRidePriceResponse.RideOption(
             id: 0,
             text_id: "standard",
             icon: "",
@@ -129,75 +154,19 @@ struct HomeScreen: View {
             subtitle: "",
             seats: 4,
             timeEstimate: "10 min",
-            price: 100
+            ridePreference: "Standard",           // <-- Add this
+            ridePreferenceKey: "STANDARD",        // <-- Add this
+            description: "Standard ride option", // <-- Add this
+            price: 100,
+            
         ))
     }
     
-    var body: some View {
-        NavigationStack(path: $navigationState.path) {
+    
+    @ViewBuilder
+    private var pickerToShow: some View {
+        if showSchedulePicker {
             ZStack {
-                // Home content
-                ZStack(alignment: .bottom) {
-                    // Map view with overlay
-                    mapContentView
-                        .onAppear {
-                            configureMap()
-                        }
-
-                    // GPS button above the sheet (show in initial, journey, chooseOnMap, rideSummary states)
-                    if bottomSheetState == .initial || bottomSheetState == .journey || bottomSheetState == .chooseOnMap || bottomSheetState == .rideSummary || bottomSheetState == .rideOptions {
-                        VStack {
-                            Spacer()
-                            HStack {
-                                Spacer()
-                                Button(action: {
-                                    centerOnCurrentLocation()
-                                }) {
-                                    circularButton(icon: "gps_location_icon")
-                                }
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, sheetHeight + 16)
-                        }
-                    }
-                    
-                    // Custom draggable sheet
-                    draggableSheet
-                }
-                .edgesIgnoringSafeArea(.bottom)
-                .onAppear {
-                    locationManager.startUpdatingLocation()
-                }
-                .onChange(of: locationManager.currentLocation) { location in
-                    // Only auto-center map on initial load, NOT when user is choosing from map
-                    if !hasSetInitialCameraPosition && bottomSheetState != .chooseOnMap {
-                        hasSetInitialCameraPosition = true
-                        updateCameraPosition(location: location)
-                    }
-                    
-                    // Auto-set pickup location from user's current location (only once)
-                    if !hasSetInitialPickupLocation, let location = location {
-                        hasSetInitialPickupLocation = true
-                        setPickupFromCurrentLocation(location: location)
-                    }
-                }
-                .onAppear {
-                    if bottomSheetState == .initial {
-                        navigationState.showBottomBar()
-                    }
-                    
-                }
-
-                // Notification overlay
-                if isShowingNotifications {
-                    NotificationScreen(showNotification: $isShowingNotifications)
-                        .transition(.move(edge: .trailing).combined(with: .opacity))
-                        .zIndex(10)
-                }
-            }
-        }
-        .overlay {
-            if showSchedulePicker {
                 Color.black.opacity(0.3)
                     .ignoresSafeArea()
                     .onTapGesture {
@@ -205,6 +174,7 @@ struct HomeScreen: View {
                             showSchedulePicker = false
                         }
                     }
+
                 VStack {
                     Spacer()
                     BottomSheetContent(
@@ -216,76 +186,320 @@ struct HomeScreen: View {
                 .transition(.move(edge: .bottom))
                 .animation(.easeInOut, value: showSchedulePicker)
             }
+        } else {
+            EmptyView()
         }
-        .onAppear{
-            if bottomSheetState != .initial {
-//                navigationState.hideBottomBar()
-                sheetHeight = maxSheetHeight
-            }
-        }
-        .overlay {
-            // Country picker overlay
-            if showCountryPicker {
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        showCountryPicker = false
-                    }
+    }
+    
+    private var headerView: some View {
+        ZStack(alignment: .bottom) {
+            // Map view with overlay
+            mapContentView
+                .onAppear {
+                    configureMap()
+                }
 
+            // GPS button above the sheet (show in initial, journey, chooseOnMap, rideSummary states)
+            if bottomSheetState == .initial || bottomSheetState == .journey || bottomSheetState == .chooseOnMap || bottomSheetState == .rideSummary || bottomSheetState == .rideOptions {
                 VStack {
                     Spacer()
-
-                    VStack(spacing: 0) {
-                        HStack {
-                            Button("Cancel") {
-                                showCountryPicker = false
-                            }
-                            .foregroundColor(.blue)
-                            .font(.body)
-
-                            Spacer()
-
-                            Text("Select Country")
-                                .font(.headline)
-
-                            Spacer()
-
-                            Button("Done") {
-                                showCountryPicker = false
-                            }
-                            .foregroundColor(.blue)
-                            .font(.body)
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            centerOnCurrentLocation()
+                        }) {
+                            circularButton(icon: "gps_location_icon")
                         }
-                        .padding()
-                        .background(Color(.systemGray6))
-
-                        Picker("Select Country", selection: $selectedCountryForDelivery) {
-                            ForEach(Country.countries) { country in
-                                HStack {
-                                    FlagView(countryCode: country.code, style: .circle)
-                                        .frame(width: 22, height: 22)
-
-                                    Text(country.name)
-                                        .foregroundColor(.primary)
-                                    Spacer()
-                                    Text(country.dialCode)
-                                        .foregroundColor(.gray)
-                                }
-                                .tag(country)
-                            }
-                        }
-                        .pickerStyle(WheelPickerStyle())
-                        .frame(height: 200)
-                        .background(Color.white)
                     }
-                    .background(Color.white)
-                    .cornerRadius(16)
-                    .padding(.horizontal)
-                    .padding(.bottom, 8)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, sheetHeight + 16)
                 }
-                .transition(.move(edge: .bottom))
-                .zIndex(100)
             }
+            
+            VStack{
+                Spacer()
+                // Custom draggable sheet
+                draggableSheet
+            }
+        }
+    }
+    
+    var body: some View {
+        bodyContent
+    }
+    
+    // MARK: - Body broken into sub-expressions
+    private var navigationContent: some View {
+        NavigationStack(path: $navigationState.path) {
+            ZStack {
+                // Home content
+                headerView
+                    .edgesIgnoringSafeArea(.bottom)
+
+                // Notification overlay
+                if isShowingNotifications {
+                    NotificationScreen(showNotification: $isShowingNotifications)
+                        .transition(.move(edge: .trailing).combined(with: .opacity))
+                        .zIndex(10)
+                }
+            }
+        }
+    }
+    
+    private var bodyContent: some View {
+        navigationContent
+            .overlay { pickerToShow }
+            .overlay { showCountryPickerFunction() }
+            .overlay { showRidePickerFunction() }
+            .onAppear {
+                locationManager.startUpdatingLocation()
+                if bottomSheetState == .initial {
+                    navigationState.showBottomBar()
+                }
+                handleBodyOnAppear()
+            }
+            .onChange(of: locationManager.currentLocation) { location in
+                handleLocationChange(location)
+            }
+            .onChange(of: mapView.camera.target) { handleCameraTargetChange($0) }
+            .onChange(of: bottomSheetState) { handleBottomSheetStateChange($0) }
+            .onChange(of: socketManager.driverLocation) { handleDriverLocationChange($0) }
+            .onChange(of: socketManager.driverInfo) { _ in handleDriverInfoChange() }
+            .onChange(of: socketManager.isRideStarted) { started in
+                if started && bottomSheetState == .driverEnRoute {
+                    handleRideStarted()
+                }
+            }
+            .onChange(of: socketManager.currentRideStatus) { status in
+                if status == .rideCompleted {
+                    handleRideCompleted()
+                }
+                // Handle ride cancellation - return to initial state
+                if status == .rideCancelled {
+                    handleRideCancelled()
+                }
+            }
+            .fullScreenCover(isPresented: $showTripComplete) {
+                TripCompleteScreen(
+                    distance: String(format: "%.1f km", estimatedDistance),
+                    totalTime: "\(estimatedDuration) min",
+                    price: String(format: "%.2f MAD", selectedRideOption?.price ?? 0),
+                    driverImage: socketManager.driverInfo?.driver.imageUrl ?? "profile_placeholder",
+                    driverName: socketManager.driverInfo?.driver.name ?? "Driver",
+                    driverTrips: socketManager.driverInfo?.driver.totalTrips ?? 0,
+                    driverRating: Double(socketManager.driverInfo?.driver.averageRating ?? "5.0") ?? 5.0,
+                    pickupLocation: pickupLocation,
+                    dropoffLocation: destinationLocation,
+                    onRate: {
+                        showTripComplete = false
+                        showPassengerRating = true
+                    },
+                    onBookAnother: {
+                        showTripComplete = false
+                        resetAfterRideCompletion()
+                    }
+                )
+            }
+            .sheet(isPresented: $showPassengerRating) {
+                PassengerRatingSheet(
+                    driverName: socketManager.driverInfo?.driver.name ?? "Driver",
+                    onSubmit: { rating, comment, tags in
+                        // Submit review to API
+                        if let rideIdStr = socketManager.currentRideId, let rideId = Int(rideIdStr) {
+                            Task {
+                                try? await APIService.shared.submitDriverReview(
+                                    rideRequestId: rideId,
+                                    rating: rating,
+                                    comment: comment,
+                                    tags: tags
+                                )
+                            }
+                        }
+                        showPassengerRating = false
+                        resetAfterRideCompletion()
+                    }
+                )
+                .presentationDetents([.medium, .large])
+                .presentationCornerRadius(35)
+                .presentationDragIndicator(.hidden)
+            }
+    }
+    
+    
+    private func handleLocationChange(_ location: CLLocation?) {
+        if !hasSetInitialCameraPosition && bottomSheetState != .chooseOnMap {
+            hasSetInitialCameraPosition = true
+            updateCameraPosition(location: location)
+        }
+        if !hasSetInitialPickupLocation, let location = location {
+            hasSetInitialPickupLocation = true
+            setPickupFromCurrentLocation(location: location)
+        }
+    }
+    
+    private func handleBodyOnAppear() {
+        if bottomSheetState != .initial {
+            sheetHeight = maxSheetHeight
+        }
+    }
+    
+    private func handleCameraTargetChange(_ newCenter: CLLocationCoordinate2D) {
+        if bottomSheetState == .chooseOnMap {
+            reverseGeocodeWithGoogle(coordinate: newCenter) { street, address in
+                DispatchQueue.main.async {
+                    selectedMapAddress = street ?? ""
+                }
+            }
+        }
+    }
+    
+    private func handleBottomSheetStateChange(_ newState: BottomSheetState) {
+        if newState == .driverEnRoute {
+            drawDriverOnMap()
+        } else {
+            clearDriverTracking()
+        }
+    }
+    
+    private func handleDriverLocationChange(_ newLocation: DriverLocationUpdate?) {
+        if bottomSheetState == .driverEnRoute, let location = newLocation {
+            updateDriverMarkerPosition(
+                latitude: location.latitude,
+                longitude: location.longitude
+            )
+        }
+    }
+    private func handleDriverInfoChange() {
+            if bottomSheetState == .driverEnRoute {
+                drawDriverOnMap()
+            }
+        }
+    @ViewBuilder
+    func showCountryPickerFunction() -> some View {
+        if showCountryPicker {
+            Color.black.opacity(0.4)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    showCountryPicker = false
+                }
+
+            VStack {
+                Spacer()
+
+                VStack(spacing: 0) {
+                    HStack {
+                        Button("Cancel") {
+                            showCountryPicker = false
+                        }
+                        .foregroundColor(.blue)
+                        .font(.body)
+
+                        Spacer()
+
+                        Text("Select Country")
+                            .font(.headline)
+
+                        Spacer()
+
+                        Button("Done") {
+                            showCountryPicker = false
+                        }
+                        .foregroundColor(.blue)
+                        .font(.body)
+                    }
+                    .padding()
+                    .background(Color(.systemGray6))
+
+                    Picker("Select Country", selection: $selectedCountryForDelivery) {
+                        ForEach(Country.countries) { country in
+                            HStack {
+                                FlagView(countryCode: country.code, style: .circle)
+                                    .frame(width: 22, height: 22)
+
+                                Text(country.name)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Text(country.dialCode)
+                                    .foregroundColor(.gray)
+                            }
+                            .tag(country)
+                        }
+                    }
+                    .pickerStyle(WheelPickerStyle())
+                    .frame(height: 200)
+                    .background(Color.white)
+                }
+                .background(Color.white)
+                .cornerRadius(16)
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+            }
+            .transition(.move(edge: .bottom))
+            .zIndex(100)
+        }
+    }
+    @ViewBuilder
+    func showRidePickerFunction() -> some View {
+        if showRideNotFound {
+            Color.black.opacity(0.4)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    showRideNotFound = false
+                }
+
+            VStack {
+                Spacer()
+
+                VStack(spacing: 0) {
+                    HStack {
+                        Button("Cancel") {
+                            showRideNotFound = false
+                        }
+                        .foregroundColor(.blue)
+                        .font(.body)
+
+                        Spacer()
+
+                        Text("Select Country")
+                            .font(.headline)
+
+                        Spacer()
+
+                        Button("Done") {
+                            showCountryPicker = false
+                        }
+                        .foregroundColor(.blue)
+                        .font(.body)
+                    }
+                    .padding()
+                    .background(Color(.systemGray6))
+
+                    Picker("Select Country", selection: $selectedCountryForDelivery) {
+                        ForEach(Country.countries) { country in
+                            HStack {
+                                FlagView(countryCode: country.code, style: .circle)
+                                    .frame(width: 22, height: 22)
+
+                                Text(country.name)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Text(country.dialCode)
+                                    .foregroundColor(.gray)
+                            }
+                            .tag(country)
+                        }
+                    }
+                    .pickerStyle(WheelPickerStyle())
+                    .frame(height: 200)
+                    .background(Color.white)
+                }
+                .background(Color.white)
+                .cornerRadius(16)
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+            }
+            .transition(.move(edge: .bottom))
+            .zIndex(100)
         }
     }
     
@@ -294,33 +508,51 @@ struct HomeScreen: View {
     private var mapContentView: some View {
         ZStack(alignment: .top) {
             GoogleMapView(mapView: $mapView, cameraPosition: $cameraPosition)
-                .edgesIgnoringSafeArea(.all)
-            
+                        .edgesIgnoringSafeArea(.all)
+                        .onAppear {
+                            // Move Google UI elements behind the bottom sheet
+                            mapView.padding = UIEdgeInsets(
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0
+                            )
+                        }
             // Center marker when choosing from map
             if bottomSheetState == .chooseOnMap {
                 VStack {
                     Spacer()
                     VStack(spacing: 4) {
-                        // Label showing what's being selected
-                        Text(isSelectingPickupFromMap ? "Select Pickup" : "Select Destination")
-                            .font(Font.custom("Poppins", size: 12).weight(.medium))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color(red: 0.22, green: 0.65, blue: 0.33))
-                            .cornerRadius(8)
-                            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                        VStack(alignment: .leading, spacing: 2) {
+                                Text(isSelectingPickupFromMap ? "Pickup" : "Destination")
+                                    .font(Font.custom("Poppins", size: 10))
+                                    .lineSpacing(12)
+                                    .foregroundColor(Color(red: 1, green: 1, blue: 1).opacity(0.75))
+                            
+                            if !selectedMapAddress.isEmpty {
+                                Text(selectedMapAddress)
+                                    .font(Font.custom("Poppins", size: 13))
+                                    .lineSpacing(14)
+                                    .foregroundColor(.white)
+                            }
+                               
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color(red: 0.22, green: 0.65, blue: 0.33))
+                        .cornerRadius(8)
+                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
                         
                         // Custom map pin from assets
                         Image("map_pin")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 50, height: 50)
+                            .frame(width: 25, height: 35)
                             .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
                     }
                     Spacer()
                 }
-                .padding(.bottom, sheetHeight + 30)
+                .padding(.bottom, 125)
             }
             
             // Distance/Duration info card when showing route
@@ -380,6 +612,11 @@ struct HomeScreen: View {
                 .padding(.horizontal, 16)
             }
             
+            // Driver ETA card when driver is en route
+            if bottomSheetState == .driverEnRoute {
+                driverETACardView
+            }
+            
             VStack(spacing: 0) {
                 HStack {
 //                    greetingText
@@ -398,6 +635,64 @@ struct HomeScreen: View {
             }
         }
         
+        
+    }
+    
+    // MARK: - Driver ETA Card View (extracted to reduce body complexity)
+    @ViewBuilder
+    private var driverETACardView: some View {
+        if let driverInfo = socketManager.driverInfo {
+            VStack {
+                Spacer()
+                    .frame(height: 100)
+                
+                // Driver ETA info card
+                HStack(spacing: 0) {
+                    // ETA
+                    HStack(spacing: 4) {
+                        Text("\(driverInfo.estimatedArrivalMinutes)")
+                            .font(Font.custom("Poppins", size: 16).weight(.bold))
+                            .foregroundColor(.white)
+                        Text("min")
+                            .font(Font.custom("Poppins", size: 12).weight(.medium))
+                            .foregroundColor(.white)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color(red: 0.22, green: 0.65, blue: 0.33))
+                    
+                    // Distance
+                    HStack(spacing: 4) {
+                        Text(driverInfo.distanceToPickup)
+                            .font(Font.custom("Poppins", size: 14).weight(.medium))
+                            .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color.white)
+                    
+                    // Status
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Driver arriving")
+                            .font(Font.custom("Poppins", size: 10))
+                            .foregroundColor(.gray)
+                        Text(driverInfo.driver.vehicle.plateNumber)
+                            .font(Font.custom("Poppins", size: 12).weight(.medium))
+                            .foregroundColor(.black)
+                            .lineLimit(1)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: 150)
+                    .background(Color.white)
+                }
+                .cornerRadius(8)
+                .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 2)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+        }
     }
    
     
@@ -443,12 +738,28 @@ struct HomeScreen: View {
             .padding(.horizontal, 16)
         }
     }
-    
+    private var reservationView: some View {
+        GenericRideDetailScreen(
+            isReservation: !isNowSelected,
+            pickup: pickupLocation,
+            destination: destinationLocation,
+            bottomSheetState: $bottomSheetState,
+            rideOptions: rideOptions,
+            selectedRideOption: $selectedRideInformation,
+            namespace: animations,
+            appliedCoupon: $appliedCoupon,
+            selectedService: $selectedService,
+            showSchedulePicker: $showSchedulePicker,
+            selectedDate: $selectedDate,
+            showCountryPicker: $showCountryPicker
+        )
+        .transition(.move(edge: .trailing).combined(with: .opacity))
+    }
     //MARK: - Draggable Sheet
     private var draggableSheet: some View {
         VStack(spacing: 0) {
             // Drag handle
-            if bottomSheetState != .rideSummary {
+            if !sheetWithNoDrag() {
                 dragHandle
             }
             
@@ -464,31 +775,6 @@ struct HomeScreen: View {
                             navigationState.showBottomBar()
                         }
                     },
-//                    trailingView: {
-//                        Button(action: {
-//                            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-//                                if !isNowSelected {
-//                                    if selectedService == "Delivery" || selectedService == "Group Ride"{
-//                                        selectedService = "Car"
-//                                    }
-//                                        bottomSheetState = .reservation
-//
-//                                } else{
-//                                    if selectedService == "Delivery" {
-//                                        bottomSheetState = .deliveryService
-//                                    }else {
-//                                        bottomSheetState = .nowRide
-//                                    }
-//
-//                                }
-//                                sheetHeight = maxSheetHeight
-//                            }
-//                        }) {
-//                            Text("Next")
-//                                .font(.poppins(.medium, size: 14))
-//                                .foregroundColor(.hezzniGreen)
-//                        }
-//                    }
                 )
                 .padding(.horizontal, 16)
             }
@@ -596,67 +882,10 @@ struct HomeScreen: View {
                 .frame(height: 5)
             
             // Location selection content or Reservation screen
-            if bottomSheetState == .reservation {
-                GenericRideDetailScreen(
-                    isReservation: !isNowSelected,
-                    pickup: pickupLocation,
-                    destination: destinationLocation,
-                    bottomSheetState: $bottomSheetState,
-                    rideInformation: rideOptions,
-                    selectedRideInformation: $selectedRideInformation,
-                    namespace: animations,
-                    appliedCoupon: $appliedCoupon,
-                    selectedService: $selectedService,
-                    showSchedulePicker: $showSchedulePicker,
-                    selectedDate: $selectedDate,
-                    showCountryPicker: $showCountryPicker
-                )
-                .transition(.move(edge: .trailing).combined(with: .opacity))
+            if bottomSheetState == .reservation || bottomSheetState == .nowRide || bottomSheetState == .deliveryService {
+                reservationView
             }
-            else if bottomSheetState == .nowRide {
-                GenericRideDetailScreen(
-                    isReservation: !isNowSelected,
-                    pickup: pickupLocation,
-                    destination: destinationLocation,
-                    bottomSheetState: $bottomSheetState,
-                    rideInformation: rideOptions,
-                    
-                    selectedRideInformation: $selectedRideInformation,
-                    namespace: animations,
-                    appliedCoupon: $appliedCoupon,
-                    selectedService: $selectedService,
-                    showSchedulePicker: $showSchedulePicker,
-                    selectedDate: $selectedDate,
-                    showCountryPicker: $showCountryPicker
-                )
-                .transition(.move(edge: .trailing).combined(with: .opacity))
-            }
-            else if bottomSheetState == .deliveryService {
-                GenericRideDetailScreen(
-                    isReservation: !isNowSelected,
-                    pickup: pickupLocation,
-                    destination: destinationLocation,
-                    bottomSheetState: $bottomSheetState,
-                    rideInformation: rideOptions,
-                    selectedRideInformation: $selectedRideInformation,
-                    namespace: animations,
-                    appliedCoupon: $appliedCoupon,
-                    selectedService: $selectedService,
-                    showSchedulePicker: $showSchedulePicker,
-                    selectedDate: $selectedDate,
-                    showCountryPicker: $showCountryPicker
-                )
-//                DeliveryDetailScreen(
-//                    pickup: pickupLocation,
-//                    destination: destinationLocation,
-//                    bottomSheetState: $bottomSheetState,
-//                    showCountryPicker: $showCountryPicker,
-//                    namespace: animations,
-//                    selectedCountry: $selectedCountryForDelivery,
-//                    selectedService: selectedService.displayName
-//                )
-                .transition(.move(edge: .trailing).combined(with: .opacity))
-            }
+           
             else if bottomSheetState == .rideSummary {
                 // Ride Summary Screen - Shows pickup/destination with continue button
                 rideSummaryView
@@ -667,18 +896,26 @@ struct HomeScreen: View {
                     rideInfo: selectedRideInformation,
                     selectedService: $selectedService,
                     bottomSheetState: $bottomSheetState,
-                    namespace: animations
+                    namespace: animations,
+                    selectedMethodIndex: $selectedPaymentMethod,
+                    methods: paymentMethods,
+                    
                 )
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
             else if bottomSheetState == .orderSummary {
                 PaymentConfirmationScreen(
+                    rideInfo: selectedRideInformation,
+                    pickupLocation: pickupLocation,
+                    destinationLocation: destinationLocation,
+                    isReservation: !isNowSelected,
                     bottomSheetState: $bottomSheetState,
+                    paymentMethod: paymentMethods[selectedPaymentMethod],
                     namespace: animations,
                     onContinue: {
                         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                             bottomSheetState = .findingRide
-                            
+                            sheetHeight = UIScreen.main.bounds.height * 0.65
                         }
                     }
                 )
@@ -690,33 +927,14 @@ struct HomeScreen: View {
                     namespace: animations,
                     sheetHeight: $sheetHeight,
                     isReservation: !isNowSelected,
-                    vehicle: selectedRideOption.map {
-                        VehicleSubOptionsView.RideOption(
-                            id: $0.id,
-                            text_id: $0.ridePreference.lowercased().replacingOccurrences(of: " ", with: "-"),
-                            icon: getIconForPreference($0.ridePreference),
-                            title: $0.ridePreference,
-                            subtitle: "Comfortable vehicles",
-                            seats: 4,
-                            timeEstimate: "\(estimatedDuration) min",
-                            price: $0.price
-                        )
-                    } ?? VehicleSubOptionsView.RideOption(
-                        id: 1,
-                        text_id: "standard",
-                        icon: "car-service-icon",
-                        title: "Hezzni Standard",
-                        subtitle: "Comfortable vehicles",
-                        seats: 4,
-                        timeEstimate: "3-8 min",
-                        price: 25
-                    ),
+                    vehicle: selectedRideInformation,
                     pickupLocation: pickupLocation,
                     destinationLocation: destinationLocation,
                     pickupDate: selectedDate,
                     onCancel: {
                         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                             bottomSheetState = .orderSummary
+                            sheetHeight = maxSheetHeight
                         }
                     },
                     pickupLatitude: pickupLatitude,
@@ -727,6 +945,15 @@ struct HomeScreen: View {
                     selectedRideOptionId: selectedRideOption?.id ?? 1,
                     estimatedPrice: selectedRideOption?.price ?? 0,
                     couponId: appliedCoupon?.couponId
+                )
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+            else if bottomSheetState == .driverEnRoute {
+                // Driver accepted the ride, showing driver info in bottom sheet
+                // Map shows driver marker and route to pickup using existing GoogleMapView
+                DriverEnRouteBottomSheet(
+                    bottomSheetState: $bottomSheetState,
+                    sheetHeight: $sheetHeight
                 )
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
@@ -749,6 +976,9 @@ struct HomeScreen: View {
                     }
                 )
                     .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+            else if bottomSheetState == .rideProcess {
+                RideProcessScreen()
             }
             else {
                 locationSelectionContent
@@ -1299,16 +1529,27 @@ struct HomeScreen: View {
     private var dragGesture: some Gesture {
         DragGesture()
             .onChanged { value in
-                isDragging = true
-                let newHeight = max(minSheetHeight, sheetHeight - value.translation.height)
-                sheetHeight = newHeight
+                if sheetWithNoDrag() {
+                    sheetHeight = sheetHeight
+                }
+                else {
+                    isDragging = true
+                    let newHeight = max(minSheetHeight, sheetHeight - value.translation.height)
+                    sheetHeight = newHeight
+                }
             }
             .onEnded { value in
-                isDragging = false
-                snapSheetToPosition()
+                if sheetWithNoDrag() {
+                    sheetHeight = sheetHeight
+                }else{
+                    isDragging = false
+                    snapSheetToPosition()
+                }
             }
     }
-    
+    func sheetWithNoDrag() -> Bool {
+        return bottomSheetState == .chooseOnMap || bottomSheetState == .findingRide || bottomSheetState == .rideSummary || bottomSheetState == .driverEnRoute
+    }
     // MARK: - Helper Methods
     
     private func fetchPlacesSuggestions() {
@@ -1427,7 +1668,7 @@ struct HomeScreen: View {
         
         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
             bottomSheetState = .chooseOnMap
-            sheetHeight = minSheetHeight + 50  // Slightly taller to show the Choose button better
+            sheetHeight = minSheetHeight - 25
             showSuggestions = false
             placeSuggestions = []
         }
@@ -1441,7 +1682,7 @@ struct HomeScreen: View {
         let centerCoordinate = mapView.camera.target
         
         // Use Google Geocoding API for reverse geocoding (more reliable)
-        reverseGeocodeWithGoogle(coordinate: centerCoordinate) { placeName in
+        reverseGeocodeWithGoogle(coordinate: centerCoordinate) { street, placeName in
             DispatchQueue.main.async {
                 let locationName = placeName ?? "Selected Location"
                 
@@ -1479,24 +1720,27 @@ struct HomeScreen: View {
         }
     }
     
-    // Google Geocoding API for reverse geocoding
-    private func reverseGeocodeWithGoogle(coordinate: CLLocationCoordinate2D, completion: @escaping (String?) -> Void) {
+    // Swift
+    private func reverseGeocodeWithGoogle(
+        coordinate: CLLocationCoordinate2D,
+        completion: @escaping (_ streetAddress: String?, _ formattedAddress: String?) -> Void
+    ) {
         let urlString = "https://maps.googleapis.com/maps/api/geocode/json?latlng=\(coordinate.latitude),\(coordinate.longitude)&key=AIzaSyAGlfVLO31MsYNRfiJooK3-e38vAVkkij0"
         
         guard let url = URL(string: urlString) else {
-            completion(nil)
+            completion(nil, nil)
             return
         }
         
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
                 print("Geocoding error: \(error.localizedDescription)")
-                completion(nil)
+                completion(nil, nil)
                 return
             }
             
             guard let data = data else {
-                completion(nil)
+                completion(nil, nil)
                 return
             }
             
@@ -1505,40 +1749,35 @@ struct HomeScreen: View {
                    let results = json["results"] as? [[String: Any]],
                    let firstResult = results.first,
                    let formattedAddress = firstResult["formatted_address"] as? String {
-                    // Get a shorter address if available
+                    var streetAddress: String? = nil
                     if let addressComponents = firstResult["address_components"] as? [[String: Any]] {
-                        var shortAddress = ""
                         for component in addressComponents {
-                            if let types = component["types"] as? [String] {
-                                if types.contains("route") || types.contains("street_address") {
-                                    if let name = component["long_name"] as? String {
-                                        shortAddress = name
-                                        break
-                                    }
-                                }
+                            if let types = component["types"] as? [String],
+                               (types.contains("route") || types.contains("street_address")),
+                               let name = component["long_name"] as? String {
+                                streetAddress = name
+                                break
                             }
                         }
-                        if !shortAddress.isEmpty {
-                            // Add locality if available
+                        if let street = streetAddress {
+                            // Optionally add locality
                             for component in addressComponents {
                                 if let types = component["types"] as? [String],
                                    types.contains("locality"),
                                    let locality = component["long_name"] as? String {
-                                    shortAddress += ", \(locality)"
+                                    streetAddress = "\(street), \(locality)"
                                     break
                                 }
                             }
-                            completion(shortAddress)
-                            return
                         }
                     }
-                    completion(formattedAddress)
+                    completion(streetAddress, formattedAddress)
                 } else {
-                    completion(nil)
+                    completion(nil, nil)
                 }
             } catch {
                 print("JSON parsing error: \(error.localizedDescription)")
-                completion(nil)
+                completion(nil, nil)
             }
         }.resume()
     }
@@ -1573,7 +1812,8 @@ struct HomeScreen: View {
                 } else {
                     sheetHeight = minSheetHeight
                 }
-            } else {
+            }
+            else {
                 if sheetHeight > (midSheetHeight + minSheetHeight) / 2 {
                     sheetHeight = midSheetHeight
                 }
@@ -1619,7 +1859,7 @@ struct HomeScreen: View {
         pickupLongitude = coordinate.longitude
         
         // Reverse geocode to get address
-        reverseGeocodeWithGoogle(coordinate: coordinate) { placeName in
+        reverseGeocodeWithGoogle(coordinate: coordinate) { street, placeName in
             DispatchQueue.main.async {
                 if let placeName = placeName {
                     self.pickupLocation = placeName
@@ -1737,16 +1977,42 @@ struct HomeScreen: View {
         pickupMarker.position = pickupCoord
         pickupMarker.title = "Pickup"
         pickupMarker.snippet = pickupLocation
-        pickupMarker.icon = GMSMarker.markerImage(with: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0))
+        if let pinImage = UIImage(named: "pickup_pin") {
+            let scaledImage = pinImage.scaledTo(size: CGSize(width: 26, height: 26))
+            pickupMarker.icon = scaledImage
+        } else {
+            pickupMarker.icon = GMSMarker.markerImage(with: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0))
+        }
         pickupMarker.map = mapView
+
+        // Add pickup widget above marker
+        addLocationWidget(
+            title: "Pickup",
+            subtitle: pickupLocation,
+            color: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0),
+            at: pickupCoord
+        )
         
         // Add destination marker
         let destinationMarker = GMSMarker()
         destinationMarker.position = dropoffCoord
         destinationMarker.title = "Destination"
         destinationMarker.snippet = destinationLocation
-        destinationMarker.icon = GMSMarker.markerImage(with: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0))
+        if let pinImage = UIImage(named: "source_dest_pin") {
+            let scaledImage = pinImage.scaledTo(size: CGSize(width: 16.88, height: 30))
+            destinationMarker.icon = scaledImage
+        } else {
+            destinationMarker.icon = GMSMarker.markerImage(with: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0))
+        }
         destinationMarker.map = mapView
+
+        // Add destination widget above marker
+        addLocationWidget(
+            title: "Destination",
+            subtitle: destinationLocation,
+            color: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0),
+            at: dropoffCoord
+        )
         
         // Fetch actual directions from Google Directions API
         locationManager.fetchDirections(from: pickupCoord, to: dropoffCoord) { [self] path, distanceText, durationText in
@@ -1785,6 +2051,357 @@ struct HomeScreen: View {
             }
         }
     }
+    
+    // MARK: - Driver Tracking Functions
+    
+    /// Draw driver marker and route on the map when driver accepts ride
+    private func drawDriverOnMap() {
+        guard let driverInfo = socketManager.driverInfo else {
+            print("⚠️ No driver info available to draw on map")
+            return
+        }
+        
+        let driverCoord = CLLocationCoordinate2D(
+            latitude: driverInfo.driver.currentLatitude,
+            longitude: driverInfo.driver.currentLongitude
+        )
+        
+        let pickupCoord = CLLocationCoordinate2D(
+            latitude: Double(driverInfo.pickupLatitude) ?? pickupLatitude,
+            longitude: Double(driverInfo.pickupLongitude) ?? pickupLongitude
+        )
+        
+        // Clear existing markers and routes from the map
+        mapView.clear()
+        
+        // Also clear the old pickup-to-destination route reference
+        // (mapView.clear() removes it visually, but we must nil the reference
+        // so it doesn't linger if the state changes back)
+        routePolyline?.map = nil
+        routePolyline = nil
+        
+        // Add driver marker (car icon)
+        let marker = GMSMarker(position: driverCoord)
+        marker.title = driverInfo.driver.name
+        marker.snippet = "\(driverInfo.driver.vehicle.make) \(driverInfo.driver.vehicle.model)"
+        
+        if let carImage = UIImage(named: "car_pin") {
+            let scaledImage = carImage.scaledTo(size: CGSize(width: 35, height: 35))
+            marker.icon = scaledImage
+        } else {
+            marker.icon = GMSMarker.markerImage(with: .systemBlue)
+        }
+        marker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
+        marker.map = mapView
+        driverMarker = marker
+        
+        // Add pickup marker
+        let pickupMarker = GMSMarker(position: pickupCoord)
+        pickupMarker.title = "Pickup"
+        pickupMarker.snippet = pickupLocation
+        if let pinImage = UIImage(named: "pickup_pin") {
+            let scaledImage = pinImage.scaledTo(size: CGSize(width: 26, height: 26))
+            pickupMarker.icon = scaledImage
+        } else {
+            pickupMarker.icon = GMSMarker.markerImage(with: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0))
+        }
+        pickupMarker.map = mapView
+        
+        // Draw route from driver to pickup
+        drawDriverToPickupRoute(from: driverCoord, to: pickupCoord)
+        
+        // Animate camera to show both driver and pickup
+        let bounds = GMSCoordinateBounds(coordinate: driverCoord, coordinate: pickupCoord)
+        let update = GMSCameraUpdate.fit(bounds, withPadding: 120)
+        mapView.animate(with: update)
+    }
+    
+    /// Draw route from driver to pickup location
+    private func drawDriverToPickupRoute(from driverCoord: CLLocationCoordinate2D, to pickupCoord: CLLocationCoordinate2D) {
+        // Remove existing driver route polyline
+        driverRoutePolyline?.map = nil
+        driverRoutePolyline = nil
+        
+        // Also ensure old pickup-to-destination route is cleared
+        routePolyline?.map = nil
+        routePolyline = nil
+        
+        locationManager.fetchDirections(from: driverCoord, to: pickupCoord) { [self] path, distanceText, durationText in
+            DispatchQueue.main.async {
+                // Clear any route that was drawn between our request and callback
+                self.driverRoutePolyline?.map = nil
+                
+                if let path = path {
+                    // Draw the actual route with a different color (blue for driver route)
+                    let polyline = GMSPolyline(path: path)
+                    polyline.strokeWidth = 5
+                    polyline.strokeColor = UIColor.systemBlue
+                    polyline.map = self.mapView
+                    self.driverRoutePolyline = polyline
+                } else {
+                    // Fallback to straight line
+                    let fallbackPath = GMSMutablePath()
+                    fallbackPath.add(driverCoord)
+                    fallbackPath.add(pickupCoord)
+                    
+                    let polyline = GMSPolyline(path: fallbackPath)
+                    polyline.strokeWidth = 4
+                    polyline.strokeColor = UIColor.systemBlue
+                    polyline.map = self.mapView
+                    self.driverRoutePolyline = polyline
+                }
+            }
+        }
+    }
+    
+    /// Update driver marker position when location changes
+    private func updateDriverMarkerPosition(latitude: Double, longitude: Double) {
+        let newPosition = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        
+        if let marker = driverMarker {
+            // Animate marker movement
+            CATransaction.begin()
+            CATransaction.setAnimationDuration(0.5)
+            marker.position = newPosition
+            CATransaction.commit()
+            
+            if socketManager.isRideStarted {
+                // Ride in progress: draw route from driver to destination
+                let destCoord = CLLocationCoordinate2D(
+                    latitude: destinationLatitude,
+                    longitude: destinationLongitude
+                )
+                drawDriverToDestinationRoute(from: newPosition, to: destCoord)
+                
+                let bounds = GMSCoordinateBounds(coordinate: newPosition, coordinate: destCoord)
+                let update = GMSCameraUpdate.fit(bounds, withPadding: 120)
+                mapView.animate(with: update)
+            } else {
+                // Driver en route to pickup: draw route to pickup
+                let pickupCoord = CLLocationCoordinate2D(
+                    latitude: pickupLatitude,
+                    longitude: pickupLongitude
+                )
+                drawDriverToPickupRoute(from: newPosition, to: pickupCoord)
+                
+                let bounds = GMSCoordinateBounds(coordinate: newPosition, coordinate: pickupCoord)
+                let update = GMSCameraUpdate.fit(bounds, withPadding: 120)
+                mapView.animate(with: update)
+            }
+        } else {
+            // If marker doesn't exist, redraw everything
+            drawDriverOnMap()
+        }
+    }
+    
+    /// Clean up driver tracking when leaving driverEnRoute state
+    private func clearDriverTracking() {
+        driverMarker?.map = nil
+        driverMarker = nil
+        driverRoutePolyline?.map = nil
+        driverRoutePolyline = nil
+    }
+    
+    // MARK: - Ride Started / Completed Handling
+    
+    /// Called when driver starts the ride — switch route from pickup to destination
+    private func handleRideStarted() {
+        guard let driverInfo = socketManager.driverInfo else { return }
+        
+        // Get current driver location (use real-time if available, else initial)
+        let driverCoord: CLLocationCoordinate2D
+        if let driverLoc = socketManager.driverLocation {
+            driverCoord = CLLocationCoordinate2D(latitude: driverLoc.latitude, longitude: driverLoc.longitude)
+        } else {
+            driverCoord = CLLocationCoordinate2D(
+                latitude: driverInfo.driver.currentLatitude,
+                longitude: driverInfo.driver.currentLongitude
+            )
+        }
+        
+        let destCoord = CLLocationCoordinate2D(
+            latitude: Double(driverInfo.dropoffLatitude) ?? destinationLatitude,
+            longitude: Double(driverInfo.dropoffLongitude) ?? destinationLongitude
+        )
+        
+        // Clear the map (removes old pickup route and pickup marker)
+        mapView.clear()
+        routePolyline?.map = nil
+        routePolyline = nil
+        driverRoutePolyline?.map = nil
+        driverRoutePolyline = nil
+        
+        // Re-add driver marker
+        let marker = GMSMarker(position: driverCoord)
+        marker.title = driverInfo.driver.name
+        marker.snippet = "\(driverInfo.driver.vehicle.make) \(driverInfo.driver.vehicle.model)"
+        if let carImage = UIImage(named: "car_pin") {
+            let scaledImage = carImage.scaledTo(size: CGSize(width: 35, height: 35))
+            marker.icon = scaledImage
+        } else {
+            marker.icon = GMSMarker.markerImage(with: .systemBlue)
+        }
+        marker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
+        marker.map = mapView
+        driverMarker = marker
+        
+        // Add destination marker
+        let destMarker = GMSMarker(position: destCoord)
+        destMarker.title = "Destination"
+        destMarker.snippet = destinationLocation
+        if let pinImage = UIImage(named: "source_dest_pin") {
+            let scaledImage = pinImage.scaledTo(size: CGSize(width: 16.88, height: 30))
+            destMarker.icon = scaledImage
+        } else {
+            destMarker.icon = GMSMarker.markerImage(with: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0))
+        }
+        destMarker.map = mapView
+        
+        // Draw route from driver to destination
+        drawDriverToDestinationRoute(from: driverCoord, to: destCoord)
+        
+        // Fit camera to show both driver and destination
+        let bounds = GMSCoordinateBounds(coordinate: driverCoord, coordinate: destCoord)
+        let update = GMSCameraUpdate.fit(bounds, withPadding: 120)
+        mapView.animate(with: update)
+        
+        print("🚗 Ride started: route redrawn from driver to destination")
+    }
+    
+    /// Draw route from driver to destination
+    private func drawDriverToDestinationRoute(from driverCoord: CLLocationCoordinate2D, to destCoord: CLLocationCoordinate2D) {
+        // Remove existing driver route polyline
+        driverRoutePolyline?.map = nil
+        driverRoutePolyline = nil
+        
+        locationManager.fetchDirections(from: driverCoord, to: destCoord) { [self] path, _, _ in
+            DispatchQueue.main.async {
+                self.driverRoutePolyline?.map = nil
+                
+                if let path = path {
+                    let polyline = GMSPolyline(path: path)
+                    polyline.strokeWidth = 5
+                    polyline.strokeColor = UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0)
+                    polyline.map = self.mapView
+                    self.driverRoutePolyline = polyline
+                } else {
+                    let fallbackPath = GMSMutablePath()
+                    fallbackPath.add(driverCoord)
+                    fallbackPath.add(destCoord)
+                    
+                    let polyline = GMSPolyline(path: fallbackPath)
+                    polyline.strokeWidth = 4
+                    polyline.strokeColor = UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0)
+                    polyline.map = self.mapView
+                    self.driverRoutePolyline = polyline
+                }
+            }
+        }
+    }
+    
+    /// Called when ride is completed — show TripCompleteScreen
+    private func handleRideCompleted() {
+        // Clear the map
+        mapView.clear()
+        clearDriverTracking()
+        routePolyline?.map = nil
+        routePolyline = nil
+        
+        withAnimation {
+            showTripComplete = true
+        }
+        print("✅ Ride completed: showing TripCompleteScreen")
+    }
+    
+    /// Called when ride is cancelled — return to initial state
+    private func handleRideCancelled() {
+        // Clear the map
+        mapView.clear()
+        clearDriverTracking()
+        routePolyline?.map = nil
+        routePolyline = nil
+        
+        // Reset to initial state
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+            bottomSheetState = .initial
+            sheetHeight = midSheetHeight
+            navigationState.showBottomBar()
+        }
+        
+        // Reset location fields
+        pickupLocation = "From?"
+        destinationLocation = "Where To?"
+        pickupLatitude = 0
+        pickupLongitude = 0
+        destinationLatitude = 0
+        destinationLongitude = 0
+        
+        print("❌ Ride cancelled: returned to initial screen")
+    }
+    
+    /// Reset everything after ride completion (dismiss trip complete, return to initial state)
+    private func resetAfterRideCompletion() {
+        // Reset socket manager state
+        socketManager.isRideStarted = false
+        socketManager.hasDriverArrived = false
+        socketManager.currentRideStatus = nil
+        socketManager.driverInfo = nil
+        socketManager.driverLocation = nil
+        socketManager.currentRideId = nil
+        
+        // Reset bottom sheet to initial state
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+            bottomSheetState = .initial
+            sheetHeight = midSheetHeight
+            navigationState.showBottomBar()
+        }
+    }
+
+    private func addLocationWidget(title: String, subtitle: String, color: UIColor, at coordinate: CLLocationCoordinate2D) {
+        let container = UIView()
+        container.backgroundColor = .white
+        container.layer.cornerRadius = 10
+        container.layer.shadowColor = UIColor.black.cgColor
+        container.layer.shadowOpacity = 0.15
+        container.layer.shadowRadius = 6
+        container.layer.shadowOffset = CGSize(width: 0, height: 3)
+
+        let titleLabel = UILabel()
+        titleLabel.text = title
+        titleLabel.font = UIFont.systemFont(ofSize: 12, weight: .semibold)
+        titleLabel.textColor = color
+
+        let subtitleLabel = UILabel()
+        subtitleLabel.text = subtitle
+        subtitleLabel.font = UIFont.systemFont(ofSize: 11, weight: .regular)
+        subtitleLabel.textColor = UIColor.darkGray
+        subtitleLabel.numberOfLines = 2
+
+        let stack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
+        stack.axis = .vertical
+        stack.spacing = 2
+        stack.alignment = .leading
+
+        container.addSubview(stack)
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: container.topAnchor, constant: 6),
+            stack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
+            stack.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -8),
+            stack.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -6)
+        ])
+
+        let marker = GMSMarker(position: coordinate)
+        marker.iconView = container
+        marker.groundAnchor = CGPoint(x: 0.5, y: 1.4)
+        marker.zIndex = 999
+        marker.map = mapView
+
+        marker.tracksViewChanges = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            marker.tracksViewChanges = false
+        }
+    }
     private func configureMap() {
             // Additional map configuration
             mapView.isMyLocationEnabled = true
@@ -1796,158 +2413,28 @@ struct HomeScreen: View {
 
 
 
+// Swift
+struct HomeScreenPreviewWrapper: View {
+    @State private var selectedService = SelectedService.defaultService
+    @State private var isNowSelected = true
+    @State private var pickupLocation = "From?"
+    @State private var destinationLocation = "Where To?"
+    @State private var bottomSheetState = BottomSheetState.initial
 
-struct RoundedCorner: Shape {
-    var radius: CGFloat = .infinity
-    var corners: UIRectCorner = .allCorners
-
-    func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
-        return Path(path.cgPath)
-    }
-}
-// Location Manager
-
-
-//// Notification Button
-//struct NotificationButton1: View {
-//    var body: some View {
-//        Button(action: {}) {
-//            Image(systemName: "bell.fill")
-//                .foregroundColor(.primary)
-//                .padding(8)
-//                .background(Color.gray.opacity(0.2))
-//                .clipShape(Circle())
-//        }
-//    }
-//}
-
-// MARK: - Ride Option Row Component
-struct RideOptionRow: View {
-    let option: CalculateRidePriceResponse.RideOption
-    let isSelected: Bool
-    let onSelect: () -> Void
-    
     var body: some View {
-        Button(action: onSelect) {
-            HStack(spacing: 12) {
-                // Ride icon
-                Image(systemName: getIconForPreference(option.ridePreferenceKey))
-                    .font(.system(size: 24))
-                    .foregroundColor(isSelected ? .white : Color(red: 0.22, green: 0.65, blue: 0.33))
-                    .frame(width: 50, height: 50)
-                    .background(isSelected ? Color(red: 0.22, green: 0.65, blue: 0.33) : Color(red: 0.22, green: 0.65, blue: 0.33).opacity(0.1))
-                    .cornerRadius(12)
-                
-                // Option details
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(option.ridePreference)
-                        .font(Font.custom("Poppins", size: 16).weight(.medium))
-                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
-                    
-                    Text(option.description)
-                        .font(Font.custom("Poppins", size: 12))
-                        .foregroundColor(Color(red: 0.59, green: 0.59, blue: 0.59))
-                        .lineLimit(1)
-                }
-                
-                Spacer()
-                
-                // Price
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text(String(format: "%.2f", option.price))
-                        .font(Font.custom("Poppins", size: 18).weight(.bold))
-                        .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
-                    Text("MAD")
-                        .font(Font.custom("Poppins", size: 10))
-                        .foregroundColor(Color(red: 0.59, green: 0.59, blue: 0.59))
-                }
-            }
-            .padding(16)
-            .background(Color.white)
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? Color(red: 0.22, green: 0.65, blue: 0.33) : Color(red: 0.92, green: 0.92, blue: 0.92), lineWidth: isSelected ? 2 : 1)
-            )
-            .shadow(color: Color.black.opacity(isSelected ? 0.1 : 0.05), radius: isSelected ? 8 : 4, x: 0, y: 2)
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-    
-    private func getIconForPreference(_ key: String) -> String {
-        switch key {
-        case "COMFORT": return "car.fill"
-        case "STANDARD": return "car"
-        case "ECONOMY": return "car.2.fill"
-        case "PREMIUM": return "bolt.car.fill"
-        default: return "car.fill"
-        }
+        HomeScreen(
+            selectedService: $selectedService,
+            isNowSelected: $isNowSelected,
+            pickupLocation: $pickupLocation,
+            destinationLocation: $destinationLocation,
+            bottomSheetState: $bottomSheetState
+        )
+        .environmentObject(NavigationStateManager())
     }
 }
 
-// Service model
-struct Service: Identifiable {
-    let id: String
-    let icon: String
-    let title: String
-}
-// Horizontal service card
-struct ServiceCardHorizontal: View {
-    let icon: String
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 8) {
-                Image(icon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 90, height: 90)
-                
-                Text(title)
-                    .font(.poppins(.medium, size: 12))
-                    .foregroundColor(.primary)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
-            }
-            .frame(width: 112, height: 130)
-            .padding(.vertical, 8)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .foregroundStyle(.white)
-                    .shadow(color: Color(hex: "#04060F").opacity(0.06), radius: 10, x: 0, y: 2)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? .hezzniGreen : .clear, lineWidth: 2)
-            )
-        }
+struct HomeScreenPreviewWrapper_Previews: PreviewProvider {
+    static var previews: some View {
+        HomeScreenPreviewWrapper()
     }
 }
-
-//// Swift
-//#Preview {
-//    struct HomeScreenPreviewWrapper: View {
-//        @State private var selectedService = SelectedService.defaultService
-//        @State private var isNowSelected = true
-//        @State private var pickupLocation = "From?"
-//        @State private var destinationLocation = "Where To?"
-//        @State private var bottomSheetState = BottomSheetState.initial
-//
-//        var body: some View {
-//            HomeScreen(
-//                selectedService: $selectedService,
-//                isNowSelected: $isNowSelected,
-//                pickupLocation: $pickupLocation,
-//                destinationLocation: $destinationLocation,
-//                bottomSheetState: $bottomSheetState
-//            )
-//            .environmentObject(NavigationStateManager())
-//        }
-//    }
-//    return HomeScreenPreviewWrapper()
-//}

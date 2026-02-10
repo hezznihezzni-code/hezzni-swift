@@ -95,7 +95,7 @@ struct LocationCardView: View {
                         .lineSpacing(18)
                         .foregroundColor(contentColor)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(alignment: .leading)
                 
                 
             }
@@ -487,3 +487,13 @@ struct CustomToggleStyle: ToggleStyle {
 }
 
 
+
+struct RoundedCorner: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+        return Path(path.cgPath)
+    }
+}

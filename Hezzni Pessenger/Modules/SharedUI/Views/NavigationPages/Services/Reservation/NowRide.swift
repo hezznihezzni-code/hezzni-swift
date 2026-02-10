@@ -7,7 +7,7 @@
 import SwiftUI
 
 let rideOptions = [
-    VehicleSubOptionsView.RideOption(
+    CalculateRidePriceResponse.RideOption(
         id: 1,
         text_id: "standard",
         icon: "car-service-icon",
@@ -15,9 +15,12 @@ let rideOptions = [
         subtitle: "Comfortable vehicles",
         seats: 4,
         timeEstimate: "3-8 min",
+        ridePreference: "Standard",           // <-- Add this
+        ridePreferenceKey: "STANDARD",        // <-- Add this
+        description: "Standard ride option",
         price: 25
     ),
-    VehicleSubOptionsView.RideOption(
+    CalculateRidePriceResponse.RideOption(
         id: 2,
         text_id: "comfort",
         icon: "car-service-comfort-icon",
@@ -25,9 +28,12 @@ let rideOptions = [
         subtitle: "Luxury vehicles",
         seats: 4,
         timeEstimate: "5-10 min",
+        ridePreference: "Standard",           // <-- Add this
+        ridePreferenceKey: "STANDARD",        // <-- Add this
+        description: "Standard ride option",
         price: 45
     ),
-    VehicleSubOptionsView.RideOption(
+    CalculateRidePriceResponse.RideOption(
         id: 3,
         text_id: "xl",
         icon: "car-service-xl-icon",
@@ -35,12 +41,15 @@ let rideOptions = [
         subtitle: "Confortable vehicles",
         seats: 6,
         timeEstimate: "5-10 min",
+        ridePreference: "Standard",           // <-- Add this
+        ridePreferenceKey: "STANDARD",        // <-- Add this
+        description: "Standard ride option",
         price: 45
     )
 ]
 // Car ride options (with Taxi)
 let carRideOptions = [
-    VehicleSubOptionsView.RideOption(
+    CalculateRidePriceResponse.RideOption(
         id: 1,
         text_id: "standard",
         icon: "car-service-icon",
@@ -48,9 +57,12 @@ let carRideOptions = [
         subtitle: "Comfortable vehicles",
         seats: 4,
         timeEstimate: "3-8 min",
+        ridePreference: "Standard",           // <-- Add this
+        ridePreferenceKey: "STANDARD",        // <-- Add this
+        description: "Standard ride option",
         price: 25
     ),
-    VehicleSubOptionsView.RideOption(
+    CalculateRidePriceResponse.RideOption(
         id: 2,
         text_id: "comfort",
         icon: "car-service-comfort-icon",
@@ -58,9 +70,12 @@ let carRideOptions = [
         subtitle: "Comfortable vehicles",
         seats: 4,
         timeEstimate: "3-8 min",
+        ridePreference: "Standard",           // <-- Add this
+        ridePreferenceKey: "STANDARD",        // <-- Add this
+        description: "Standard ride option",
         price: 35
     ),
-    VehicleSubOptionsView.RideOption(
+    CalculateRidePriceResponse.RideOption(
         id: 3,
         text_id: "xl",
         icon: "car-service-xl-icon",
@@ -68,9 +83,12 @@ let carRideOptions = [
         subtitle: "Comfortable vehicles",
         seats: 6,
         timeEstimate: "3-8 min",
+        ridePreference: "Standard",           // <-- Add this
+        ridePreferenceKey: "STANDARD",        // <-- Add this
+        description: "Standard ride option",
         price: 50
     ),
-    VehicleSubOptionsView.RideOption(
+    CalculateRidePriceResponse.RideOption(
         id: 5,
         text_id: "taxi",
         icon: "taxi-service-icon",
@@ -78,13 +96,16 @@ let carRideOptions = [
         subtitle: "Comfortable vehicles",
         seats: 6,
         timeEstimate: "3-8 min",
+        ridePreference: "Standard",           // <-- Add this
+        ridePreferenceKey: "STANDARD",        // <-- Add this
+        description: "Standard ride option",
         price: 100
     )
 ]
 
 // Bike ride option
 let bikeRideOptions = [
-    VehicleSubOptionsView.RideOption(
+    CalculateRidePriceResponse.RideOption(
         id: 6,
         text_id: "bike-standard",
         icon: "motorcycle-service-icon",
@@ -92,13 +113,16 @@ let bikeRideOptions = [
         subtitle: "Comfortable vehicles",
         seats: 1,
         timeEstimate: "3-8 min",
+        ridePreference: "Standard",           // <-- Add this
+        ridePreferenceKey: "STANDARD",        // <-- Add this
+        description: "Standard ride option",
         price: 25
     )
 ]
 
 // Taxi ride option (if you want a separate array)
 let taxiRideOptions = [
-    VehicleSubOptionsView.RideOption(
+    CalculateRidePriceResponse.RideOption(
         id: 5,
         text_id: "taxi",
         icon: "taxi-service-icon",
@@ -106,6 +130,9 @@ let taxiRideOptions = [
         subtitle: "Comfortable vehicles",
         seats: 6,
         timeEstimate: "3-8 min",
+        ridePreference: "Standard",           // <-- Add this
+        ridePreferenceKey: "STANDARD",        // <-- Add this
+        description: "Standard ride option",
         price: 100
     )
 ]
@@ -396,18 +423,9 @@ struct TripSummaryView: View {
 }
 struct VehicleSubOptionsView: View {
     @Binding var selectedOption: String?
-    @Binding var rideInfo: RideOption
-    let options: [RideOption]
-    struct RideOption {
-        let id: Int
-        let text_id: String
-        let icon: String
-        let title: String
-        let subtitle: String
-        let seats: Int
-        let timeEstimate: String
-        let price: Double
-    }
+    @Binding var rideInfo: CalculateRidePriceResponse.RideOption
+    let options: [CalculateRidePriceResponse.RideOption]
+    
     var body: some View {
         VStack(spacing: 16) {
             ForEach(options, id: \ .text_id) { option in

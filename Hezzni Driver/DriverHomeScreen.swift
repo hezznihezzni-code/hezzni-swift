@@ -15,6 +15,7 @@ struct DriverHomeScreen: View {
     @State private var showIncomingRide = false
     @State private var showRideAcceptedAlert = false
     @State private var showRideDeclinedAlert = false
+    @State private var showCancelConfirmation = false  // Confirmation dialog for cancelling ride
     @State private var alertMessage = ""
     
     var body: some View {
@@ -63,6 +64,16 @@ struct DriverHomeScreen: View {
             Button("OK") { }
         } message: {
             Text(alertMessage)
+        }
+        .alert("Cancel Ride", isPresented: $showCancelConfirmation) {
+            Button("No, Keep Ride", role: .cancel) { }
+            Button("Yes, Cancel", role: .destructive) {
+                if let rideId = socketManager.currentRide?.rideId {
+                    socketManager.cancelRide(rideRequestId: rideId, reason: "Driver cancelled")
+                }
+            }
+        } message: {
+            Text("Are you sure you want to cancel this ride?")
         }
         .onAppear {
             setupSocketCallbacks()
@@ -187,6 +198,16 @@ struct DriverHomeScreen: View {
                     .tint(.green)
                 }
             }
+            
+            // Cancel Ride button
+            if let rideId = ride.rideId {
+                Button("Cancel Ride") {
+                    showCancelConfirmation = true
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.red)
+                .padding(.top, 8)
+            }
         }
         .padding()
         .background(
@@ -251,6 +272,7 @@ struct DriverHomeScreen: View {
         socketManager.onRideCancelled = { reason in
             alertMessage = reason ?? "The ride has been cancelled"
             showRideDeclinedAlert = true
+            // Driver is automatically moved back to online status by the socket manager
         }
     }
     

@@ -141,7 +141,7 @@ class CouponStateManager: ObservableObject {
 
 // MARK: - Ride Options Helper
 struct RideOptionsHelper {
-    static func getBaseOptions(for serviceName: String) -> [VehicleSubOptionsView.RideOption] {
+    static func getBaseOptions(for serviceName: String) -> [CalculateRidePriceResponse.RideOption] {
         switch serviceName.lowercased() {
         case "car", "car rides":
             return carRideOptions
@@ -155,12 +155,12 @@ struct RideOptionsHelper {
     }
     
     static func mergeWithRideInformation(
-        baseOptions: [VehicleSubOptionsView.RideOption],
+        baseOptions: [CalculateRidePriceResponse.RideOption],
         rideInformation: [CalculateRidePriceResponse.RideOption]
-    ) -> [VehicleSubOptionsView.RideOption] {
+    ) -> [CalculateRidePriceResponse.RideOption] {
         return baseOptions.map { option in
             if let info = rideInformation.first(where: { $0.id == option.id }) {
-                return VehicleSubOptionsView.RideOption(
+                return CalculateRidePriceResponse.RideOption(
                     id: option.id,
                     text_id: option.text_id,
                     icon: option.icon,
@@ -168,6 +168,9 @@ struct RideOptionsHelper {
                     subtitle: option.subtitle,
                     seats: option.seats,
                     timeEstimate: option.timeEstimate,
+                    ridePreference: option.ridePreference,
+                    ridePreferenceKey: option.ridePreferenceKey,
+                    description: option.description,
                     price: info.price
                 )
             } else {
@@ -311,3 +314,70 @@ struct DateFormattingHelper {
 //        }
 //    }
 //}
+
+
+
+// MARK: - Ride Option Row Component
+struct RideOptionRow: View {
+    let option: CalculateRidePriceResponse.RideOption
+    let isSelected: Bool
+    let onSelect: () -> Void
+    
+    var body: some View {
+        Button(action: onSelect) {
+            HStack(spacing: 12) {
+                // Ride icon
+                Image(systemName: getIconForPreference(option.ridePreferenceKey))
+                    .font(.system(size: 24))
+                    .foregroundColor(isSelected ? .white : Color(red: 0.22, green: 0.65, blue: 0.33))
+                    .frame(width: 50, height: 50)
+                    .background(isSelected ? Color(red: 0.22, green: 0.65, blue: 0.33) : Color(red: 0.22, green: 0.65, blue: 0.33).opacity(0.1))
+                    .cornerRadius(12)
+                
+                // Option details
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(option.ridePreference)
+                        .font(Font.custom("Poppins", size: 16).weight(.medium))
+                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                    
+                    Text(option.description)
+                        .font(Font.custom("Poppins", size: 12))
+                        .foregroundColor(Color(red: 0.59, green: 0.59, blue: 0.59))
+                        .lineLimit(1)
+                }
+                
+                Spacer()
+                
+                // Price
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(String(format: "%.2f", option.price))
+                        .font(Font.custom("Poppins", size: 18).weight(.bold))
+                        .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+                    Text("MAD")
+                        .font(Font.custom("Poppins", size: 10))
+                        .foregroundColor(Color(red: 0.59, green: 0.59, blue: 0.59))
+                }
+            }
+            .padding(16)
+            .background(Color.white)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isSelected ? Color(red: 0.22, green: 0.65, blue: 0.33) : Color(red: 0.92, green: 0.92, blue: 0.92), lineWidth: isSelected ? 2 : 1)
+            )
+            .shadow(color: Color.black.opacity(isSelected ? 0.1 : 0.05), radius: isSelected ? 8 : 4, x: 0, y: 2)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+    
+    private func getIconForPreference(_ key: String) -> String {
+        switch key {
+        case "COMFORT": return "car.fill"
+        case "STANDARD": return "car"
+        case "ECONOMY": return "car.2.fill"
+        case "PREMIUM": return "bolt.car.fill"
+        default: return "car.fill"
+        }
+    }
+}
+

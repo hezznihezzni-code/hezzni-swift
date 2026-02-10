@@ -150,26 +150,17 @@ struct PaymentMethodList: View {
 
 // MARK: - PaymentMethodScreen
 struct RidePaymentScreen: View {
-    var rideInfo: VehicleSubOptionsView.RideOption
+    var rideInfo: CalculateRidePriceResponse.RideOption
     @Binding var selectedService: SelectedService
     @Binding var bottomSheetState: BottomSheetState
     var namespace: Namespace.ID?
-    @State private var selectedMethodIndex: Int = 0
-    private let methods: [Card] = [
-        .init(iconName: "cash_on_deliver_icon", title: "Cash Payment", subtitle: "pay the driver directly", badge: nil, cardNumber: nil, isAddCard: false, cardHolder: nil, expiry: nil),
-        .init(iconName: "hezzni_wallet_icon", title: "Hezzni Wallet", subtitle: "Pay with Hezzni balance", badge: "55.66 MAD", cardNumber: nil, isAddCard: false, cardHolder: nil, expiry: nil),
-        .init(iconName: "visa", title: "Visa Card", subtitle: "", badge: nil, cardNumber: "**** **** **** 2345", isAddCard: false, cardHolder: nil, expiry: nil),
-        .init(iconName: "mastercard", title: "Mastercard", subtitle: "", badge: nil, cardNumber: "**** **** **** 2345", isAddCard: false, cardHolder: nil, expiry: nil),
-        .init(iconName: nil, title: "Add Credit / Debit Card", subtitle: "Add Visa or Mastercard for trips", badge: nil, cardNumber: nil, isAddCard: true, cardHolder: nil, expiry: nil)
-    ]
+    @Binding var selectedMethodIndex: Int
+    var methods: [Card]
     var body: some View {
         ZStack{
             VStack{
                 ScrollView{
-                    
-                    
                     VStack(spacing: 15) {
-                        
                         VStack(alignment: .leading, spacing: 24) {
                             RideOptionCard(
                                 icon: rideInfo.icon,
@@ -186,7 +177,7 @@ struct RidePaymentScreen: View {
                                 .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
                             PaymentMethodList(methods: methods, selectedIndex: $selectedMethodIndex)
                         }
-                        .frame(width: 363)
+                        .padding(.horizontal, 16)
                         Spacer()
                         PrimaryButton(text: "Continue", action: {
                             withAnimation{

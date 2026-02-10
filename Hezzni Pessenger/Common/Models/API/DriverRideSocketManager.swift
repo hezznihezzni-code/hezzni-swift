@@ -136,6 +136,7 @@ enum DriverSocketEvent: String {
     case goOffline = "driver:goOffline"
     case acceptRide = "driver:acceptRide"
     case declineRide = "driver:declineRide"
+    case cancelRide = "driver:cancelRide"  // Driver cancels accepted ride
     case updateLocation = "driver:updateLocation"
     case arrivedAtPickup = "driver:arrivedAtPickup"
     case startRide = "driver:startRide"
@@ -604,7 +605,7 @@ final class DriverRideSocketManager: ObservableObject {
         guard let socket = socket, connectionState == .connected else { return }
         
         let payload: [String: Any] = [
-            "rideId": rideId
+            "rideRequestId": rideId
         ]
         
         socket.emit(DriverSocketEvent.arrivedAtPickup.rawValue, payload)
@@ -616,7 +617,7 @@ final class DriverRideSocketManager: ObservableObject {
         guard let socket = socket, connectionState == .connected else { return }
         
         let payload: [String: Any] = [
-            "rideId": rideId
+            "rideRequestId": rideId
         ]
         
         socket.emit(DriverSocketEvent.startRide.rawValue, payload)
@@ -628,7 +629,7 @@ final class DriverRideSocketManager: ObservableObject {
         guard let socket = socket, connectionState == .connected else { return }
         
         let payload: [String: Any] = [
-            "rideId": rideId
+            "rideRequestId": rideId
         ]
         
         socket.emit(DriverSocketEvent.completeRide.rawValue, payload)
@@ -637,6 +638,42 @@ final class DriverRideSocketManager: ObservableObject {
         onlineStatus = .online
         
         print("Completed ride: \(rideId)")
+    }
+    
+    /// Cancel an accepted ride with optional reason
+    /// Emits: driver:cancelRide with { rideRequestId, reason }
+    func cancelRide(rideRequestId: Int, reason: String? = nil) {
+        guard let socket = socket, connectionState == .connected else {
+            print("⚠️ Cannot cancel ride - socket not connected")
+            return
+        }
+        
+        var payload: [String: Any] = [
+            "rideRequestId": rideRequestId
+        ]
+        
+        if let reason = reason {
+            payload["reason"] = reason
+        }
+        
+        print("")
+        print("╔══════════════════════════════════════════════════════════════╗")
+        print("║  ❌ EMITTING: driver:cancelRide                              ║")
+        print("╠══════════════════════════════════════════════════════════════╣")
+        print("║  rideRequestId: \(rideRequestId)")
+        print("║  reason: \(reason ?? "No reason provided")")
+        print("╚══════════════════════════════════════════════════════════════╝")
+        print("")
+        
+        socket.emit(DriverSocketEvent.cancelRide.rawValue, payload)
+        
+        // Reset state
+        currentRide = nil
+        currentRideRequest = nil
+        hasIncomingRequest = false
+        onlineStatus = .online
+        
+        print("❌ Cancelled ride: \(rideRequestId)")
     }
     
     /// Clear current ride request (e.g., after timeout or decline)

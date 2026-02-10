@@ -117,7 +117,16 @@ struct ReservationConfirmedScreen: View {
         }
     }
 }
-
+//swift
+#Preview {
+    ReservationScheduleCard(
+        carInfo: "8 | أ | 26363",
+        carModel: "Toyota HR-V",
+        carColor: "White",
+        carType: "STANDARD",
+        carImage: "personal_car1"
+    )
+}
 // MARK: - Reusable Car Info Section
 
 struct ReservationScheduleCard: View {
@@ -161,6 +170,8 @@ struct ReservationScheduleCard: View {
         }
     }
 }
+
+
 
 struct CarInfoSection: View {
     var carInfo: String
@@ -427,7 +438,11 @@ struct PickupTimeCard: View {
         .frame(width: 362)
     }
 }
-//
-//#Preview {
-//    ReservationConfirmedScreen()
-//}
+//swift
+#Preview {
+    ReservationConfirmedScreen(
+        bottomSheetState: .constant(.findingRide),
+        namespace: nil,
+        sheetHeight: .constant(300)
+    )
+}
