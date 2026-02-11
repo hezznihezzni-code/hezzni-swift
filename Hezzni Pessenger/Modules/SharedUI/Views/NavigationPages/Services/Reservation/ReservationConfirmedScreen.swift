@@ -278,37 +278,92 @@ struct CarInfoSection: View {
 // MARK: - Reusable Person Details With Buttons
 
 struct PersonDetailsWithActions: View {
-    var profileImage: String
+    var profileImage: String  // Can be local image name or URL string
     var name: String
     var trips: Int
     var rating: Double
     var badgeImage: String?
     var onChat: () -> Void
     var onCall: () -> Void
+    
+    // Check if profileImage is a URL
+    private var isURL: Bool {
+        profileImage.hasPrefix("http://") || profileImage.hasPrefix("https://")
+    }
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(profileImage)
-                .resizable()
-                .frame(width: 60, height: 60)
-                .clipShape(Circle())
-                .overlay(
-                    HStack(spacing: 0){
-                        Image(systemName: "star.fill")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.yellow)
-                        Text(String(format: "%.1f", rating))
-                            .font(Font.custom("Poppins", size: 10).weight(.medium))
-                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+            // Profile image - supports both local and URL images
+            Group {
+                if isURL {
+                    AsyncImage(url: URL(string: profileImage)) { phase in
+                        switch phase {
+                        case .empty:
+                            Circle()
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(width: 60, height: 60)
+                                .overlay(
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle())
+                                )
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 60, height: 60)
+                                .clipShape(Circle())
+                        case .failure:
+                            Circle()
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(width: 60, height: 60)
+                                .overlay(
+                                    Image(systemName: "person.fill")
+                                        .font(.title2)
+                                        .foregroundColor(.gray)
+                                )
+                        @unknown default:
+                            Circle()
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(width: 60, height: 60)
+                        }
                     }
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .shadow(color: Color.black.opacity(0.05), radius: 4, y: 1)
-                    .offset(y: 9),
-                    alignment: .bottom
-                )
+                } else {
+                    // Local image or placeholder
+                    if UIImage(named: profileImage) != nil {
+                        Image(profileImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 60, height: 60)
+                            .clipShape(Circle())
+                    } else {
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 60, height: 60)
+                            .overlay(
+                                Image(systemName: "person.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.gray)
+                            )
+                    }
+                }
+            }
+            .overlay(
+                HStack(spacing: 0){
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.yellow)
+                    Text(String(format: "%.1f", rating))
+                        .font(Font.custom("Poppins", size: 10).weight(.medium))
+                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Color.white)
+                .cornerRadius(10)
+                .shadow(color: Color.black.opacity(0.05), radius: 4, y: 1)
+                .offset(y: 9),
+                alignment: .bottom
+            )
             VStack(alignment: .leading, spacing: 2) {
                 HStack{
                     Text(name)

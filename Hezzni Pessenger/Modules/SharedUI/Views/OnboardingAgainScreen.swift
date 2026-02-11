@@ -4,12 +4,14 @@
 //
 //  Created by Zohaib Ahmed on 9/15/25.
 //
-
 import SwiftUI
 
 struct OnboardingAgainScreen: View {
     @State private var showCreateAccount = false
+    @State private var loginUserIfExist = false
     @StateObject private var navigationState = NavigationStateManager()
+    @State private var phoneNumber: String = ""
+    @StateObject private var authController = AuthController.shared
     
     var body: some View {
         NavigationStack {
@@ -29,7 +31,7 @@ struct OnboardingAgainScreen: View {
                             .multilineTextAlignment(.leading)
                         
                         HStack{
-                            Text("Good to see you again! Ready for your next ride? ")
+                            Text("Wherever you’re going Hezzni is here for you")
                                 .font(.system(size: 14))
                                 .foregroundColor(Color("onboarding-text-color"))
                                 .multilineTextAlignment(.leading)
@@ -37,52 +39,100 @@ struct OnboardingAgainScreen: View {
                             Spacer()
                         }.frame(maxWidth: .infinity)
                     }
-//                    .padding(.horizontal, 16)
                     .padding(.top, 10)
+                    
                     // Buttons section
                     VStack(spacing: 16) {
                         VStack{
-                            // Create Account Button
-                            PrimaryButton(text:"Continue with +923088877196", action: {
+                            // Continue with saved number
+                            PrimaryButton(
+                                text: "Continue with \(phoneNumber)",
+                                action: {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        // Navigate to main app
+                                        loginUserIfExist = true
+                                    }
+                                }
+                            )
+                            // Sign In button
+                            Button(action: {
                                 // Navigate to Create Account screen with animation
                                 withAnimation(.easeInOut(duration: 0.3)) {
                                     showCreateAccount = true
                                 }
-                            })
-                            
-                            // Sign In button
-                            Button(action: {
-                                // Handle sign in action
                             }) {
                                 Text("Use other phone number")
                                     .font(.headline)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.black)
                                     .frame(maxWidth: .infinity)
-                                    .frame(height: 30)
+                                    .frame(height: 56)
                                     .background(Color.white)
                                     .cornerRadius(12)
-                                    
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                    )
                             }
                         }
                         
                         TermsCaption()
                     }
-                    
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 30)
                 .background(Color.white)
             }
             .navigationDestination(isPresented: $showCreateAccount) {
-                CreateAccountScreen()
-                    .transition(.move(edge: .trailing)) // Slide in from right
+                OnboardingView()
+                            .navigationBarBackButtonHidden(true)
+
+            }
+            .navigationDestination(isPresented: $loginUserIfExist) {
+                if authController.isUserRegistered() {
+                    // User is already registered, go to main screen
+                    if AppUserType.shared.userType == .passenger {
+                        MainScreen()
+                            .navigationBarBackButtonHidden(true)
+                    } else {
+                        if authController.isServiceTypeExists(){
+                            DriverHomeComplete()
+                                .navigationBarBackButtonHidden(true)
+                        }
+                        else {
+                            OnBoardingDriver(phoneNumber: phoneNumber)
+                                .navigationBarBackButtonHidden(true)
+                        }
+                    }
+
+                } else {
+                    // User needs to complete registration
+                    if AppUserType.shared.userType == .passenger{
+                        CompleteProfile()
+                            .navigationBarBackButtonHidden(true)
+                    } else {
+                        OnBoardingDriver(phoneNumber: phoneNumber)
+                            .navigationBarBackButtonHidden(true)
+                    }
+                }
             }
         }
-        .navigationViewStyle(StackNavigationViewStyle()) // Ensures proper stack behavior
+        .onAppear {
+            loadUserPhoneNumber()
+        }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
-}
-
-#Preview {
-    OnboardingAgainScreen()
+    
+    private func loadUserPhoneNumber() {
+        if AppUserType.shared.userType == .driver {
+            if let driver = UserDefaults.standard.getDriverUser() {
+                phoneNumber = driver.phone ?? "+92XXXXXXXXXX"
+            }
+        } else {
+            if let user = UserDefaults.standard.getUser() {
+                phoneNumber = user.phone ?? "+92XXXXXXXXXX"
+            }
+        }
+    }
+    
 }

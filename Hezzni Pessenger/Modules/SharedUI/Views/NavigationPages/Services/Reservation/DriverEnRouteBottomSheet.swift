@@ -155,8 +155,8 @@ struct DriverEnRouteBottomSheet: View {
         ReservationScheduleCard(
             carInfo: driverInfo.driver.vehicle.plateNumber,
             carModel: "\(driverInfo.driver.vehicle.make) \(driverInfo.driver.vehicle.model)",
-            carColor: "",
-            carType: "STANDARD",
+            carColor: driverInfo.driver.vehicle.color ?? "",
+            carType: driverInfo.driver.vehicle.year != nil ? String(driverInfo.driver.vehicle.year!) : "STANDARD",
             carImage: "personal_car1"
         )
     }

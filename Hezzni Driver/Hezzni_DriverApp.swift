@@ -4,33 +4,21 @@
 //
 //  Created by Zohaib Ahmed on 12/2/25.
 //
-
 import SwiftUI
 import GoogleMaps
 
 @main
 struct Hezzni_DriverApp: App {
-    @State var currentTab = 0
-    @StateObject var navigationState = NavigationStateManager()
     
     init() {
-            GMSServices.provideAPIKey("AIzaSyAGlfVLO31MsYNRfiJooK3-e38vAVkkij0")
-        }
+        GMSServices.provideAPIKey("AIzaSyAGlfVLO31MsYNRfiJooK3-e38vAVkkij0")
+        // Set user type to driver
+        AppUserType.shared.userType = .driver
+    }
+    
     var body: some Scene {
-        
         WindowGroup {
-//            BasicInfo(
-//                totalTabs: 5,
-//                currentTab: $currentTab,
-//                onNext: {},
-//                onBack: {
-//                    if currentTab > 0 {
-//                        currentTab -= 1
-//                    }
-//                }
-//            )
-            OnboardingView()
-                .environmentObject(navigationState)
+            RootView()
         }
     }
 }
@@ -38,8 +26,23 @@ struct Hezzni_DriverApp: App {
 //AppUserType.shared.userType // .driver or .passenger
 class AppUserType {
     static let shared = AppUserType()
-    let userType: UserType
+    var userType: UserType
+    
     private init() {
+        // Default to driver, but this can be determined from UserDefaults
         self.userType = .driver
+    }
+    
+    func getCurrentUser() -> Any? {
+        switch userType {
+        case .driver:
+            return UserDefaults.standard.getDriverUser()
+        case .passenger:
+            return UserDefaults.standard.getUser()
+        }
+    }
+    
+    func hasLoggedInUser() -> Bool {
+        return getCurrentUser() != nil
     }
 }

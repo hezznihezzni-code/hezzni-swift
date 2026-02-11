@@ -82,6 +82,18 @@ struct DriverFoundResponse: Codable, Equatable {
         let plateNumber: String
         let make: String
         let model: String
+        let color: String?
+        let year: Int?
+        
+        // Computed property for vehicle description
+        var fullDescription: String {
+            var parts: [String] = []
+            if let c = color { parts.append(c) }
+            parts.append(make)
+            parts.append(model)
+            if let y = year { parts.append(String(y)) }
+            return parts.joined(separator: " ")
+        }
     }
     
     // Computed properties for backwards compatibility

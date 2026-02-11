@@ -16,6 +16,10 @@ struct DriverHomeScreen: View {
     @State private var showRideAcceptedAlert = false
     @State private var showRideDeclinedAlert = false
     @State private var showCancelConfirmation = false  // Confirmation dialog for cancelling ride
+    @State private var showRatingSheet = false  // Show rating sheet after ride completion
+    @State private var completedRideRequestId: Int?  // Store the completed ride ID for rating
+    @State private var completedPassengerName: String = ""  // Store passenger name for rating
+    @State private var completedPassengerImageUrl: String?  // Store passenger image URL
     @State private var alertMessage = ""
     
     var body: some View {
@@ -74,6 +78,23 @@ struct DriverHomeScreen: View {
             }
         } message: {
             Text("Are you sure you want to cancel this ride?")
+        }
+        .sheet(isPresented: $showRatingSheet) {
+            if let rideRequestId = completedRideRequestId {
+                DriverRatingSheet(
+                    passengerName: completedPassengerName,
+                    passengerImageUrl: completedPassengerImageUrl,
+                    rideRequestId: rideRequestId,
+                    onSubmit: {
+                        showRatingSheet = false
+                        completedRideRequestId = nil
+                    },
+                    onSkip: {
+                        showRatingSheet = false
+                        completedRideRequestId = nil
+                    }
+                )
+            }
         }
         .onAppear {
             setupSocketCallbacks()
@@ -192,7 +213,23 @@ struct DriverHomeScreen: View {
                     .tint(.blue)
                     
                     Button("Complete") {
+                        // Store ride info for rating before completing
+                        completedRideRequestId = rideId
+                        if let request = socketManager.currentRideRequest {
+                            completedPassengerName = request.passenger.name
+                            completedPassengerImageUrl = request.passenger.imageUrl
+                        } else {
+                            completedPassengerName = "Passenger"
+                            completedPassengerImageUrl = nil
+                        }
+                        
+                        // Complete the ride
                         socketManager.completeRide(rideId: rideId)
+                        
+                        // Show rating sheet after short delay
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            showRatingSheet = true
+                        }
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.green)
@@ -306,6 +343,20 @@ struct IncomingRideRequestView: View {
     @State private var timeRemaining = 30
     @State private var timer: Timer?
     
+    // Computed total distance (driver to pickup + pickup to destination)
+    private var totalDistanceKm: Double {
+        let pickupDistance = request.distanceToPickup ?? 0
+        let rideDistance = request.distanceKm ?? 0
+        return pickupDistance + rideDistance
+    }
+    
+    // Computed total estimated time
+    private var totalEstimatedMinutes: Int {
+        let arrivalTime = request.estimatedArrivalMinutes ?? 0
+        let rideDuration = request.estimatedDurationMinutes ?? 0
+        return arrivalTime + rideDuration
+    }
+    
     var body: some View {
         VStack(spacing: 20) {
             // Header with timer
@@ -338,43 +389,135 @@ struct IncomingRideRequestView: View {
             
             Divider()
             
-            // Passenger info
+            // Passenger info with image
             HStack {
-                Circle()
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(width: 60, height: 60)
-                    .overlay(
-                        Image(systemName: "person.fill")
-                            .font(.title2)
-                            .foregroundColor(.gray)
-                    )
+                // Passenger profile image (async loading from URL)
+                AsyncImage(url: URL(string: request.passenger.imageUrl ?? "")) { phase in
+                    switch phase {
+                    case .empty:
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 60, height: 60)
+                            .overlay(
+                                Image(systemName: "person.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.gray)
+                            )
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 60, height: 60)
+                            .clipShape(Circle())
+                    case .failure:
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 60, height: 60)
+                            .overlay(
+                                Image(systemName: "person.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.gray)
+                            )
+                    @unknown default:
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 60, height: 60)
+                    }
+                }
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(request.passenger.name)
                         .font(.headline)
                     
-                    HStack(spacing: 4) {
-                        Image(systemName: "star.fill")
-                            .foregroundColor(.yellow)
+                    // Rating and trips
+                    HStack(spacing: 8) {
+                        HStack(spacing: 2) {
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.yellow)
+                                .font(.caption)
+                            Text(request.passenger.displayRating)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        }
+                        
+                        Text("•")
+                            .foregroundColor(.gray)
                             .font(.caption)
-                        Text(String(format: "%.1f", request.passenger.rating ?? 5.0))
+                        
+                        Text(request.passenger.displayTrips)
                             .font(.caption)
+                            .foregroundColor(.gray)
                     }
                 }
                 
                 Spacer()
                 
-                VStack(alignment: .trailing) {
-                    Text("$\(String(format: "%.2f", request.estimatedPrice))")
+                VStack(alignment: .trailing, spacing: 4) {
+                    // Price - show properly even if 0
+                    Text(request.formattedPrice)
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
                     
-                    Text("\(String(format: "%.1f", request.distanceKm!)) km")
+                    // Total distance (to pickup + ride)
+                    Text(String(format: "%.1f km total", totalDistanceKm))
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
             }
+            
+            // Ride details card
+            HStack(spacing: 20) {
+                // Distance to pickup
+                VStack(spacing: 4) {
+                    Image(systemName: "car.fill")
+                        .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+                    Text(request.formattedDistanceToPickup)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Text("To Pickup")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
+                .frame(maxWidth: .infinity)
+                
+                Divider()
+                    .frame(height: 40)
+                
+                // ETA to pickup
+                VStack(spacing: 4) {
+                    Image(systemName: "clock.fill")
+                        .foregroundColor(.orange)
+                    Text(request.formattedETA)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Text("ETA")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
+                .frame(maxWidth: .infinity)
+                
+                Divider()
+                    .frame(height: 40)
+                
+                // Total ride duration
+                VStack(spacing: 4) {
+                    Image(systemName: "hourglass")
+                        .foregroundColor(.blue)
+                    Text("\(totalEstimatedMinutes) min")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    Text("Total Time")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.blue.opacity(0.05))
+            )
             
             // Location details
             VStack(spacing: 12) {
@@ -388,6 +531,7 @@ struct IncomingRideRequestView: View {
                             .foregroundColor(.gray)
                         Text(request.pickup.address)
                             .font(.subheadline)
+                            .lineLimit(2)
                     }
                     
                     Spacer()
@@ -403,6 +547,7 @@ struct IncomingRideRequestView: View {
                             .foregroundColor(.gray)
                         Text(request.dropoff.address)
                             .font(.subheadline)
+                            .lineLimit(2)
                     }
                     
                     Spacer()

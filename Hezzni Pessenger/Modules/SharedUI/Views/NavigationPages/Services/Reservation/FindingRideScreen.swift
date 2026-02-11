@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct FindingRideScreen: View {
+    var rideInfo: CalculateRidePriceResponse.RideOption
     @Binding var bottomSheetState: BottomSheetState
     var namespace: Namespace.ID?
     @Binding var sheetHeight: CGFloat
@@ -221,7 +222,7 @@ struct FindingRideScreen: View {
             dropoffAddress: destinationLocation,
             serviceTypeId: serviceTypeId,
             selectedRideOptionId: selectedRideOptionId,
-            estimatedPrice: estimatedPrice,
+            estimatedPrice: rideInfo.price,
             couponId: couponId
         )
         
@@ -355,17 +356,17 @@ struct AnimatedEllipses: View {
     }
 }
 
-#Preview {
-    FindingRideScreen(
-        bottomSheetState: .constant(.findingRide),
-        sheetHeight: .constant(600),
-        pickupLatitude: 33.5731,
-        pickupLongitude: -7.5898,
-        dropoffLatitude: 33.5922,
-        dropoffLongitude: -7.6012,
-        serviceTypeId: 1,
-        selectedRideOptionId: 1,
-        estimatedPrice: 25
-    )
-}
+//#Preview {
+//    FindingRideScreen(
+//        bottomSheetState: .constant(.findingRide),
+//        sheetHeight: .constant(600),
+//        pickupLatitude: 33.5731,
+//        pickupLongitude: -7.5898,
+//        dropoffLatitude: 33.5922,
+//        dropoffLongitude: -7.6012,
+//        serviceTypeId: 1,
+//        selectedRideOptionId: 1,
+//        estimatedPrice: 25
+//    )
+//}
 

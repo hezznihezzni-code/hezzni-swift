@@ -304,8 +304,18 @@ struct HomeScreen: View {
                 PassengerRatingSheet(
                     driverName: socketManager.driverInfo?.driver.name ?? "Driver",
                     onSubmit: { rating, comment, tags in
-                        // Submit review to API
-                        if let rideIdStr = socketManager.currentRideId, let rideId = Int(rideIdStr) {
+                        // Submit review to API using rideRequestId
+                        if let rideRequestId = socketManager.currentRideRequestId {
+                            Task {
+                                try? await APIService.shared.submitDriverReview(
+                                    rideRequestId: rideRequestId,
+                                    rating: rating,
+                                    comment: comment,
+                                    tags: tags
+                                )
+                            }
+                        } else if let rideIdStr = socketManager.currentRideId, let rideId = Int(rideIdStr) {
+                            // Fallback to currentRideId if rideRequestId not available
                             Task {
                                 try? await APIService.shared.submitDriverReview(
                                     rideRequestId: rideId,
@@ -923,6 +933,7 @@ struct HomeScreen: View {
             }
             else if bottomSheetState == .findingRide {
                 FindingRideScreen(
+                    rideInfo: selectedRideInformation,
                     bottomSheetState: $bottomSheetState,
                     namespace: animations,
                     sheetHeight: $sheetHeight,
@@ -934,7 +945,7 @@ struct HomeScreen: View {
                     onCancel: {
                         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                             bottomSheetState = .orderSummary
-                            sheetHeight = maxSheetHeight
+                            sheetHeight = midSheetHeight + 200
                         }
                     },
                     pickupLatitude: pickupLatitude,
@@ -951,9 +962,8 @@ struct HomeScreen: View {
             else if bottomSheetState == .driverEnRoute {
                 // Driver accepted the ride, showing driver info in bottom sheet
                 // Map shows driver marker and route to pickup using existing GoogleMapView
-                DriverEnRouteBottomSheet(
+                DriverEnRouteScreen(
                     bottomSheetState: $bottomSheetState,
-                    sheetHeight: $sheetHeight
                 )
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
@@ -1962,7 +1972,6 @@ struct HomeScreen: View {
             }
         }
     }
-    
     private func drawRoute(from pickupCoord: CLLocationCoordinate2D, to dropoffCoord: CLLocationCoordinate2D) {
         // Remove existing polyline
         if let polyline = routePolyline {
@@ -2026,9 +2035,17 @@ struct HomeScreen: View {
                     
                     self.routePolyline = polyline
                     
-                    // Animate camera to show the route
+                    
+                    // Create asymmetric padding - more padding at bottom
                     let bounds = GMSCoordinateBounds(path: path)
-                    let update = GMSCameraUpdate.fit(bounds, withPadding: 100)
+                    let padding = UIEdgeInsets(
+                        top: 100,
+                        left: 50,
+                        bottom: 300 + 50, // Extra padding for bottom sheet
+                        right: 50
+                    )
+                    
+                    let update = GMSCameraUpdate.fit(bounds, with: padding)
                     self.mapView.animate(with: update)
                 } else {
                     // Fallback to straight line if directions API fails
@@ -2043,15 +2060,21 @@ struct HomeScreen: View {
                     
                     self.routePolyline = polyline
                     
-                    // Animate camera to show both points
+                    // Asymmetric padding for fallback
                     let bounds = GMSCoordinateBounds(path: fallbackPath)
-                    let update = GMSCameraUpdate.fit(bounds, withPadding: 100)
+                    let padding = UIEdgeInsets(
+                        top: 100,
+                        left: 50,
+                        bottom: 300 + 50,
+                        right: 50
+                    )
+                    
+                    let update = GMSCameraUpdate.fit(bounds, with: padding)
                     self.mapView.animate(with: update)
                 }
             }
         }
     }
-    
     // MARK: - Driver Tracking Functions
     
     /// Draw driver marker and route on the map when driver accepts ride
@@ -2086,7 +2109,7 @@ struct HomeScreen: View {
         marker.snippet = "\(driverInfo.driver.vehicle.make) \(driverInfo.driver.vehicle.model)"
         
         if let carImage = UIImage(named: "car_pin") {
-            let scaledImage = carImage.scaledTo(size: CGSize(width: 35, height: 35))
+            let scaledImage = carImage.scaledTo(size: CGSize(width: 16, height: 30))
             marker.icon = scaledImage
         } else {
             marker.icon = GMSMarker.markerImage(with: .systemBlue)
@@ -2236,7 +2259,7 @@ struct HomeScreen: View {
         marker.title = driverInfo.driver.name
         marker.snippet = "\(driverInfo.driver.vehicle.make) \(driverInfo.driver.vehicle.model)"
         if let carImage = UIImage(named: "car_pin") {
-            let scaledImage = carImage.scaledTo(size: CGSize(width: 35, height: 35))
+            let scaledImage = carImage.scaledTo(size: CGSize(width: 16, height: 30))
             marker.icon = scaledImage
         } else {
             marker.icon = GMSMarker.markerImage(with: .systemBlue)

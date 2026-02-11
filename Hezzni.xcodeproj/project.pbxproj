@@ -67,6 +67,7 @@
 		52535A952F1A8410009BF648 /* Exceptions for "Hezzni Driver" folder in "Hezzni Pessenger" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				DriverRatingSheet.swift,
 				DriverServiceSelectionView.swift,
 				DriverServicesViewModel.swift,
 			);
@@ -218,6 +219,7 @@
 				Modules/SharedUI/Views/WelcomeScreens/CameraCaptureView.swift,
 				Modules/SharedUI/Views/WelcomeScreens/DocumentScannerView.swift,
 				Modules/SharedUI/Views/WelcomeScreens/OnBoardingDriver.swift,
+				RootView.swift,
 			);
 			target = 52CD68D02EDF346600D898E4 /* Hezzni Driver */;
 		};

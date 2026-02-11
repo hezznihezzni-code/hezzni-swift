@@ -95,12 +95,37 @@ struct DriverRideRequest: Codable, Identifiable {
         let name: String
         let phone: String?
         let imageUrl: String?
+        let averageRating: String?  // Server sends as string "5.00"
+        let totalTrips: Int?
+        
+        // Legacy field support
         let rating: Double?
         
         // Computed property for display rating
         var displayRating: String {
+            // Prefer averageRating from server
+            if let avgRating = averageRating, let r = Double(avgRating) {
+                return String(format: "%.1f", r)
+            }
+            // Fallback to legacy rating field
             if let r = rating {
                 return String(format: "%.1f", r)
+            }
+            return "New"
+        }
+        
+        // Computed property for numeric rating
+        var numericRating: Double {
+            if let avgRating = averageRating, let r = Double(avgRating) {
+                return r
+            }
+            return rating ?? 5.0
+        }
+        
+        // Computed property for trips display
+        var displayTrips: String {
+            if let trips = totalTrips {
+                return "\(trips) trips"
             }
             return "New"
         }

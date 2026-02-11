@@ -3,6 +3,7 @@ import SwiftUI
 struct OnboardingView: View {
     @State private var showCreateAccount = false
     @StateObject private var navigationState = NavigationStateManager()
+    @State private var showRootView = false
     
     var body: some View {
         NavigationStack {
@@ -43,7 +44,12 @@ struct OnboardingView: View {
                         Button(action: {
                             // Navigate to Create Account screen with animation
                             withAnimation(.easeInOut(duration: 0.3)) {
-                                showCreateAccount = true
+                                if AppUserType.shared.hasLoggedInUser() {
+                                    showRootView = true
+                                }
+                                else {
+                                    showCreateAccount = true
+                                }
                             }
                         }) {
                             Text("Sign In")
@@ -69,6 +75,10 @@ struct OnboardingView: View {
             }
             .navigationDestination(isPresented: $showCreateAccount) {
                 CreateAccountScreen()
+                    .transition(.move(edge: .trailing)) // Slide in from right
+            }
+            .navigationDestination(isPresented: $showRootView) {
+                RootView()
                     .transition(.move(edge: .trailing)) // Slide in from right
             }
         }

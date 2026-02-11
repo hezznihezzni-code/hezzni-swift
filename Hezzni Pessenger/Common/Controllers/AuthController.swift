@@ -26,6 +26,9 @@ extension UserDefaults {
         }
         return nil
     }
+    func deleteUser() {
+        UserDefaults.standard.removeObject(forKey: UserDefaults.loggedInUserKey)
+    }
 }
 
 // MARK: - Driver Persistence + Models
@@ -43,6 +46,10 @@ extension UserDefaults {
             return try? JSONDecoder().decode(DriverUser.self, from: data)
         }
         return nil
+    }
+    
+    func deleteDriverUser() {
+        UserDefaults.standard.removeObject(forKey: UserDefaults.loggedInDriverKey)
     }
 }
 

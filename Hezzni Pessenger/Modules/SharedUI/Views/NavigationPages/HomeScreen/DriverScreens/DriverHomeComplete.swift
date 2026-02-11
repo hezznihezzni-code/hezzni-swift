@@ -462,7 +462,7 @@ struct DriverHomeComplete: View {
     private var onlineStatusPill: some View {
         HStack(spacing: 7) {
             Circle()
-                .foregroundColor(.clear)
+
                 .frame(width: 8, height: 8)
                 .background(isOnline ? Color(red: 0.22, green: 0.65, blue: 0.33) : Color(red: 0.85, green: 0.85, blue: 0.85))
             Text(isOnline ? "You're Online" : "You're Offline")
@@ -1007,12 +1007,12 @@ struct ActiveRideBottomSheet: View {
                 
                 PickupDestinationPathView(pickupLocation: request.pickupLocation, destinationLocation: request.destinationLocation, offsetX: 25)
                 
-                // Show distance info when not yet within range
-                if state == .accepted && !canMarkArrived {
-                    distanceInfoView(distance: distanceToPickup, threshold: pickupProximityThreshold, label: "pickup")
-                } else if state == .inProgress && !canCompleteRide {
-                    distanceInfoView(distance: distanceToDestination, threshold: destinationProximityThreshold, label: "destination")
-                }
+//                // Show distance info when not yet within range
+//                if state == .accepted && !canMarkArrived {
+//                    distanceInfoView(distance: distanceToPickup, threshold: pickupProximityThreshold, label: "pickup")
+//                } else if state == .inProgress && !canCompleteRide {
+//                    distanceInfoView(distance: distanceToDestination, threshold: destinationProximityThreshold, label: "destination")
+//                }
                 
                 actionButton
             }
@@ -1678,45 +1678,6 @@ struct TagButton: View {
                 )
                 )
         }
-    }
-}
-
-// MARK: - Flow Layout for Tags
-struct DriverFlowLayout: Layout {
-    var spacing: CGFloat = 8
-    
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let result = arrange(proposal: proposal, subviews: subviews)
-        return result.size
-    }
-    
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let result = arrange(proposal: proposal, subviews: subviews)
-        for (index, frame) in result.frames.enumerated() {
-            subviews[index].place(at: CGPoint(x: bounds.minX + frame.origin.x, y: bounds.minY + frame.origin.y), proposal: .unspecified)
-        }
-    }
-    
-    private func arrange(proposal: ProposedViewSize, subviews: Subviews) -> (size: CGSize, frames: [CGRect]) {
-        let maxWidth = proposal.width ?? .infinity
-        var currentX: CGFloat = 0
-        var currentY: CGFloat = 0
-        var lineHeight: CGFloat = 0
-        var frames: [CGRect] = []
-        
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if currentX + size.width > maxWidth {
-                currentX = 0
-                currentY += lineHeight + spacing
-                lineHeight = 0
-            }
-            frames.append(CGRect(origin: CGPoint(x: currentX, y: currentY), size: size))
-            currentX += size.width + spacing
-            lineHeight = max(lineHeight, size.height)
-        }
-        
-        return (CGSize(width: maxWidth, height: currentY + lineHeight), frames)
     }
 }
 

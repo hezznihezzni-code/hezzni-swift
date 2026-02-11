@@ -347,6 +347,8 @@ struct AccountScreen: View {
 //                                        
 //                                    }
 //                                )
+                                Spacer()
+                                    .frame(height: 150)
                             }
                         }
                         .padding(0)
@@ -394,7 +396,7 @@ struct DriverAccountScreen: View {
             if let route = currentRoute {
                 switch route {
                 case .login:
-                    OnboardingView()
+                    RootView()
                         .transition(.move(edge: .trailing))
                 case .completeProfile:
                     CompleteProfile(
@@ -691,7 +693,7 @@ struct DriverAccountScreen: View {
                                     
                                 }
                                 Spacer()
-                                    .frame(height: 80)
+                                    .frame(height: 150)
                             }
                             .padding(0)
                             .frame(width: .infinity, alignment: .center)

@@ -411,7 +411,7 @@ struct DriverEnRouteScreen: View {
         
         // Use car_pin image for driver
         if let carImage = UIImage(named: "car_pin") {
-            let scaledImage = carImage.scaledTo(size: CGSize(width: 50, height: 50))
+            let scaledImage = carImage.scaledTo(size: CGSize(width: 16, height: 30))
             marker.icon = scaledImage
         } else {
             marker.icon = GMSMarker.markerImage(with: .systemBlue)

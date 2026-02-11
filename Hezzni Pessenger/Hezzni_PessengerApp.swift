@@ -9,21 +9,39 @@ import SwiftUI
 import GoogleMaps
 
 @main
-struct Hezzni_PessengerApp: App {
+struct Hezzni_PassengerApp: App {
+    
     init() {
-            GMSServices.provideAPIKey("AIzaSyAGlfVLO31MsYNRfiJooK3-e38vAVkkij0")
-        }
+        GMSServices.provideAPIKey("AIzaSyAGlfVLO31MsYNRfiJooK3-e38vAVkkij0")
+        // Set user type to passenger
+        AppUserType.shared.userType = .passenger
+    }
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
         }
     }
 }
-
 class AppUserType {
     static let shared = AppUserType()
-    let userType: UserType
+    var userType: UserType
+    
     private init() {
+        // Default to passenger, but this can be determined from UserDefaults
         self.userType = .passenger
+    }
+    
+    func getCurrentUser() -> Any? {
+        switch userType {
+        case .driver:
+            return UserDefaults.standard.getDriverUser()
+        case .passenger:
+            return UserDefaults.standard.getUser()
+        }
+    }
+    
+    func hasLoggedInUser() -> Bool {
+        return getCurrentUser() != nil
     }
 }
