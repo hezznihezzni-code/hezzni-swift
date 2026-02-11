@@ -962,8 +962,9 @@ struct HomeScreen: View {
             else if bottomSheetState == .driverEnRoute {
                 // Driver accepted the ride, showing driver info in bottom sheet
                 // Map shows driver marker and route to pickup using existing GoogleMapView
-                DriverEnRouteScreen(
+                DriverEnRouteBottomSheet(
                     bottomSheetState: $bottomSheetState,
+                    sheetHeight: $sheetHeight,
                 )
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
