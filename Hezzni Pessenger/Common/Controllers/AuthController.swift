@@ -70,6 +70,7 @@ class AuthController: ObservableObject {
     
     // Cache of the current user from login/verify/complete profile
     @Published var currentUser: User?
+    @Published var driverUser: DriverUser?
     
     private init() {}
     
@@ -128,7 +129,7 @@ class AuthController: ObservableObject {
                         if let token = response.data.token {
                             TokenManager.shared.saveToken(token)
                         }
-                        currentUser = User(
+                        driverUser = DriverUser(
                             id: response.data.user.id,
                             phone: response.data.user.phone,
                             name: response.data.user.name,
@@ -138,57 +139,18 @@ class AuthController: ObservableObject {
                             gender: response.data.user.gender,
                             cityId: response.data.user.cityId,
                             isRegistered: response.data.user.isRegistered,
-                            createdAt: response.data.user.createdAt,
-                            serviceTypeId: response.data.user.serviceType?.id,
                             serviceType: response.data.user.serviceType,
+                            serviceTypeId: response.data.user.serviceTypeId,
+                            createdAt: response.data.user.createdAt,
                             carRideStatus: response.data.user.carRideStatus,
                             motorcycleStatus: response.data.user.motorcycleStatus,
+                            taxiStatus: response.data.user.taxiStatus,
                             rentalProfile: response.data.user.rentalProfile,
-                            taxiStatus: response.data.user.taxiStatus
                         )
-                        if let user = currentUser {
-                            UserDefaults.standard.saveUser(user)
+                        if let user = driverUser {
+                            UserDefaults.standard.saveDriverUser(user)
                         }
-//
-//                        //Call profile api to get all data of the user
-//                        Task {
-//                            do {
-//                                let profileResponse = try await APIService.shared.fetchDriverProfile()
-//                                UserDefaults.standard.saveDriverUser(profileResponse.data.user)
-//                                print("Full driver profile fetched and persisted successfully.")
-//                                print(profileResponse)
-//                                currentUser = User(
-//                                    id: response.data.user.id,
-//                                    phone: response.data.user.phone,
-//                                    name: response.data.user.name,
-//                                    email: response.data.user.email,
-//                                    imageUrl: response.data.user.imageUrl,
-//                                    dob: response.data.user.dob,
-//                                    gender: response.data.user.gender,
-//                                    cityId: response.data.user.cityId,
-//                                    isRegistered: response.data.user.isRegistered,
-//                                    createdAt: response.data.user.createdAt,
-//                                    serviceTypeId: response.data.user.serviceType?.id,
-//                                    serviceType: response.data.user.serviceType,
-//                                    carRideStatus: response.data.user.carRideStatus,
-//                                    motorcycleStatus: response.data.user.motorcycleStatus,
-//                                    rentalProfile: response.data.user.rentalProfile,
-//                                    taxiStatus: response.data.user.taxiStatus
-//                                )
-//
-//                                if let user = currentUser {
-//                                    UserDefaults.standard.saveUser(user)
-//                                }
-//                            } catch {
-//                                print("Error fetching full driver profile: \(error.localizedDescription)")
-//                            }
-//                        }
 
-//                        // Persist driver user
-//                        UserDefaults.standard.saveDriverUser(response.data.user)
-
-                        // Also fill passenger-shaped currentUser when possible (for shared UI flows).
-                        
                         
                         print("Congratulations: \(response.message)")
                     } else {
@@ -373,34 +335,64 @@ class AuthController: ObservableObject {
 
     // Helper used by OTPScreen navigation
     func isUserRegistered() -> Bool {
-        if let user = currentUser {
-            return user.isRegistered
+        if AppUserType.shared.userType == .passenger {
+            if let user = UserDefaults.standard.getUser() {
+                return user.isRegistered
+            }
+        }
+        else {
+            if let user = UserDefaults.standard.getDriverUser() {
+                return user.isRegistered
+            }
         }
         return UserDefaults.standard.bool(forKey: "isUserRegistered")
     }
     // Helper used by OTPScreen navigation
     func isServiceTypeExists() -> Bool {
-        guard let user = currentUser else {
-            print("No current user found when checking service type existence.")
-            return UserDefaults.standard.bool(forKey: "isUserRegistered")
-        }
-
-        // No service selected at all
-        guard user.serviceTypeId != nil || user.serviceType != nil else {
-            return false
-        }
-
-        // Check whichever service status object is present. If any present status is PENDING, return false.
-        let statuses: [ServiceVerificationStatus?] = [user.motorcycleStatus, user.taxiStatus, user.carRideStatus, user.rentalProfile]
-        for s in statuses {
-            if let s, s.status.uppercased() == "PENDING" {
+        if AppUserType.shared.userType == .passenger {
+            guard let user = UserDefaults.standard.getUser() else {
+                print("No current user found when checking service type existence.")
+                return UserDefaults.standard.bool(forKey: "isUserRegistered")
+            }
+            // No service selected at all
+            guard user.serviceTypeId != nil || user.serviceType != nil else {
                 return false
             }
+            
+            // Check whichever service status object is present. If any present status is PENDING, return false.
+            let statuses: [ServiceVerificationStatus?] = [user.motorcycleStatus, user.taxiStatus, user.carRideStatus, user.rentalProfile]
+            for s in statuses {
+                if let s, s.status.uppercased() == "PENDING" {
+                    return false
+                }
+            }
+            
+            // If a status object exists and it is not PENDING, treat it as completed/verified enough.
+            // If none of the status objects exist, fall back to just having a serviceType.
+            return true
+        } else {
+            guard let user = UserDefaults.standard.getDriverUser() else {
+                print("No current user found when checking service type existence.")
+                return UserDefaults.standard.bool(forKey: "isUserRegistered")
+            }
+            // No service selected at all
+            guard user.serviceTypeId != nil || user.serviceType != nil else {
+                return false
+            }
+
+            // Check whichever service status object is present. If any present status is PENDING, return false.
+            let statuses: [ServiceVerificationStatus?] = [user.motorcycleStatus, user.taxiStatus, user.carRideStatus, user.rentalProfile]
+            for s in statuses {
+                if let s, s.status.uppercased() == "PENDING" {
+                    return false
+                }
+            }
+
+            // If a status object exists and it is not PENDING, treat it as completed/verified enough.
+            // If none of the status objects exist, fall back to just having a serviceType.
+            return true
         }
 
-        // If a status object exists and it is not PENDING, treat it as completed/verified enough.
-        // If none of the status objects exist, fall back to just having a serviceType.
-        return true
     }
     // MARK: - Resend OTP
     func resendOTP() async -> Bool {
@@ -556,6 +548,7 @@ struct DriverUser: Codable {
     let cityId: Int?
     let isRegistered: Bool
     let serviceType: DriverServiceType?
+    let serviceTypeId: Int?
     let createdAt: String?
     let carRideStatus: ServiceVerificationStatus?
     let motorcycleStatus: ServiceVerificationStatus?
@@ -605,6 +598,7 @@ extension DriverUser {
             cityId: user.cityId,
             isRegistered: user.isRegistered,
             serviceType: user.serviceType,
+            serviceTypeId: user.serviceTypeId,
             createdAt: user.createdAt,
             carRideStatus: user.carRideStatus,
             motorcycleStatus: user.motorcycleStatus,

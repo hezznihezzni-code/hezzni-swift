@@ -571,61 +571,61 @@ struct HomeScreen: View {
                     Spacer()
                         .frame(height: 100)
                     
-                    // Route info card
-                    HStack(spacing: 0) {
-                        // Distance
-                        HStack(spacing: 4) {
-                            Text(String(format: "%.1f", estimatedDistance))
-                                .font(Font.custom("Poppins", size: 16).weight(.bold))
-                                .foregroundColor(.white)
-                            Text("KM")
-                                .font(Font.custom("Poppins", size: 12).weight(.medium))
-                                .foregroundColor(.white)
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color(red: 0.22, green: 0.65, blue: 0.33))
-                        
-                        // Duration
-                        HStack(spacing: 4) {
-                            Text("\(estimatedDuration)")
-                                .font(Font.custom("Poppins", size: 16).weight(.bold))
-                                .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
-                            Text("min")
-                                .font(Font.custom("Poppins", size: 12).weight(.medium))
-                                .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color.white)
-                        
-                        // Destination
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Destination")
-                                .font(Font.custom("Poppins", size: 10))
-                                .foregroundColor(.gray)
-                            Text(destinationLocation)
-                                .font(Font.custom("Poppins", size: 12).weight(.medium))
-                                .foregroundColor(.black)
-                                .lineLimit(1)
-                        }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 8)
-                        .frame(maxWidth: 150)
-                        .background(Color.white)
-                    }
-                    .cornerRadius(8)
-                    .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 2)
-                    
+//                    // Route info card
+//                    HStack(spacing: 0) {
+//                        // Distance
+//                        HStack(spacing: 4) {
+//                            Text(String(format: "%.1f", estimatedDistance))
+//                                .font(Font.custom("Poppins", size: 16).weight(.bold))
+//                                .foregroundColor(.white)
+//                            Text("KM")
+//                                .font(Font.custom("Poppins", size: 12).weight(.medium))
+//                                .foregroundColor(.white)
+//                        }
+//                        .padding(.horizontal, 12)
+//                        .padding(.vertical, 8)
+//                        .background(Color(red: 0.22, green: 0.65, blue: 0.33))
+//                        
+//                        // Duration
+//                        HStack(spacing: 4) {
+//                            Text("\(estimatedDuration)")
+//                                .font(Font.custom("Poppins", size: 16).weight(.bold))
+//                                .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+//                            Text("min")
+//                                .font(Font.custom("Poppins", size: 12).weight(.medium))
+//                                .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+//                        }
+//                        .padding(.horizontal, 12)
+//                        .padding(.vertical, 8)
+//                        .background(Color.white)
+//                        
+//                        // Destination
+//                        VStack(alignment: .leading, spacing: 2) {
+//                            Text("Destination")
+//                                .font(Font.custom("Poppins", size: 10))
+//                                .foregroundColor(.gray)
+//                            Text(destinationLocation)
+//                                .font(Font.custom("Poppins", size: 12).weight(.medium))
+//                                .foregroundColor(.black)
+//                                .lineLimit(1)
+//                        }
+//                        .padding(.horizontal, 10)
+//                        .padding(.vertical, 8)
+//                        .frame(maxWidth: 150)
+//                        .background(Color.white)
+//                    }
+//                    .cornerRadius(8)
+//                    .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 2)
+//                    
                     Spacer()
                 }
                 .padding(.horizontal, 16)
             }
             
-            // Driver ETA card when driver is en route
-            if bottomSheetState == .driverEnRoute {
-                driverETACardView
-            }
+//            // Driver ETA card when driver is en route
+//            if bottomSheetState == .driverEnRoute {
+//                driverETACardView
+//            }
             
             VStack(spacing: 0) {
                 HStack {
@@ -648,63 +648,63 @@ struct HomeScreen: View {
         
     }
     
-    // MARK: - Driver ETA Card View (extracted to reduce body complexity)
-    @ViewBuilder
-    private var driverETACardView: some View {
-        if let driverInfo = socketManager.driverInfo {
-            VStack {
-                Spacer()
-                    .frame(height: 100)
-                
-                // Driver ETA info card
-                HStack(spacing: 0) {
-                    // ETA
-                    HStack(spacing: 4) {
-                        Text("\(driverInfo.estimatedArrivalMinutes)")
-                            .font(Font.custom("Poppins", size: 16).weight(.bold))
-                            .foregroundColor(.white)
-                        Text("min")
-                            .font(Font.custom("Poppins", size: 12).weight(.medium))
-                            .foregroundColor(.white)
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color(red: 0.22, green: 0.65, blue: 0.33))
-                    
-                    // Distance
-                    HStack(spacing: 4) {
-                        Text(driverInfo.distanceToPickup)
-                            .font(Font.custom("Poppins", size: 14).weight(.medium))
-                            .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color.white)
-                    
-                    // Status
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Driver arriving")
-                            .font(Font.custom("Poppins", size: 10))
-                            .foregroundColor(.gray)
-                        Text(driverInfo.driver.vehicle.plateNumber)
-                            .font(Font.custom("Poppins", size: 12).weight(.medium))
-                            .foregroundColor(.black)
-                            .lineLimit(1)
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: 150)
-                    .background(Color.white)
-                }
-                .cornerRadius(8)
-                .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 2)
-                
-                Spacer()
-            }
-            .padding(.horizontal, 16)
-        }
-    }
-   
+//    // MARK: - Driver ETA Card View (extracted to reduce body complexity)
+//    @ViewBuilder
+//    private var driverETACardView: some View {
+//        if let driverInfo = socketManager.driverInfo {
+//            VStack {
+//                Spacer()
+//                    .frame(height: 100)
+//                
+//                // Driver ETA info card
+//                HStack(spacing: 0) {
+//                    // ETA
+//                    HStack(spacing: 4) {
+//                        Text("\(driverInfo.estimatedArrivalMinutes)")
+//                            .font(Font.custom("Poppins", size: 16).weight(.bold))
+//                            .foregroundColor(.white)
+//                        Text("min")
+//                            .font(Font.custom("Poppins", size: 12).weight(.medium))
+//                            .foregroundColor(.white)
+//                    }
+//                    .padding(.horizontal, 12)
+//                    .padding(.vertical, 8)
+//                    .background(Color(red: 0.22, green: 0.65, blue: 0.33))
+//                    
+//                    // Distance
+//                    HStack(spacing: 4) {
+//                        Text(driverInfo.distanceToPickup)
+//                            .font(Font.custom("Poppins", size: 14).weight(.medium))
+//                            .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+//                    }
+//                    .padding(.horizontal, 12)
+//                    .padding(.vertical, 8)
+//                    .background(Color.white)
+//                    
+//                    // Status
+//                    VStack(alignment: .leading, spacing: 2) {
+//                        Text("Driver arriving")
+//                            .font(Font.custom("Poppins", size: 10))
+//                            .foregroundColor(.gray)
+//                        Text(driverInfo.driver.vehicle.plateNumber)
+//                            .font(Font.custom("Poppins", size: 12).weight(.medium))
+//                            .foregroundColor(.black)
+//                            .lineLimit(1)
+//                    }
+//                    .padding(.horizontal, 10)
+//                    .padding(.vertical, 8)
+//                    .frame(maxWidth: 150)
+//                    .background(Color.white)
+//                }
+//                .cornerRadius(8)
+//                .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 2)
+//                
+//                Spacer()
+//            }
+//            .padding(.horizontal, 16)
+//        }
+//    }
+//   
     
     private var suggestionsListView: some View {
         VStack(spacing: 0) {
@@ -1973,6 +1973,127 @@ struct HomeScreen: View {
             }
         }
     }
+    private func createPickupMarkerView(title: String, subtitle: String, color: UIColor, pinImage: UIImage?) -> UIView {
+        let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 120, height: 60))
+        
+        // Info card
+        let cardView = UIView(frame: CGRect(x: 0, y: 0, width: 120, height: 40))
+        cardView.backgroundColor = .white
+        cardView.layer.cornerRadius = 8
+        cardView.layer.shadowColor = UIColor.black.cgColor
+        cardView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        cardView.layer.shadowOpacity = 0.2
+        cardView.layer.shadowRadius = 4
+        
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 2
+        stackView.frame = CGRect(x: 8, y: 6, width: 104, height: 28)
+        
+        let titleLabel = UILabel()
+        titleLabel.text = title
+        titleLabel.font = UIFont.boldSystemFont(ofSize: 12)
+        titleLabel.textColor = color
+        
+        let subtitleLabel = UILabel()
+        subtitleLabel.text = subtitle
+        subtitleLabel.font = UIFont.systemFont(ofSize: 10)
+        subtitleLabel.textColor = .darkGray
+        subtitleLabel.numberOfLines = 1
+        
+        stackView.addArrangedSubview(titleLabel)
+        stackView.addArrangedSubview(subtitleLabel)
+        cardView.addSubview(stackView)
+        
+        // Pin icon below
+        let pinImageView = UIImageView(frame: CGRect(x: 52, y: 40, width: 16, height: 20))
+        if let pinImage = pinImage {
+            pinImageView.image = pinImage
+        }
+        pinImageView.contentMode = .scaleAspectFit
+        
+        containerView.addSubview(cardView)
+        containerView.addSubview(pinImageView)
+        
+        return containerView
+    }
+
+    private func createDestinationMarkerView(title: String, subtitle: String, distance: String, duration: String, color: UIColor, pinImage: UIImage?) -> UIView {
+        let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 192, height: 60))
+        
+        // Main card view with horizontal layout
+        let cardView = UIView(frame: CGRect(x: 0, y: 0, width: 192, height: 40))
+        cardView.backgroundColor = .white
+        cardView.layer.cornerRadius = 8
+        cardView.layer.shadowColor = UIColor.black.cgColor
+        cardView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        cardView.layer.shadowOpacity = 0.2
+        cardView.layer.shadowRadius = 4
+        cardView.clipsToBounds = false
+        
+        // Distance box (green background)
+        let distanceBox = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+        distanceBox.backgroundColor = UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0)
+        distanceBox.layer.cornerRadius = 8
+        distanceBox.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner] // Only left corners
+        
+        let distanceLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+        distanceLabel.text = distance
+        distanceLabel.font = UIFont.boldSystemFont(ofSize: 15)
+        distanceLabel.textColor = .white
+        distanceLabel.textAlignment = .center
+        distanceLabel.numberOfLines = 2
+        distanceBox.addSubview(distanceLabel)
+        
+        // Duration box (light green background)
+        let durationBox = UIView(frame: CGRect(x: 40, y: 0, width: 40, height: 40))
+        durationBox.backgroundColor = UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 0.2)
+        
+        let durationLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+        durationLabel.text = duration
+        durationLabel.font = UIFont.boldSystemFont(ofSize: 15)
+        durationLabel.textColor = UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0)
+        durationLabel.textAlignment = .center
+        durationLabel.numberOfLines = 2
+        durationBox.addSubview(durationLabel)
+        
+        // Destination info (right side)
+        let destinationStack = UIStackView()
+        destinationStack.axis = .vertical
+        destinationStack.spacing = 2
+        destinationStack.frame = CGRect(x: 88, y: 8, width: 96, height: 32)
+        
+        let titleLabel = UILabel()
+        titleLabel.text = title
+        titleLabel.font = UIFont.systemFont(ofSize: 10)
+        titleLabel.textColor = .gray
+        
+        let subtitleLabel = UILabel()
+        subtitleLabel.text = subtitle
+        subtitleLabel.font = UIFont.boldSystemFont(ofSize: 11)
+        subtitleLabel.textColor = .black
+        subtitleLabel.numberOfLines = 2
+        subtitleLabel.lineBreakMode = .byTruncatingTail
+        
+        destinationStack.addArrangedSubview(titleLabel)
+        destinationStack.addArrangedSubview(subtitleLabel)
+        
+        cardView.addSubview(distanceBox)
+        cardView.addSubview(durationBox)
+        cardView.addSubview(destinationStack)
+        
+        // Pin icon below card, centered
+        let pinImageView = UIImageView(frame: CGRect(x: 88, y: 40, width: 16, height: 20))
+        if let pinImage = pinImage {
+            pinImageView.image = pinImage
+        }
+        pinImageView.contentMode = .scaleAspectFit
+        
+        containerView.addSubview(cardView)
+        containerView.addSubview(pinImageView)
+        
+        return containerView
+    }
     private func drawRoute(from pickupCoord: CLLocationCoordinate2D, to dropoffCoord: CLLocationCoordinate2D) {
         // Remove existing polyline
         if let polyline = routePolyline {
@@ -1982,51 +2103,53 @@ struct HomeScreen: View {
         // Clear existing markers
         mapView.clear()
         
-        // Add pickup marker
+        // Add pickup marker with integrated widget
         let pickupMarker = GMSMarker()
         pickupMarker.position = pickupCoord
         pickupMarker.title = "Pickup"
         pickupMarker.snippet = pickupLocation
+        
         if let pinImage = UIImage(named: "pickup_pin") {
-            let scaledImage = pinImage.scaledTo(size: CGSize(width: 26, height: 26))
-            pickupMarker.icon = scaledImage
+            let scaledPin = pinImage.scaledTo(size: CGSize(width: 26, height: 26))
+            let markerView = createPickupMarkerView(
+                title: "Pickup",
+                subtitle: pickupLocation,
+                color: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0),
+                pinImage: scaledPin
+            )
+            pickupMarker.iconView = markerView
+            pickupMarker.groundAnchor = CGPoint(x: 0.5, y: 1.0)
         } else {
             pickupMarker.icon = GMSMarker.markerImage(with: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0))
         }
         pickupMarker.map = mapView
-
-        // Add pickup widget above marker
-        addLocationWidget(
-            title: "Pickup",
-            subtitle: pickupLocation,
-            color: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0),
-            at: pickupCoord
-        )
-        
-        // Add destination marker
-        let destinationMarker = GMSMarker()
-        destinationMarker.position = dropoffCoord
-        destinationMarker.title = "Destination"
-        destinationMarker.snippet = destinationLocation
-        if let pinImage = UIImage(named: "source_dest_pin") {
-            let scaledImage = pinImage.scaledTo(size: CGSize(width: 16.88, height: 30))
-            destinationMarker.icon = scaledImage
-        } else {
-            destinationMarker.icon = GMSMarker.markerImage(with: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0))
-        }
-        destinationMarker.map = mapView
-
-        // Add destination widget above marker
-        addLocationWidget(
-            title: "Destination",
-            subtitle: destinationLocation,
-            color: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0),
-            at: dropoffCoord
-        )
         
         // Fetch actual directions from Google Directions API
         locationManager.fetchDirections(from: pickupCoord, to: dropoffCoord) { [self] path, distanceText, durationText in
             DispatchQueue.main.async {
+                // Add destination marker with distance and time
+                let destinationMarker = GMSMarker()
+                destinationMarker.position = dropoffCoord
+                destinationMarker.title = "Destination"
+                destinationMarker.snippet = self.destinationLocation
+                
+                if let pinImage = UIImage(named: "source_dest_pin") {
+                    let scaledPin = pinImage.scaledTo(size: CGSize(width: 16.88, height: 30))
+                    let markerView = self.createDestinationMarkerView(
+                        title: "Destination",
+                        subtitle: self.destinationLocation,
+                        distance: distanceText ?? "N/A",
+                        duration: durationText ?? "N/A",
+                        color: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0),
+                        pinImage: scaledPin
+                    )
+                    destinationMarker.iconView = markerView
+                    destinationMarker.groundAnchor = CGPoint(x: 0.5, y: 1.0)
+                } else {
+                    destinationMarker.icon = GMSMarker.markerImage(with: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0))
+                }
+                destinationMarker.map = self.mapView
+                
                 if let path = path {
                     // Draw the actual route
                     let polyline = GMSPolyline(path: path)
@@ -2035,7 +2158,6 @@ struct HomeScreen: View {
                     polyline.map = self.mapView
                     
                     self.routePolyline = polyline
-                    
                     
                     // Create asymmetric padding - more padding at bottom
                     let bounds = GMSCoordinateBounds(path: path)
@@ -2078,7 +2200,6 @@ struct HomeScreen: View {
     }
     // MARK: - Driver Tracking Functions
     
-    /// Draw driver marker and route on the map when driver accepts ride
     private func drawDriverOnMap() {
         guard let driverInfo = socketManager.driverInfo else {
             print("⚠️ No driver info available to draw on map")
@@ -2099,33 +2220,44 @@ struct HomeScreen: View {
         mapView.clear()
         
         // Also clear the old pickup-to-destination route reference
-        // (mapView.clear() removes it visually, but we must nil the reference
-        // so it doesn't linger if the state changes back)
         routePolyline?.map = nil
         routePolyline = nil
         
-        // Add driver marker (car icon)
-        let marker = GMSMarker(position: driverCoord)
-        marker.title = driverInfo.driver.name
-        marker.snippet = "\(driverInfo.driver.vehicle.make) \(driverInfo.driver.vehicle.model)"
+        // Add driver marker (car icon) with widget
+        let driverMarker = GMSMarker(position: driverCoord)
+        driverMarker.title = driverInfo.driver.name
+        driverMarker.snippet = "\(driverInfo.driver.vehicle.make) \(driverInfo.driver.vehicle.model)"
         
         if let carImage = UIImage(named: "car_pin") {
-            let scaledImage = carImage.scaledTo(size: CGSize(width: 16, height: 30))
-            marker.icon = scaledImage
+            let scaledCar = carImage.scaledTo(size: CGSize(width: 16, height: 30))
+            let markerView = createDriverMarkerView(
+                name: driverInfo.driver.name,
+                vehicle: "\(driverInfo.driver.vehicle.make) \(driverInfo.driver.vehicle.model)",
+                carImage: scaledCar
+            )
+            driverMarker.iconView = markerView
+            driverMarker.groundAnchor = CGPoint(x: 0.5, y: 1.0)
         } else {
-            marker.icon = GMSMarker.markerImage(with: .systemBlue)
+            driverMarker.icon = GMSMarker.markerImage(with: .systemBlue)
         }
-        marker.groundAnchor = CGPoint(x: 0.5, y: 0.5)
-        marker.map = mapView
-        driverMarker = marker
+        driverMarker.map = mapView
+        self.driverMarker = driverMarker
         
-        // Add pickup marker
+        // Add pickup marker with widget
         let pickupMarker = GMSMarker(position: pickupCoord)
         pickupMarker.title = "Pickup"
         pickupMarker.snippet = pickupLocation
+        
         if let pinImage = UIImage(named: "pickup_pin") {
-            let scaledImage = pinImage.scaledTo(size: CGSize(width: 26, height: 26))
-            pickupMarker.icon = scaledImage
+            let scaledPin = pinImage.scaledTo(size: CGSize(width: 26, height: 26))
+            let markerView = createPickupMarkerView(
+                title: "Pickup",
+                subtitle: pickupLocation,
+                color: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0),
+                pinImage: scaledPin
+            )
+            pickupMarker.iconView = markerView
+            pickupMarker.groundAnchor = CGPoint(x: 0.5, y: 1.0)
         } else {
             pickupMarker.icon = GMSMarker.markerImage(with: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0))
         }
@@ -2136,10 +2268,58 @@ struct HomeScreen: View {
         
         // Animate camera to show both driver and pickup
         let bounds = GMSCoordinateBounds(coordinate: driverCoord, coordinate: pickupCoord)
-        let update = GMSCameraUpdate.fit(bounds, withPadding: 120)
+        let padding = UIEdgeInsets(top: 100, left: 50, bottom: 300 + 50, right: 50)
+        let update = GMSCameraUpdate.fit(bounds, with: padding)
         mapView.animate(with: update)
     }
-    
+
+    /// Create driver marker view with car icon
+    private func createDriverMarkerView(name: String, vehicle: String, carImage: UIImage?) -> UIView {
+        let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 120, height: 60))
+        
+        // Info card
+        let cardView = UIView(frame: CGRect(x: 0, y: 0, width: 120, height: 40))
+        cardView.backgroundColor = .white
+        cardView.layer.cornerRadius = 8
+        cardView.layer.shadowColor = UIColor.black.cgColor
+        cardView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        cardView.layer.shadowOpacity = 0.2
+        cardView.layer.shadowRadius = 4
+        cardView.clipsToBounds = false
+        
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 2
+        stackView.frame = CGRect(x: 8, y: 6, width: 104, height: 28)
+        
+        let nameLabel = UILabel()
+        nameLabel.text = name
+        nameLabel.font = UIFont.boldSystemFont(ofSize: 12)
+        nameLabel.textColor = .systemBlue
+        
+        let vehicleLabel = UILabel()
+        vehicleLabel.text = vehicle
+        vehicleLabel.font = UIFont.systemFont(ofSize: 10)
+        vehicleLabel.textColor = .darkGray
+        vehicleLabel.numberOfLines = 1
+        
+        stackView.addArrangedSubview(nameLabel)
+        stackView.addArrangedSubview(vehicleLabel)
+        cardView.addSubview(stackView)
+        
+        // Car icon below
+        let carImageView = UIImageView(frame: CGRect(x: 52, y: 40, width: 16, height: 20))
+        if let carImage = carImage {
+            carImageView.image = carImage
+        }
+        carImageView.contentMode = .scaleAspectFit
+        
+        containerView.addSubview(cardView)
+        containerView.addSubview(carImageView)
+        
+        return containerView
+    }
+
     /// Draw route from driver to pickup location
     private func drawDriverToPickupRoute(from driverCoord: CLLocationCoordinate2D, to pickupCoord: CLLocationCoordinate2D) {
         // Remove existing driver route polyline
@@ -2177,7 +2357,7 @@ struct HomeScreen: View {
             }
         }
     }
-    
+
     /// Update driver marker position when location changes
     private func updateDriverMarkerPosition(latitude: Double, longitude: Double) {
         let newPosition = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
@@ -2198,7 +2378,8 @@ struct HomeScreen: View {
                 drawDriverToDestinationRoute(from: newPosition, to: destCoord)
                 
                 let bounds = GMSCoordinateBounds(coordinate: newPosition, coordinate: destCoord)
-                let update = GMSCameraUpdate.fit(bounds, withPadding: 120)
+                let padding = UIEdgeInsets(top: 100, left: 50, bottom: 300 + 50, right: 50)
+                let update = GMSCameraUpdate.fit(bounds, with: padding)
                 mapView.animate(with: update)
             } else {
                 // Driver en route to pickup: draw route to pickup
@@ -2209,7 +2390,8 @@ struct HomeScreen: View {
                 drawDriverToPickupRoute(from: newPosition, to: pickupCoord)
                 
                 let bounds = GMSCoordinateBounds(coordinate: newPosition, coordinate: pickupCoord)
-                let update = GMSCameraUpdate.fit(bounds, withPadding: 120)
+                let padding = UIEdgeInsets(top: 100, left: 50, bottom: 300 + 50, right: 50)
+                let update = GMSCameraUpdate.fit(bounds, with: padding)
                 mapView.animate(with: update)
             }
         } else {
@@ -2217,7 +2399,76 @@ struct HomeScreen: View {
             drawDriverOnMap()
         }
     }
-    
+
+    private func drawDriverToDestinationRoute(from driverCoord: CLLocationCoordinate2D, to destCoord: CLLocationCoordinate2D) {
+        // Remove existing driver route polyline
+        driverRoutePolyline?.map = nil
+        driverRoutePolyline = nil
+        
+        // Clear existing markers to redraw with destination widget
+        mapView.clear()
+        
+        // Re-add driver marker
+        if let driverInfo = socketManager.driverInfo, let carImage = UIImage(named: "car_pin") {
+            let driverMarker = GMSMarker(position: driverCoord)
+            let scaledCar = carImage.scaledTo(size: CGSize(width: 16, height: 30))
+            let markerView = createDriverMarkerView(
+                name: driverInfo.driver.name,
+                vehicle: "\(driverInfo.driver.vehicle.make) \(driverInfo.driver.vehicle.model)",
+                carImage: scaledCar
+            )
+            driverMarker.iconView = markerView
+            driverMarker.groundAnchor = CGPoint(x: 0.5, y: 1.0)
+            driverMarker.map = mapView
+            self.driverMarker = driverMarker
+        }
+        
+        locationManager.fetchDirections(from: driverCoord, to: destCoord) { [self] path, distanceText, durationText in
+            DispatchQueue.main.async {
+                self.driverRoutePolyline?.map = nil
+                
+                // Add destination marker with distance and time widget
+                let destinationMarker = GMSMarker(position: destCoord)
+                destinationMarker.title = "Destination"
+                destinationMarker.snippet = self.destinationLocation
+                
+                if let pinImage = UIImage(named: "source_dest_pin") {
+                    let scaledPin = pinImage.scaledTo(size: CGSize(width: 16.88, height: 30))
+                    let markerView = self.createDestinationMarkerView(
+                        title: "Destination",
+                        subtitle: self.destinationLocation,
+                        distance: distanceText ?? "N/A",
+                        duration: durationText ?? "N/A",
+                        color: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0),
+                        pinImage: scaledPin
+                    )
+                    destinationMarker.iconView = markerView
+                    destinationMarker.groundAnchor = CGPoint(x: 0.5, y: 1.0)
+                } else {
+                    destinationMarker.icon = GMSMarker.markerImage(with: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0))
+                }
+                destinationMarker.map = self.mapView
+                
+                if let path = path {
+                    let polyline = GMSPolyline(path: path)
+                    polyline.strokeWidth = 5
+                    polyline.strokeColor = UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0)
+                    polyline.map = self.mapView
+                    self.driverRoutePolyline = polyline
+                } else {
+                    let fallbackPath = GMSMutablePath()
+                    fallbackPath.add(driverCoord)
+                    fallbackPath.add(destCoord)
+                    
+                    let polyline = GMSPolyline(path: fallbackPath)
+                    polyline.strokeWidth = 4
+                    polyline.strokeColor = UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0)
+                    polyline.map = self.mapView
+                    self.driverRoutePolyline = polyline
+                }
+            }
+        }
+    }
     /// Clean up driver tracking when leaving driverEnRoute state
     private func clearDriverTracking() {
         driverMarker?.map = nil
@@ -2290,37 +2541,6 @@ struct HomeScreen: View {
         mapView.animate(with: update)
         
         print("🚗 Ride started: route redrawn from driver to destination")
-    }
-    
-    /// Draw route from driver to destination
-    private func drawDriverToDestinationRoute(from driverCoord: CLLocationCoordinate2D, to destCoord: CLLocationCoordinate2D) {
-        // Remove existing driver route polyline
-        driverRoutePolyline?.map = nil
-        driverRoutePolyline = nil
-        
-        locationManager.fetchDirections(from: driverCoord, to: destCoord) { [self] path, _, _ in
-            DispatchQueue.main.async {
-                self.driverRoutePolyline?.map = nil
-                
-                if let path = path {
-                    let polyline = GMSPolyline(path: path)
-                    polyline.strokeWidth = 5
-                    polyline.strokeColor = UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0)
-                    polyline.map = self.mapView
-                    self.driverRoutePolyline = polyline
-                } else {
-                    let fallbackPath = GMSMutablePath()
-                    fallbackPath.add(driverCoord)
-                    fallbackPath.add(destCoord)
-                    
-                    let polyline = GMSPolyline(path: fallbackPath)
-                    polyline.strokeWidth = 4
-                    polyline.strokeColor = UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0)
-                    polyline.map = self.mapView
-                    self.driverRoutePolyline = polyline
-                }
-            }
-        }
     }
     
     /// Called when ride is completed — show TripCompleteScreen
