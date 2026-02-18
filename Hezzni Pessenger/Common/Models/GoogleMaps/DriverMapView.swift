@@ -29,6 +29,10 @@ struct DriverMapView: UIViewRepresentable {
     var pickupLocation: CLLocationCoordinate2D?
     var destinationLocation: CLLocationCoordinate2D?
     
+    // Address strings for marker info cards
+    var pickupAddressText: String = ""
+    var destinationAddressText: String = ""
+    
     // Route display mode (replaces simple showRoute bool)
     var routeDisplayMode: DriverRouteDisplayMode = .none
     
@@ -296,39 +300,35 @@ struct DriverMapView: UIViewRepresentable {
             // Clear existing routes first
             clearRoutes(on: mapView)
             
-            // Add pickup marker with source_dest_pin
+            let pickupAddress = parent.pickupAddressText
+            let destAddress = parent.destinationAddressText
+            
+            // Add pickup marker with passenger_pickup pin and info card
             if pickupMarker == nil {
                 pickupMarker = GMSMarker()
             }
             pickupMarker?.position = pickupLocation
             pickupMarker?.title = "Pickup"
             
-            if let pinImage = UIImage(named: "source_dest_pin") {
-                let scaledImage = pinImage.scaledTo(size: CGSize(width: 16.88, height: 30))
-                pickupMarker?.icon = scaledImage
-            } else {
-                pickupMarker?.icon = GMSMarker.markerImage(with: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0))
-            }
-            pickupMarker?.map = mapView
-            
-            // Add destination marker with source_dest_pin
-            if destinationMarker == nil {
-                destinationMarker = GMSMarker()
-            }
-            destinationMarker?.position = destinationLocation
-            destinationMarker?.title = "Destination"
-            
-            if let pinImage = UIImage(named: "source_dest_pin") {
-                let scaledImage = pinImage.scaledTo(size: CGSize(width: 16.88, height: 30))
-                destinationMarker?.icon = scaledImage
-            } else {
-                destinationMarker?.icon = GMSMarker.markerImage(with: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0))
-            }
-            destinationMarker?.map = mapView
-            
-            // Draw route from driver to pickup (black line)
-            locationManager.fetchDirections(from: driverLocation, to: pickupLocation) { [weak self] path, _, _ in
+            // Draw route from driver to pickup (black line) — need distance/duration for pickup info card
+            locationManager.fetchDirections(from: driverLocation, to: pickupLocation) { [weak self] path, distanceText, durationText in
                 DispatchQueue.main.async {
+                    // Update pickup marker with info card showing distance/duration from driver
+                    if let pinImage = UIImage(named: "passenger_pickup") ?? UIImage(named: "pickup_pin") {
+                        let scaledPin = pinImage.scaledTo(size: CGSize(width: 26, height: 26))
+                        let markerView = self?.createPickupMarkerView(
+                            title: "Pickup",
+                            subtitle: pickupAddress,
+                            color: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0),
+                            pinImage: scaledPin
+                        )
+                        self?.pickupMarker?.iconView = markerView
+                        self?.pickupMarker?.groundAnchor = CGPoint(x: 0.5, y: 1.0)
+                    } else {
+                        self?.pickupMarker?.icon = GMSMarker.markerImage(with: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0))
+                    }
+                    self?.pickupMarker?.map = mapView
+                    
                     if let path = path {
                         let polyline = GMSPolyline(path: path)
                         polyline.strokeWidth = 5
@@ -356,9 +356,33 @@ struct DriverMapView: UIViewRepresentable {
                 }
             }
             
-            // Draw route from pickup to destination (green line)
-            locationManager.fetchDirections(from: pickupLocation, to: destinationLocation) { [weak self] path, _, _ in
+            // Draw route from pickup to destination (green line) — need distance/duration for destination info card
+            locationManager.fetchDirections(from: pickupLocation, to: destinationLocation) { [weak self] path, distanceText, durationText in
                 DispatchQueue.main.async {
+                    // Add destination marker with info card
+                    if self?.destinationMarker == nil {
+                        self?.destinationMarker = GMSMarker()
+                    }
+                    self?.destinationMarker?.position = destinationLocation
+                    self?.destinationMarker?.title = "Destination"
+                    
+                    if let pinImage = UIImage(named: "source_dest_pin") {
+                        let scaledPin = pinImage.scaledTo(size: CGSize(width: 16.88, height: 30))
+                        let markerView = self?.createDestinationMarkerView(
+                            title: "Destination",
+                            subtitle: destAddress,
+                            distance: distanceText ?? "N/A",
+                            duration: durationText ?? "N/A",
+                            color: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0),
+                            pinImage: scaledPin
+                        )
+                        self?.destinationMarker?.iconView = markerView
+                        self?.destinationMarker?.groundAnchor = CGPoint(x: 0.5, y: 1.0)
+                    } else {
+                        self?.destinationMarker?.icon = GMSMarker.markerImage(with: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0))
+                    }
+                    self?.destinationMarker?.map = mapView
+                    
                     if let path = path {
                         let polyline = GMSPolyline(path: path)
                         polyline.strokeWidth = 5
@@ -400,6 +424,8 @@ struct DriverMapView: UIViewRepresentable {
             // Clear existing routes first
             clearRoutes(on: mapView)
             
+            let pickupAddress = parent.pickupAddressText
+            
             // Add pickup marker
             if pickupMarker == nil {
                 pickupMarker = GMSMarker()
@@ -407,17 +433,25 @@ struct DriverMapView: UIViewRepresentable {
             pickupMarker?.position = pickupLocation
             pickupMarker?.title = "Pickup"
             
-            if let pinImage = UIImage(named: "source_dest_pin") {
-                let scaledImage = pinImage.scaledTo(size: CGSize(width: 16.88, height: 30))
-                pickupMarker?.icon = scaledImage
-            } else {
-                pickupMarker?.icon = GMSMarker.markerImage(with: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0))
-            }
-            pickupMarker?.map = mapView
-            
             // Draw route from driver to pickup (black line)
-            locationManager.fetchDirections(from: driverLocation, to: pickupLocation) { [weak self] path, _, _ in
+            locationManager.fetchDirections(from: driverLocation, to: pickupLocation) { [weak self] path, distanceText, durationText in
                 DispatchQueue.main.async {
+                    // Update pickup marker with info card
+                    if let pinImage = UIImage(named: "passenger_pickup") ?? UIImage(named: "pickup_pin") {
+                        let scaledPin = pinImage.scaledTo(size: CGSize(width: 26, height: 26))
+                        let markerView = self?.createPickupMarkerView(
+                            title: "Pickup",
+                            subtitle: pickupAddress,
+                            color: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0),
+                            pinImage: scaledPin
+                        )
+                        self?.pickupMarker?.iconView = markerView
+                        self?.pickupMarker?.groundAnchor = CGPoint(x: 0.5, y: 1.0)
+                    } else {
+                        self?.pickupMarker?.icon = GMSMarker.markerImage(with: UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0))
+                    }
+                    self?.pickupMarker?.map = mapView
+                    
                     if let path = path {
                         let polyline = GMSPolyline(path: path)
                         polyline.strokeWidth = 5
@@ -451,6 +485,8 @@ struct DriverMapView: UIViewRepresentable {
             // Clear existing routes first
             clearRoutes(on: mapView)
             
+            let destAddress = parent.destinationAddressText
+            
             // Add destination marker
             if destinationMarker == nil {
                 destinationMarker = GMSMarker()
@@ -458,17 +494,27 @@ struct DriverMapView: UIViewRepresentable {
             destinationMarker?.position = destinationLocation
             destinationMarker?.title = "Destination"
             
-            if let pinImage = UIImage(named: "source_dest_pin") {
-                let scaledImage = pinImage.scaledTo(size: CGSize(width: 16.88, height: 30))
-                destinationMarker?.icon = scaledImage
-            } else {
-                destinationMarker?.icon = GMSMarker.markerImage(with: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0))
-            }
-            destinationMarker?.map = mapView
-            
             // Draw route from driver to destination (green line)
-            locationManager.fetchDirections(from: driverLocation, to: destinationLocation) { [weak self] path, _, _ in
+            locationManager.fetchDirections(from: driverLocation, to: destinationLocation) { [weak self] path, distanceText, durationText in
                 DispatchQueue.main.async {
+                    // Update destination marker with info card
+                    if let pinImage = UIImage(named: "source_dest_pin") {
+                        let scaledPin = pinImage.scaledTo(size: CGSize(width: 16.88, height: 30))
+                        let markerView = self?.createDestinationMarkerView(
+                            title: "Destination",
+                            subtitle: destAddress,
+                            distance: distanceText ?? "N/A",
+                            duration: durationText ?? "N/A",
+                            color: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0),
+                            pinImage: scaledPin
+                        )
+                        self?.destinationMarker?.iconView = markerView
+                        self?.destinationMarker?.groundAnchor = CGPoint(x: 0.5, y: 1.0)
+                    } else {
+                        self?.destinationMarker?.icon = GMSMarker.markerImage(with: UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0))
+                    }
+                    self?.destinationMarker?.map = mapView
+                    
                     if let path = path {
                         let polyline = GMSPolyline(path: path)
                         polyline.strokeWidth = 5
@@ -502,7 +548,13 @@ struct DriverMapView: UIViewRepresentable {
                 .includingCoordinate(point1)
                 .includingCoordinate(point2)
             
-            let update = GMSCameraUpdate.fit(bounds, withPadding: 80)
+            let padding = UIEdgeInsets(
+                top: 100,
+                left: 50,
+                bottom: 300 + 50, // Extra padding for bottom sheet
+                right: 50
+            )
+            let update = GMSCameraUpdate.fit(bounds, with: padding)
             mapView.animate(with: update)
         }
         
@@ -512,8 +564,138 @@ struct DriverMapView: UIViewRepresentable {
                 .includingCoordinate(pickup)
                 .includingCoordinate(destination)
             
-            let update = GMSCameraUpdate.fit(bounds, withPadding: 80)
+            let padding = UIEdgeInsets(
+                top: 100,
+                left: 50,
+                bottom: 300 + 50, // Extra padding for bottom sheet
+                right: 50
+            )
+            let update = GMSCameraUpdate.fit(bounds, with: padding)
             mapView.animate(with: update)
+        }
+        
+        // MARK: - Marker View Builders
+        
+        func createPickupMarkerView(title: String, subtitle: String, color: UIColor, pinImage: UIImage?) -> UIView {
+            let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 200, height: 70))
+            containerView.backgroundColor = .clear
+            
+            // Card view above the pin
+            let cardView = UIView(frame: CGRect(x: 50, y: 0, width: 100, height: 40))
+            cardView.backgroundColor = .white
+            cardView.layer.cornerRadius = 8
+            cardView.layer.shadowColor = UIColor.black.cgColor
+            cardView.layer.shadowOffset = CGSize(width: 0, height: 2)
+            cardView.layer.shadowOpacity = 0.15
+            cardView.layer.shadowRadius = 4
+            
+            // Title label
+            let titleLabel = UILabel()
+            titleLabel.text = title
+            titleLabel.font = UIFont.systemFont(ofSize: 10)
+            titleLabel.textColor = .gray
+            
+            // Subtitle label (address)
+            let subtitleLabel = UILabel()
+            subtitleLabel.text = subtitle
+            subtitleLabel.font = UIFont.boldSystemFont(ofSize: 11)
+            subtitleLabel.textColor = .black
+            subtitleLabel.numberOfLines = 2
+            subtitleLabel.lineBreakMode = .byTruncatingTail
+            
+            let stackView = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
+            stackView.axis = .vertical
+            stackView.spacing = 2
+            stackView.frame = CGRect(x: 8, y: 4, width: 84, height: 32)
+            
+            cardView.addSubview(stackView)
+            
+            // Pin icon below card, centered
+            let pinImageView = UIImageView(frame: CGRect(x: 92, y: 40, width: 16, height: 20))
+            if let pinImage = pinImage {
+                pinImageView.image = pinImage
+            }
+            pinImageView.contentMode = .scaleAspectFit
+            
+            containerView.addSubview(cardView)
+            containerView.addSubview(pinImageView)
+            
+            return containerView
+        }
+        
+        func createDestinationMarkerView(title: String, subtitle: String, distance: String, duration: String, color: UIColor, pinImage: UIImage?) -> UIView {
+            let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 200, height: 70))
+            containerView.backgroundColor = .clear
+            
+            // Card view above the pin
+            let cardView = UIView(frame: CGRect(x: 4, y: 0, width: 192, height: 48))
+            cardView.backgroundColor = .white
+            cardView.layer.cornerRadius = 8
+            cardView.layer.shadowColor = UIColor.black.cgColor
+            cardView.layer.shadowOffset = CGSize(width: 0, height: 2)
+            cardView.layer.shadowOpacity = 0.15
+            cardView.layer.shadowRadius = 4
+            
+            // Distance box
+            let distanceBox = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+            distanceBox.backgroundColor = UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 0.2)
+            
+            let distanceLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+            distanceLabel.text = distance
+            distanceLabel.font = UIFont.boldSystemFont(ofSize: 15)
+            distanceLabel.textColor = UIColor(red: 0.85, green: 0.26, blue: 0.26, alpha: 1.0)
+            distanceLabel.textAlignment = .center
+            distanceLabel.numberOfLines = 2
+            distanceBox.addSubview(distanceLabel)
+            
+            // Duration box
+            let durationBox = UIView(frame: CGRect(x: 40, y: 0, width: 40, height: 40))
+            durationBox.backgroundColor = UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 0.2)
+            
+            let durationLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+            durationLabel.text = duration
+            durationLabel.font = UIFont.boldSystemFont(ofSize: 15)
+            durationLabel.textColor = UIColor(red: 0.22, green: 0.65, blue: 0.33, alpha: 1.0)
+            durationLabel.textAlignment = .center
+            durationLabel.numberOfLines = 2
+            durationBox.addSubview(durationLabel)
+            
+            // Destination info (right side)
+            let destinationStack = UIStackView()
+            destinationStack.axis = .vertical
+            destinationStack.spacing = 2
+            destinationStack.frame = CGRect(x: 88, y: 8, width: 96, height: 32)
+            
+            let titleLabel = UILabel()
+            titleLabel.text = title
+            titleLabel.font = UIFont.systemFont(ofSize: 10)
+            titleLabel.textColor = .gray
+            
+            let subtitleLabel = UILabel()
+            subtitleLabel.text = subtitle
+            subtitleLabel.font = UIFont.boldSystemFont(ofSize: 11)
+            subtitleLabel.textColor = .black
+            subtitleLabel.numberOfLines = 2
+            subtitleLabel.lineBreakMode = .byTruncatingTail
+            
+            destinationStack.addArrangedSubview(titleLabel)
+            destinationStack.addArrangedSubview(subtitleLabel)
+            
+            cardView.addSubview(distanceBox)
+            cardView.addSubview(durationBox)
+            cardView.addSubview(destinationStack)
+            
+            // Pin icon below card, centered
+            let pinImageView = UIImageView(frame: CGRect(x: 88, y: 40, width: 16, height: 20))
+            if let pinImage = pinImage {
+                pinImageView.image = pinImage
+            }
+            pinImageView.contentMode = .scaleAspectFit
+            
+            containerView.addSubview(cardView)
+            containerView.addSubview(pinImageView)
+            
+            return containerView
         }
         
         // MARK: - Ripple Animation

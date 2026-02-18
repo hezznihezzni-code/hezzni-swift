@@ -136,6 +136,7 @@ struct DriverHomeComplete: View {
     @State private var showCallOptions = false
     @State private var showTripComplete = false
     @State private var showRatingSheet = false
+    @State private var showCancelRideSheet = false
     @State private var locationUpdateTimer: Timer?
     
     // Distance tracking for button enabling
@@ -153,9 +154,10 @@ struct DriverHomeComplete: View {
     init() {
         let defaultLocation = CLLocationCoordinate2D(latitude: 31.6295, longitude: -7.9811)
         _cameraPosition = State(initialValue: GMSCameraPosition.camera(withTarget: defaultLocation, zoom: 14))
-        
     }
-    
+    func loadPreferences() async {
+        await preferencesVM.loadPreferences()
+    }
     var body: some View {
         NavigationStack {
             ZStack(alignment: .leading) {
@@ -232,7 +234,9 @@ struct DriverHomeComplete: View {
                     time: currentRideRequest?.duration ?? "0 min",
                     passengerName: currentRideRequest?.passengerName ?? "Passenger",
                     passengerRating: currentRideRequest?.passengerRating ?? 5.0,
+                    passengerTrips: currentRideRequest?.passengerTrips ?? 0,
                     passengerImage: currentRideRequest?.passengerImage ?? "profile_placeholder",
+                    isVerified: currentRideRequest?.isVerified ?? true,
                     pickupLocation: currentRideRequest?.pickupLocation ?? "",
                     destinationLocation: currentRideRequest?.destinationLocation ?? "",
                     onRateRider: {
@@ -248,15 +252,15 @@ struct DriverHomeComplete: View {
             .sheet(isPresented: $showRatingSheet) {
                 DriverRatingScreen(
                     passengerName: currentRideRequest?.passengerName ?? "Passenger",
-                    onSubmit: {
+                    onSubmit: { rating, comment, tags in
                         // Submit passenger review via API
                         if let rideRequest = currentRideRequest {
                             Task {
                                 try? await APIService.shared.submitPassengerReview(
                                     rideRequestId: rideRequest.rideRequestId,
-                                    rating: 5, // TODO: Pass actual rating from DriverRatingScreen
-                                    comment: nil,
-                                    tags: nil
+                                    rating: rating,
+                                    comment: comment,
+                                    tags: tags
                                 )
                             }
                         }
@@ -265,6 +269,30 @@ struct DriverHomeComplete: View {
                     }
                 )
                 .presentationDetents([.medium, .large])
+                .presentationCornerRadius(35)
+                .presentationDragIndicator(.hidden)
+            }
+            .sheet(isPresented: $showCancelRideSheet) {
+                RideCancelScreen(
+                    isDriver: true,
+                    onCancel: { reason in
+                        if let rideRequest = currentRideRequest {
+                            driverSocketManager.cancelRide(
+                                rideRequestId: rideRequest.rideRequestId,
+                                reason: reason
+                            )
+                        }
+                        showCancelRideSheet = false
+                        withAnimation {
+                            rideState = .waitingForRequests
+                            currentRideRequest = nil
+                        }
+                    },
+                    onDismiss: {
+                        showCancelRideSheet = false
+                    }
+                )
+                .presentationDetents([.large])
                 .presentationCornerRadius(35)
                 .presentationDragIndicator(.hidden)
             }
@@ -402,6 +430,8 @@ struct DriverHomeComplete: View {
                 latitude: currentRideRequest!.destinationLatitude,
                 longitude: currentRideRequest!.destinationLongitude
             ) : nil,
+            pickupAddressText: currentRideRequest?.pickupLocation ?? "",
+            destinationAddressText: currentRideRequest?.destinationLocation ?? "",
             routeDisplayMode: currentRouteDisplayMode,
             showRoute: rideState == .rideRequestReceived, // Keep for legacy support
             isWaitingForRequests: rideState == .waitingForRequests,
@@ -428,7 +458,7 @@ struct DriverHomeComplete: View {
             Spacer()
             
             if rideState == .rideAccepted || rideState == .arrivedAtPickup || rideState == .rideInProgress {
-                    Button(action: {}) {
+                    Button(action: { showCancelRideSheet = true }) {
                         Text("Cancel")
                             .font(Font.custom("Poppins", size: 14).weight(.medium))
                             .foregroundColor(Color(red: 0.83, green: 0.18, blue: 0.18))
@@ -486,7 +516,7 @@ struct DriverHomeComplete: View {
             if rideState == .offline || rideState == .waitingForRequests {
                 Button(action: {
                     Task {
-                        await preferencesVM.loadPreferences()
+                        await loadPreferences()
                         await MainActor.run {
                             showOptionsSheet = true
                         }
@@ -1353,16 +1383,14 @@ struct CallOptionsSheet: View {
 // MARK: - Driver Trip Complete Screen
 struct DriverTripCompleteScreen: View {
     var fare: String = "25.00 MAD"
-    var serviceFee: String = "-1.25 MAD"
     var distance: String = "2.5 KM"
     var time: String = "8 min"
-    var paymentMethod: String = "Cash"
-    var discount: String = "5%"
-    var earningsAdded: String = "22.00 MAD"
     
     var passengerName: String = "Ahmed Hassan"
     var passengerRating: Double = 4.8
+    var passengerTrips: Int = 0
     var passengerImage: String = "profile_placeholder"
+    var isVerified: Bool = true
     
     var pickupLocation: String = "Current Location, Marrakech"
     var destinationLocation: String = "Current Location, Marrakech"
@@ -1372,171 +1400,153 @@ struct DriverTripCompleteScreen: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 18) {
+                Spacer().frame(height: 24)
+                
+                // Top pin image
                 VStack(spacing: 8) {
                     ZStack {
-                        Circle()
-                            .fill(Color(red: 0.67, green: 0.85, blue: 0.72))
-                            .frame(width: 100, height: 100)
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 40, weight: .bold))
-                            .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+                        Image("location_pin")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 136, height: 160)
                     }
                     
                     Text("Trip Complete")
                         .font(Font.custom("Poppins", size: 22).weight(.semibold))
-                        .foregroundColor(.black)
-                    
+                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
                     Text("Your trip has ended successfully.")
                         .font(Font.custom("Poppins", size: 14))
-                        .foregroundColor(Color.black.opacity(0.6))
+                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09).opacity(0.6))
                 }
-                .padding(.top, 40)
+                .padding(.top, 4)
                 
-                tripSummaryCard
+                // Trip Stats
+                TripStatsView(distance: distance, totalTime: time, price: fare)
+                    .padding(.horizontal)
+                    .padding(.top, 8)
                 
-                passengerCard
+                // Passenger card
+                VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        Image(passengerImage)
+                            .resizable()
+                            .frame(width: 66, height: 66)
+                            .clipShape(Circle())
+                            .overlay(
+                                HStack(spacing: 0) {
+                                    Image(systemName: "star.fill")
+                                        .font(.system(size: 10))
+                                        .foregroundColor(.yellow)
+                                    Text(String(format: "%.1f", passengerRating))
+                                        .font(Font.custom("Poppins", size: 10).weight(.medium))
+                                        .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                                }
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.white)
+                                    .cornerRadius(10)
+                                    .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 1)
+                                    .offset(y: 8),
+                                alignment: .bottom
+                            )
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(alignment: .center, spacing: 8) {
+                                Text(passengerName)
+                                    .font(Font.custom("Poppins", size: 16).weight(.medium))
+                                    .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                                
+                                if isVerified {
+                                    Image("verified_badge")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 16, height: 16)
+                                }
+                            }
+                            
+                            if passengerTrips > 0 {
+                                Text("(\(passengerTrips) trips)")
+                                    .font(Font.custom("Poppins", size: 12))
+                                    .foregroundColor(Color(red: 0.45, green: 0.44, blue: 0.44))
+                            }
+                            
+                            // Rider label pill
+                            HStack(spacing: 6) {
+                                Image(systemName: "person.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 12, height: 12)
+                                    .foregroundColor(.white)
+                                Text("Rider")
+                                    .font(Font.custom("Poppins", size: 12).weight(.medium))
+                                    .foregroundColor(.white)
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(Color.black)
+                            .cornerRadius(7)
+                            .padding(.top, 6)
+                        }
+                        Spacer()
+                    }
+                    .padding(12)
+                }
+                .background(Color.white)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color(red: 0.92, green: 0.92, blue: 0.92).opacity(0.6), lineWidth: 0.5)
+                )
+                .shadow(color: Color.black.opacity(0.03), radius: 20, x: 0, y: 6)
+                .padding(.horizontal, 16)
                 
-                locationCard
+                // Pickup / Destination
+                VStack(spacing: 8) {
+                    PickupDestinationPathView(
+                        pickupLocation: pickupLocation,
+                        destinationLocation: destinationLocation
+                    )
+                    .padding(.horizontal, 16)
+                }
                 
+                Spacer()
+                
+                // Action buttons
                 VStack(spacing: 12) {
                     Button(action: onRateRider) {
                         Text("Rate your Rider")
-                            .font(Font.custom("Poppins", size: 14).weight(.medium))
+                            .font(Font.custom("Poppins", size: 16).weight(.medium))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .frame(height: 50)
+                            .padding(.vertical, 16)
                             .background(Color(red: 0.22, green: 0.65, blue: 0.33))
-                            .cornerRadius(10)
+                            .cornerRadius(12)
                     }
+                    .padding(.horizontal, 16)
                     
                     Button(action: onFindNextRide) {
                         Text("Find Next Ride")
-                            .font(Font.custom("Poppins", size: 14).weight(.medium))
-                            .foregroundColor(.black)
+                            .font(Font.custom("Poppins", size: 16).weight(.medium))
+                            .foregroundColor(Color(red: 0.09, green: 0.09, blue: 0.09))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Color(red: 0.95, green: 0.95, blue: 0.95))
+                            .cornerRadius(12)
                     }
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 40)
-            }
-        }
-        .background(Color.white)
-    }
-    
-    private var tripSummaryCard: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Image(systemName: "doc.text")
-                    .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
-                Text("Trip Summary")
-                    .font(Font.custom("Poppins", size: 16).weight(.medium))
-                    .foregroundColor(.black)
-                Spacer()
-                Image(systemName: "chevron.down")
-                    .foregroundColor(Color.black.opacity(0.3))
-            }
-            
-            VStack(spacing: 8) {
-                summaryRow(title: "Fare", value: fare, valueColor: .black)
-                summaryRow(title: "Service fee (5%)", value: serviceFee, valueColor: Color.red)
-                summaryRow(title: "Distance", value: distance, valueColor: .black)
-                summaryRow(title: "Time", value: time, valueColor: .black)
-                summaryRow(title: "Payment Method", value: paymentMethod, valueColor: Color(red: 0.22, green: 0.65, blue: 0.33), showBadge: true)
-                summaryRow(title: "Discount", value: discount, valueColor: .black)
-                
-                Divider()
-                
-                HStack {
-                    Text("Earnings Added")
-                        .font(Font.custom("Poppins", size: 14).weight(.medium))
-                        .foregroundColor(.black)
-                    Spacer()
-                    Text(earningsAdded)
-                        .font(Font.custom("Poppins", size: 16).weight(.semibold))
-                        .foregroundColor(Color(red: 0.22, green: 0.65, blue: 0.33))
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
                 }
             }
+            .background(Color.white.edgesIgnoringSafeArea(.all))
         }
-        .padding(16)
-        .background(Color.white)
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.black.opacity(0.1), lineWidth: 0.5)
-        )
-        .shadow(color: Color.black.opacity(0.05), radius: 10)
-        .padding(.horizontal, 20)
-    }
-    
-    private func summaryRow(title: String, value: String, valueColor: Color, showBadge: Bool = false) -> some View {
-        HStack {
-            Text(title)
-                .font(Font.custom("Poppins", size: 14))
-                .foregroundColor(Color.black.opacity(0.6))
-            Spacer()
-            if showBadge {
-                HStack(spacing: 4) {
-                    Image(systemName: "creditcard.fill")
-                        .font(.system(size: 10))
-                    Text(value)
-                        .font(Font.custom("Poppins", size: 12).weight(.medium))
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(valueColor.opacity(0.1))
-                .foregroundColor(valueColor)
-                .cornerRadius(12)
-            } else {
-                Text(value)
-                    .font(Font.custom("Poppins", size: 14).weight(.medium))
-                    .foregroundColor(valueColor)
-            }
-        }
-    }
-    
-    private var passengerCard: some View {
-        HStack(spacing: 12) {
-            Image(passengerImage)
-                .resizable()
-                .frame(width: 50, height: 50)
-                .clipShape(Circle())
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text(passengerName)
-                    .font(Font.custom("Poppins", size: 16).weight(.medium))
-                    .foregroundColor(.black)
-                
-                HStack(spacing: 4) {
-                    Image(systemName: "star.fill")
-                        .font(.system(size: 10))
-                        .foregroundColor(.yellow)
-                    Text(String(format: "%.1f", passengerRating))
-                        .font(Font.custom("Poppins", size: 12).weight(.medium))
-                        .foregroundColor(.black)
-                }
-            }
-            
-            Spacer()
-        }
-        .padding(16)
-        .background(Color.white)
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.black.opacity(0.1), lineWidth: 0.5)
-        )
-        .padding(.horizontal, 20)
-    }
-    
-    private var locationCard: some View {
-        PickupDestinationPathView(pickupLocation: "Current Location, Marrakech", destinationLocation: "Menara Mall, Gueliz District", offsetX: 25)
     }
 }
 
 // MARK: - Driver Rating Screen
 struct DriverRatingScreen: View {
     let passengerName: String
-    var onSubmit: () -> Void = {}
+    var onSubmit: (Int, String?, [String]?) -> Void = { _, _, _ in }
     
     @State private var rating: Int = 0
     @State private var reviewText: String = ""
@@ -1624,7 +1634,13 @@ struct DriverRatingScreen: View {
                     )
             }
             
-            Button(action: onSubmit) {
+            Button(action: {
+                onSubmit(
+                    rating,
+                    reviewText.isEmpty ? nil : reviewText,
+                    selectedTags.isEmpty ? nil : Array(selectedTags)
+                )
+            }) {
                 Text("Submit Review")
                     .font(Font.custom("Poppins", size: 14).weight(.medium))
                     .foregroundColor(.white)
@@ -1633,6 +1649,8 @@ struct DriverRatingScreen: View {
                     .background(Color(red: 0.22, green: 0.65, blue: 0.33))
                     .cornerRadius(10)
             }
+            .disabled(rating == 0)
+            .opacity(rating == 0 ? 0.5 : 1.0)
             
             Spacer()
         }
@@ -1681,9 +1699,9 @@ struct TagButton: View {
     }
 }
 
-#Preview {
-    DriverHomeComplete()
-}
+//#Preview {
+//    DriverHomeComplete()
+//}
 
 // MARK: - Side Drawer View
 struct SideDrawerView: View {

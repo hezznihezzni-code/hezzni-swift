@@ -23,7 +23,7 @@ enum AccountRoute: Hashable {
     case helpSupport
     case termsPrivacy
     //For testing purpose
-    case cancelRide
+//    case cancelRide
     case vehicleDetails // for Driver only
     
 }
@@ -161,14 +161,15 @@ struct AccountScreen: View {
                     TermsPrivacyScreen()
                         .transition(.move(edge: .trailing))
                     //TO BE REMOVED
-                case .cancelRide:
-                    RideCancelScreen(
-                        onBack: {
-                            currentRoute = nil
-                            navigationState.showBottomBar()
-                        },
-                    )
-                        .transition(.move(edge: .trailing))
+//                case .cancelRide:
+//                    RideCancelScreen(
+//                        isDriver: false,
+//                        onDismiss: {
+//                            currentRoute = nil
+//                            navigationState.showBottomBar()
+//                        },
+//                    )
+//                        .transition(.move(edge: .trailing))
                 case .vehicleDetails:
                     VehicleDetailsScreen()
                 }
@@ -508,14 +509,14 @@ struct DriverAccountScreen: View {
                     TermsPrivacyScreen()
                         .transition(.move(edge: .trailing))
                     //TO BE REMOVED
-                case .cancelRide:
-                    RideCancelScreen(
-                        onBack: {
-                            currentRoute = nil
-                            
-                        },
-                    )
-                        .transition(.move(edge: .trailing))
+//                case .cancelRide:
+//                    RideCancelScreen(
+//                        onBack: {
+//                            currentRoute = nil
+//                            
+//                        },
+//                    )
+//                        .transition(.move(edge: .trailing))
                 case .vehicleDetails:
                     VehicleDetailsScreen(
                         onBack: {

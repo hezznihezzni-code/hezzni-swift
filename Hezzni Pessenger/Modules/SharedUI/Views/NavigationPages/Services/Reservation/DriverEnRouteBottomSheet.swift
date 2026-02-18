@@ -63,6 +63,7 @@ struct DriverEnRouteBottomSheet: View {
                 .padding(.horizontal, 18)
                 .padding(.bottom, 24)
             }
+            .cornerRadius(16, corners: [.topLeft, .topRight])
         }
         .background(Color.white)
         .onAppear {
