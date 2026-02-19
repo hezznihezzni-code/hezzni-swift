@@ -43,7 +43,7 @@ struct AccountScreen: View {
             if let route = currentRoute {
                 switch route {
                 case .login:
-                    OnboardingView()
+                    RootView()
                         .transition(.move(edge: .trailing))
                 case .completeProfile:
                     CompleteProfile(

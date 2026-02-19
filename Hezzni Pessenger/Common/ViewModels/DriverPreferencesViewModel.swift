@@ -15,33 +15,37 @@ final class DriverPreferencesViewModel: ObservableObject {
 
     init(api: APIService = .shared) {
         self.api = api
+        Task { [weak self] in
+            await self?.loadPreferences()
+        }
     }
 
+//    swift
     func loadPreferences(force: Bool = false) async {
         guard force || preferences.isEmpty else {
             log.debug("Skipping preferences fetch (cache hit). count=\(self.preferences.count, privacy: .public)")
             return
         }
-
+    
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
-
+    
         log.info("Fetching driver preferences")
         do {
             let response = try await api.fetchDriverPreferences()
             let prefs = response.data.data.preferences
             preferences = prefs
-
-            // If user hasn't made a local selection yet, initialize from API state.
+    
+            // Select all preferences by default if no selection exists.
             if selectedPreferenceIds.isEmpty {
-                selectedPreferenceIds = Set(prefs.filter { $0.isActive }.map { $0.id })
+                selectedPreferenceIds = Set(prefs.map { $0.id })
             } else {
                 // Remove any ids that no longer exist.
                 let valid = Set(prefs.map { $0.id })
                 selectedPreferenceIds = selectedPreferenceIds.intersection(valid)
             }
-
+    
             log.info("Fetched driver preferences. count=\(prefs.count, privacy: .public), selected=\(self.selectedPreferenceIds.count, privacy: .public)")
         } catch {
             let msg = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
@@ -49,7 +53,6 @@ final class DriverPreferencesViewModel: ObservableObject {
             log.error("Failed to fetch driver preferences. error=\(msg, privacy: .public)")
         }
     }
-
     func updateSelected(id: Int, isSelected: Bool) {
         if isSelected {
             selectedPreferenceIds.insert(id)

@@ -631,12 +631,14 @@ struct HomeScreen: View {
                 HStack {
 //                    greetingText
                     Spacer()
-                    NotificationButton(action: {
-                        navigationState.hideBottomBar()
-                        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                            isShowingNotifications = true
-                        }
-                    })
+                    if sheetHeight <= maxSheetHeight - 10 {
+                        NotificationButton(action: {
+                            navigationState.hideBottomBar()
+                            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                                isShowingNotifications = true
+                            }
+                        })
+                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 8)
@@ -997,7 +999,7 @@ struct HomeScreen: View {
             }
         }
         .frame(height: sheetHeight)
-        .background(Color.white)
+        .background(bottomSheetState == .driverEnRoute ? Color.hezzniGreen : Color.white)
         .cornerRadius(20)
         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: -5)
         .gesture(dragGesture)
@@ -1251,10 +1253,10 @@ struct HomeScreen: View {
                             .padding(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
                             .background(.white)
                             .cornerRadius(8, corners: [.topLeft, .topRight])
-                            .overlay(
-                                RoundedCorner(radius: 8, corners: [.topLeft, .topRight])
-                                    .stroke(Color(red: 0.22, green: 0.65, blue: 0.33), lineWidth: 1.5)
-                            )
+//                            .overlay(
+//                                RoundedCorner(radius: 8, corners: [.topLeft, .topRight])
+//                                    .stroke(Color(red: 0.22, green: 0.65, blue: 0.33), lineWidth: 1.5)
+//                            )
                         } else {
                             LocationCardView(
                                 imageName: "pickup_ellipse",
@@ -1300,10 +1302,10 @@ struct HomeScreen: View {
                             .padding(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
                             .background(.white)
                             .cornerRadius(8, corners: [.bottomLeft, .bottomRight])
-                            .overlay(
-                                RoundedCorner(radius: 8, corners: [.bottomLeft, .bottomRight])
-                                    .stroke(Color(red: 0.22, green: 0.65, blue: 0.33), lineWidth: 1.5)
-                            )
+//                            .overlay(
+//                                RoundedCorner(radius: 8, corners: [.bottomLeft, .bottomRight])
+//                                    .stroke(Color(red: 0.22, green: 0.65, blue: 0.33), lineWidth: 1.5)
+//                            )
                         } else {
                             LocationCardView(
                                 imageName: "dropoff_ellipse",

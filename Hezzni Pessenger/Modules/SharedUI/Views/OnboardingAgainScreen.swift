@@ -84,8 +84,7 @@ struct OnboardingAgainScreen: View {
                 .background(Color.white)
             }
             .navigationDestination(isPresented: $showCreateAccount) {
-                OnboardingView()
-                            .navigationBarBackButtonHidden(true)
+                CreateAccountScreen()
 
             }
             .navigationDestination(isPresented: $loginUserIfExist) {
