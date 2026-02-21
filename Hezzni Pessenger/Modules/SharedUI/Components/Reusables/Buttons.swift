@@ -49,7 +49,7 @@ struct NotificationButton: View {
     var action: () -> Void = {}
     var body: some View {
         Button(action: action) {
-            Image(systemName: "bell")
+            Image("notification_bell_icon")
                 .foregroundStyle(.foreground)
                 .padding()
                 .background(

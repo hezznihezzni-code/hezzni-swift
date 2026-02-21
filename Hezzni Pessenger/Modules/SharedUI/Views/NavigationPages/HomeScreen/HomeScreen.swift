@@ -112,6 +112,7 @@ struct HomeScreen: View {
     
     // Google Places autocomplete suggestions
     @State private var placeSuggestions: [PlaceSuggestion] = []
+    @State private var locationHistory: [PlaceSuggestion] = []
     @State private var isLoadingSuggestions = false
     
     // Track which location is being selected from map (pickup or destination)
@@ -238,7 +239,7 @@ struct HomeScreen: View {
 
                 // Notification overlay
                 if isShowingNotifications {
-                    NotificationScreen(showNotification: $isShowingNotifications)
+                    NotificationScreen(showNotification: $isShowingNotifications, bottomSheetState: bottomSheetState)
                         .transition(.move(edge: .trailing).combined(with: .opacity))
                         .zIndex(10)
                 }
@@ -523,8 +524,8 @@ struct HomeScreen: View {
                             // Move Google UI elements behind the bottom sheet
                             mapView.padding = UIEdgeInsets(
                                 top: 0,
-                                left: 0,
-                                bottom: 0,
+                                left: 20,
+                                bottom: 30,
                                 right: 0
                             )
                         }
@@ -630,6 +631,24 @@ struct HomeScreen: View {
             VStack(spacing: 0) {
                 HStack {
 //                    greetingText
+                    if bottomSheetState == .chooseOnMap {
+                        Button(action: {
+                            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                                bottomSheetState = .journey
+                                sheetHeight = maxSheetHeight
+                            }
+                            
+                        }) {
+                            Image(systemName: "arrow.left")
+                                .foregroundStyle(.foreground)
+                                .padding()
+                                .background(
+                                    Circle()
+                                        .fill(.white)
+                                        .stroke(.white200, lineWidth: 1)
+                                )
+                        }
+                    }
                     Spacer()
                     if sheetHeight <= maxSheetHeight - 10 {
                         NotificationButton(action: {
@@ -999,7 +1018,7 @@ struct HomeScreen: View {
             }
         }
         .frame(height: sheetHeight)
-        .background(bottomSheetState == .driverEnRoute ? Color.hezzniGreen : Color.white)
+        .background(bottomSheetState == .driverEnRoute ? Color.hezzniGreen : bottomSheetState == .chooseOnMap ? .clear : Color.white)
         .cornerRadius(20)
         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: -5)
         .gesture(dragGesture)
@@ -1066,18 +1085,7 @@ struct HomeScreen: View {
     
     /// Get display name for service (shorter version for UI)
     private func getDisplayName(for name: String) -> String {
-        switch name.lowercased() {
-        case "car rides":
-            return "Car"
-        case "airport ride":
-            return "Ride to Airport"
-        case "city to city":
-            return "City to City"
-        case "group ride":
-            return "Group Ride"
-        default:
-            return name
-        }
+        return name
     }
     
     /// Get icon for ride preference
@@ -1321,6 +1329,7 @@ struct HomeScreen: View {
                                         navigationState.hideBottomBar()
                                         bottomSheetState = .journey
                                     }
+                                    fetchPlacesSuggestions()
                                 },
                                 roundedEdges: .bottom
                             )
@@ -1413,18 +1422,35 @@ struct HomeScreen: View {
                                     }
                                     Divider()
                                 }
-                            } else if !isLoadingSuggestions && !searchText.isEmpty {
-                                // Fallback to filtered static suggestions if no API results
-                                ForEach(filteredSuggestions, id: \.self) { suggestion in
+                            } else if searchText.isEmpty && !locationHistory.isEmpty {
+                                // Show history when not typing
+                                Text("Recent Places")
+                                    .font(.poppins(.medium, size: 13))
+                                    .foregroundColor(.gray)
+                                    .padding(.horizontal, 12)
+                                    .padding(.top, 4)
+                                
+                                ForEach(locationHistory) { historyItem in
                                     Button(action: {
-                                        handleSuggestionSelection(suggestion)
+                                        handlePlaceSuggestionSelection(historyItem)
                                     }) {
                                         HStack(spacing: 12) {
-                                            Image(systemName: "mappin.circle.fill")
-                                                .foregroundColor(.gray)
-                                            Text(suggestion)
-                                                .font(.poppins(.regular, size: 14))
-                                                .foregroundColor(.primary)
+                                            Image("history-icon")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 20, height: 20)
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text(historyItem.mainText)
+                                                    .font(.poppins(.medium, size: 14))
+                                                    .foregroundColor(.primary)
+                                                    .lineLimit(1)
+                                                if !historyItem.secondaryText.isEmpty {
+                                                    Text(historyItem.secondaryText)
+                                                        .font(.poppins(.regular, size: 12))
+                                                        .foregroundColor(.gray)
+                                                        .lineLimit(1)
+                                                }
+                                            }
                                             Spacer()
                                         }
                                         .padding(.vertical, 8)
@@ -1571,9 +1597,13 @@ struct HomeScreen: View {
         
         guard !searchText.isEmpty else {
             placeSuggestions = []
-            print("🔍 Search text is empty, clearing suggestions")
+            locationHistory = SearchHistoryManager.shared.getHistory()
+            print("🔍 Search text is empty, loading \(locationHistory.count) history items")
             return
         }
+        
+        // Clear history when typing
+        locationHistory = []
         
         isLoadingSuggestions = true
         locationManager.fetchPlacesSuggestions(query: searchText) { suggestions in
@@ -1586,6 +1616,9 @@ struct HomeScreen: View {
     }
     
     private func handlePlaceSuggestionSelection(_ suggestion: PlaceSuggestion) {
+        // Save to history immediately
+        SearchHistoryManager.shared.saveSuggestion(suggestion)
+        
         isLoadingSuggestions = true
         
         locationManager.fetchPlaceDetails(placeId: suggestion.placeId) { coordinate, address in
@@ -1682,7 +1715,7 @@ struct HomeScreen: View {
         
         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
             bottomSheetState = .chooseOnMap
-            sheetHeight = minSheetHeight - 25
+            sheetHeight = minSheetHeight - 45
             showSuggestions = false
             placeSuggestions = []
         }
@@ -1809,6 +1842,9 @@ struct HomeScreen: View {
         
         // Expand sheet when editing
         if editing {
+            // Load history immediately
+            locationHistory = SearchHistoryManager.shared.getHistory()
+            fetchPlacesSuggestions()
             withAnimation(.spring()) {
                 sheetHeight = maxSheetHeight
             }
@@ -1892,6 +1928,9 @@ struct HomeScreen: View {
             bottomSheetState = .journey
             sheetHeight = maxSheetHeight
             
+            // Load history for immediate display
+            locationHistory = SearchHistoryManager.shared.getHistory()
+            
             // If pickup location is already set (from current location), skip to destination
             if pickupLatitude != 0 && pickupLongitude != 0 && pickupLocation != "From?" {
                 isEditingPickup = false
@@ -1963,7 +2002,10 @@ struct HomeScreen: View {
                             bottomSheetState = .nowRide
                         }
                         else {
-                            bottomSheetState = .reservation
+                            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                                showSchedulePicker = true
+                                bottomSheetState = .reservation
+                            }
                         }
                         sheetHeight = maxSheetHeight
                     }

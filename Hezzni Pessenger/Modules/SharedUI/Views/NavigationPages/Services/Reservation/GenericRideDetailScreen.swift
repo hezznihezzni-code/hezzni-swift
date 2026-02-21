@@ -131,7 +131,7 @@ struct GenericRideDetailScreen : View {
     private var filteredServices: [PassengerService] {
         servicesViewModel.services.filter { service in
             let name = service.name.lowercased()
-            return name != "rental car" && name != "reservation"
+            return name != "rental car" && name != "reservation" && name != "taxi"
         }
     }
     
@@ -423,6 +423,8 @@ struct GenericRideDetailScreen : View {
                         }
                     }
                     .padding(.horizontal, 16)
+                    Spacer()
+                        .frame(height: 20)
                 }
             }
             .navigationBarBackButtonHidden(true)

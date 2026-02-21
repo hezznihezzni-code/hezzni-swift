@@ -313,10 +313,47 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 }
 
 // MARK: - Place Suggestion Model
-struct PlaceSuggestion: Identifiable, Equatable {
-    let id = UUID()
+struct PlaceSuggestion: Identifiable, Equatable, Codable {
+    var id = UUID()
     let placeId: String
     let description: String
     let mainText: String
     let secondaryText: String
+    var isFromHistory: Bool = false
+}
+
+// MARK: - Search History Manager
+class SearchHistoryManager {
+    static let shared = SearchHistoryManager()
+    private let historyKey = "searchLocationHistory"
+    
+    func saveSuggestion(_ suggestion: PlaceSuggestion) {
+        var historySuggestion = suggestion
+        historySuggestion.isFromHistory = true
+        
+        var currentHistory = getHistory()
+        // Remove if exists to move it to top
+        currentHistory.removeAll { $0.placeId == suggestion.placeId }
+        currentHistory.insert(historySuggestion, at: 0)
+        // Keep max 10
+        if currentHistory.count > 10 {
+            currentHistory = Array(currentHistory.prefix(10))
+        }
+        
+        if let encoded = try? JSONEncoder().encode(currentHistory) {
+            UserDefaults.standard.set(encoded, forKey: historyKey)
+        }
+    }
+    
+    func getHistory() -> [PlaceSuggestion] {
+        guard let data = UserDefaults.standard.data(forKey: historyKey),
+              let history = try? JSONDecoder().decode([PlaceSuggestion].self, from: data) else {
+            return []
+        }
+        return history
+    }
+    
+    func clearHistory() {
+        UserDefaults.standard.removeObject(forKey: historyKey)
+    }
 }

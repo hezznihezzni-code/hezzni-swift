@@ -16,7 +16,7 @@ struct GoogleMapView: UIViewRepresentable {
     
     func makeUIView(context: Context) -> GMSMapView {
         mapView = GMSMapView.map(withFrame: CGRect.zero, camera: cameraPosition)
-        mapView.isMyLocationEnabled = true
+        mapView.isMyLocationEnabled = false
         mapView.settings.myLocationButton = false  // Already set
         
         // Hide Google logo and other UI elements
@@ -36,6 +36,8 @@ struct GoogleMapView: UIViewRepresentable {
         return mapView
     }
     func updateUIView(_ uiView: GMSMapView, context: Context) {
+        mapView.isMyLocationEnabled = false
+        mapView.settings.myLocationButton = false  
         uiView.animate(to: cameraPosition)
     }
     

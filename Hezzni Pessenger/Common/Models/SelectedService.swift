@@ -41,18 +41,19 @@ struct SelectedService: Equatable, Hashable {
     
     /// Display name for UI (shortened version)
     var displayName: String {
-        switch name.lowercased() {
-        case "car rides":
-            return "Car"
-        case "airport ride":
-            return "Ride to Airport"
-        case "city to city":
-            return "City to City"
-        case "group ride":
-            return "Group Ride"
-        default:
-            return name
-        }
+        return name
+//        switch name.lowercased() {
+//        case "car rides":
+//            return "Car"
+//        case "airport ride":
+//            return "Ride to Airport"
+//        case "city to city":
+//            return "City to City"
+//        case "group ride":
+//            return "Group Ride"
+//        default:
+//            return name
+//        }
     }
     
     /// Default service when nothing is selected

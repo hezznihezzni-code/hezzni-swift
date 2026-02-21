@@ -11,12 +11,15 @@ struct NotificationScreen: View {
     @Binding var showNotification: Bool
     @EnvironmentObject private var navigationState: NavigationStateManager
     @Environment(\.dismiss) private var dismiss
+    var bottomSheetState: BottomSheetState
     
     var body: some View {
         VStack(spacing: 0) {
             CustomAppBar(
                 title: "Notifications", backButtonAction: {
-                    navigationState.showBottomBar()
+                    if bottomSheetState == .initial{
+                        navigationState.showBottomBar()
+                    }
                     showNotification = !showNotification
                     
                 }
@@ -212,5 +215,5 @@ struct NotificationItem: View {
 }
 
 #Preview{
-    NotificationScreen(showNotification: .constant(true))
+    NotificationScreen(showNotification: .constant(true), bottomSheetState: .initial)
 }
