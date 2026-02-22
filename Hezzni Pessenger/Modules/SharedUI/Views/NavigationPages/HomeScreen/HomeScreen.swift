@@ -99,8 +99,6 @@ struct HomeScreen: View {
     // Country picker presentation (full-screen overlay)
     @State private var showCountryPicker: Bool = false
     @State private var selectedCountryForDelivery: Country = .morocco
-    
-    @State var selectedRideInformation: CalculateRidePriceResponse.RideOption //
 
     // Filtered services (excluding Rental Car and Reservation)
     private var filteredServices: [PassengerService] {
@@ -146,21 +144,6 @@ struct HomeScreen: View {
         // Default to Marrakech, Morocco
         let defaultLocation = CLLocationCoordinate2D(latitude: 31.6295, longitude: -7.9811)
         _cameraPosition = State(initialValue: GMSCameraPosition.camera(withTarget: defaultLocation, zoom: 14))
-        // Line 136, inside HomeScreen.init
-        _selectedRideInformation = State(initialValue: CalculateRidePriceResponse.RideOption(
-            id: 0,
-            text_id: "standard",
-            icon: "",
-            title: "Standard",
-            subtitle: "",
-            seats: 4,
-            timeEstimate: "10 min",
-            ridePreference: "Standard",           // <-- Add this
-            ridePreferenceKey: "STANDARD",        // <-- Add this
-            description: "Standard ride option", // <-- Add this
-            price: 100,
-            
-        ))
     }
     
     
@@ -776,7 +759,7 @@ struct HomeScreen: View {
             destination: destinationLocation,
             bottomSheetState: $bottomSheetState,
             rideOptions: rideOptions,
-            selectedRideOption: $selectedRideInformation,
+            selectedRideOption: $selectedRideOption,
             namespace: animations,
             appliedCoupon: $appliedCoupon,
             selectedService: $selectedService,
@@ -870,6 +853,7 @@ struct HomeScreen: View {
                     backButtonAction: {
                         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                             bottomSheetState = .rideSummary
+                            
                             sheetHeight = midSheetHeight
                         }
                     }
@@ -882,7 +866,11 @@ struct HomeScreen: View {
                     weight: .medium,
                     backButtonAction: {
                         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                            bottomSheetState = .reservation
+                            if isNowSelected {
+                                bottomSheetState = .nowRide
+                            } else {
+                                bottomSheetState = .reservation
+                            }
                             sheetHeight = maxSheetHeight
                         }
                     }
@@ -922,9 +910,9 @@ struct HomeScreen: View {
                 rideSummaryView
                     .transition(.move(edge: .trailing).combined(with: .opacity))
             }
-            else if bottomSheetState == .payment{
+            else if bottomSheetState == .payment, let rideOption = selectedRideOption {
                 RidePaymentScreen(
-                    rideInfo: selectedRideInformation,
+                    rideInfo: rideOption,
                     selectedService: $selectedService,
                     bottomSheetState: $bottomSheetState,
                     namespace: animations,
@@ -934,9 +922,10 @@ struct HomeScreen: View {
                 )
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
-            else if bottomSheetState == .orderSummary {
+            else if bottomSheetState == .orderSummary, let rideOption = selectedRideOption {
                 PaymentConfirmationScreen(
-                    rideInfo: selectedRideInformation,
+                    rideInfo: rideOption,
+                    selectedService: selectedService,
                     pickupLocation: pickupLocation,
                     destinationLocation: destinationLocation,
                     isReservation: !isNowSelected,
@@ -952,14 +941,14 @@ struct HomeScreen: View {
                 )
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
-            else if bottomSheetState == .findingRide {
+            else if bottomSheetState == .findingRide, let rideOption = selectedRideOption {
                 FindingRideScreen(
-                    rideInfo: selectedRideInformation,
+                    rideInfo: rideOption,
                     bottomSheetState: $bottomSheetState,
                     namespace: animations,
                     sheetHeight: $sheetHeight,
                     isReservation: !isNowSelected,
-                    vehicle: selectedRideInformation,
+                    vehicle: rideOption,
                     pickupLocation: pickupLocation,
                     destinationLocation: destinationLocation,
                     pickupDate: selectedDate,
@@ -974,8 +963,8 @@ struct HomeScreen: View {
                     dropoffLatitude: destinationLatitude,
                     dropoffLongitude: destinationLongitude,
                     serviceTypeId: selectedService.id,
-                    selectedRideOptionId: selectedRideOption?.id ?? 1,
-                    estimatedPrice: selectedRideOption?.price ?? 0,
+                    selectedRideOptionId: rideOption.id,
+                    estimatedPrice: rideOption.price,
                     couponId: appliedCoupon?.couponId
                 )
                 .transition(.move(edge: .trailing).combined(with: .opacity))
@@ -1161,7 +1150,7 @@ struct HomeScreen: View {
     
     // MARK: - Ride Options View (Shows after API returns ride options)
     private var rideOptionsView: some View {
-        ScrollView {
+        ScrollView (showsIndicators: false){
             VStack(spacing: 16) {
                 // Distance and Time Info
                 HStack(spacing: 16) {
@@ -1224,7 +1213,7 @@ struct HomeScreen: View {
     }
     
     private var locationSelectionContent: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             VStack(spacing: 10) {
                 if bottomSheetState == .initial {
                     NowReservationToggleButton(isNowSelected: $isNowSelected)

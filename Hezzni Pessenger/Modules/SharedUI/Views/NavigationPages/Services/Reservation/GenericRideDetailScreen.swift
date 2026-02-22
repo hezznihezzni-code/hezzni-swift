@@ -89,7 +89,7 @@ struct GenericRideDetailScreen : View {
     var destination: String
     @Binding var bottomSheetState: BottomSheetState
     var rideOptions: [CalculateRidePriceResponse.RideOption] = []
-    @Binding var selectedRideOption: CalculateRidePriceResponse.RideOption
+    @Binding var selectedRideOption: CalculateRidePriceResponse.RideOption?
     var namespace: Namespace.ID?
     @State private var selectedOption: String? = "standard"
     @State var couponField: String = ""
@@ -99,7 +99,7 @@ struct GenericRideDetailScreen : View {
     @State private var isValidatingCoupon: Bool = false
     @Binding var selectedService: SelectedService
     @Binding var showSchedulePicker: Bool
-    @Binding var selectedDate: Date  // Changed from @State to @Binding
+    @Binding var selectedDate: Date 
     
     //------Delivery fields---------//
     @State private var reciverName: String = ""
@@ -165,8 +165,8 @@ struct GenericRideDetailScreen : View {
         let couponCode = couponField.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !couponCode.isEmpty else { return }
         
-        // Get the current price from selectedRideInformation
-        let currentPrice = selectedRideOption.price
+        // Get the current price from selectedRideOption
+        let currentPrice = selectedRideOption?.price ?? 0
         
         isValidatingCoupon = true
         showCouponError = false
@@ -253,7 +253,7 @@ struct GenericRideDetailScreen : View {
     var body: some View {
         ZStack {
             VStack{
-                ScrollView {
+                ScrollView(showsIndicators: false) {
                     ZStack {
                         VStack(spacing: 16){
                             HStack{
@@ -431,6 +431,11 @@ struct GenericRideDetailScreen : View {
             .onAppear {
                 Task {
                     await servicesViewModel.loadServices()
+                }
+                // Default to first service if no ride option is selected
+                if selectedRideOption == nil, let first = options.first {
+                    selectedRideOption = first
+                    selectedOption = first.text_id
                 }
             }
             .onChange(of: selectedCountry) {
@@ -685,20 +690,7 @@ struct GenericRideDetailScreen : View {
         pickup: "pickupLocation",
         destination: "destinationLocation",
         bottomSheetState: .constant(.reservation),
-        selectedRideOption: .constant(CalculateRidePriceResponse.RideOption(
-            id: 0,
-            text_id: "standard",
-            icon: "",
-            title: "Standard",
-            subtitle: "",
-            seats: 4,
-            timeEstimate: "10 min",
-            ridePreference: "Standard",           // <-- Added
-            ridePreferenceKey: "STANDARD",        // <-- Added
-            description: "Standard ride option",   // <-- Added
-            price: 100,
-            
-        )),
+        selectedRideOption: .constant(nil),
         appliedCoupon: .constant(nil),
         selectedService: .constant(SelectedService(id: 1, name: "Group Ride")),
         showSchedulePicker: .constant(false),

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PaymentConfirmationScreen: View {
     var rideInfo: CalculateRidePriceResponse.RideOption
+    var selectedService: SelectedService
     var pickupLocation: String
     var destinationLocation: String
     var isReservation: Bool
@@ -34,7 +35,7 @@ struct PaymentConfirmationScreen: View {
                 Spacer()
             }
             HStack(spacing: 4) {
-                Text(rideInfo.ridePreference)
+                Text(selectedService.displayName.uppercased())
                     .font(Font.custom("Poppins", size: 11).weight(.medium))
                     .foregroundColor(.white)
             }
@@ -179,7 +180,7 @@ struct PaymentConfirmationScreen: View {
     // MARK: - Body
     
     var body: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             VStack(alignment: .trailing, spacing: 20) {
                 Spacer().frame(height: 15)
                 tripDetailsCard

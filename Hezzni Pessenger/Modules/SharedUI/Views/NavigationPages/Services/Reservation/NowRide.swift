@@ -423,7 +423,7 @@ struct TripSummaryView: View {
 }
 struct VehicleSubOptionsView: View {
     @Binding var selectedOption: String?
-    @Binding var rideInfo: CalculateRidePriceResponse.RideOption
+    @Binding var rideInfo: CalculateRidePriceResponse.RideOption?
     let options: [CalculateRidePriceResponse.RideOption]
     
     var body: some View {

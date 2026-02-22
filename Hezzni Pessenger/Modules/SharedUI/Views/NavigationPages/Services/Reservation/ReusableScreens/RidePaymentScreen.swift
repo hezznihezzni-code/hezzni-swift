@@ -159,7 +159,7 @@ struct RidePaymentScreen: View {
     var body: some View {
         ZStack{
             VStack{
-                ScrollView{
+                ScrollView(showsIndicators: false){
                     VStack(spacing: 15) {
                         VStack(alignment: .leading, spacing: 24) {
                             RideOptionCard(
