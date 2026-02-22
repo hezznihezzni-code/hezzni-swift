@@ -1421,7 +1421,7 @@ struct HomeScreen: View {
                                 
                                 ForEach(locationHistory) { historyItem in
                                     Button(action: {
-                                        handlePlaceSuggestionSelection(historyItem)
+                                        handleRecentPlaceSelection(historyItem)
                                     }) {
                                         HStack(spacing: 12) {
                                             Image("history-icon")
@@ -1642,6 +1642,39 @@ struct HomeScreen: View {
                         proceedToPayment()
                     }
                 }
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
+        }
+    }
+
+    private func handleRecentPlaceSelection(_ suggestion: PlaceSuggestion) {
+        // Save to history immediately (moves selected item to top)
+        SearchHistoryManager.shared.saveSuggestion(suggestion)
+
+        isLoadingSuggestions = true
+
+        locationManager.fetchPlaceDetails(placeId: suggestion.placeId) { coordinate, address in
+            DispatchQueue.main.async {
+                isLoadingSuggestions = false
+
+                let locationName = address ?? suggestion.mainText
+
+                // Recent place tap should always target destination
+                destinationLocation = locationName
+                if let coordinate = coordinate {
+                    destinationLatitude = coordinate.latitude
+                    destinationLongitude = coordinate.longitude
+                }
+
+                placeSuggestions = []
+                showSuggestions = false
+                isEditingPickup = false
+                isEditingDestination = false
+                searchText = ""
+
+                // Move directly to ride summary details flow
+                proceedToPayment()
+
                 UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
             }
         }
